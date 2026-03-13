@@ -46,11 +46,11 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          <MainPage />
-        </LayoutWrapper>
-      } />
+      <Route path="/" element={<Navigate to="/Home" replace />} />
+      <Route path="/Home" element={<AppLayout><Home /></AppLayout>} />
+      <Route path="/Projects" element={<AppLayout><Projects /></AppLayout>} />
+      <Route path="/Audits" element={<AppLayout><Audits /></AppLayout>} />
+      <Route path="/Admin" element={<AppLayout><Admin /></AppLayout>} />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}
@@ -62,7 +62,6 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
-      <Route path="/Admin" element={<LayoutWrapper currentPageName="Admin"><Admin /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
