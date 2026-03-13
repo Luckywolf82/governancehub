@@ -1,7 +1,7 @@
 /*
 PRODUCT INTELLIGENCE AUDIT — Starter Kit Adaptation
-Adapted from TankRadar product intelligence audit observed in:
-src/components/audits/product/product-intelligence-audit-2026-03-12.jsx
+Canonical location: src/components/audits/product/product-intelligence-audit-2026-03-12.jsx
+Originally adapted from a TankRadar-style product intelligence model for GovernanceHub starter kit use.
 
 Purpose:
 - Carry over the TankRadar-style product scoring model into GovernanceHub starter kit
