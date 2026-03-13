@@ -1,52 +1,87 @@
+import { Link } from "react-router-dom";
+import { FolderKanban, ClipboardList, Shield, ArrowRight } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+
+const FEATURES = [
+  {
+    icon: FolderKanban,
+    label: "Projects",
+    desc: "Track active and planned development initiatives across your organization.",
+    href: "/Projects",
+    color: "text-blue-600",
+  },
+  {
+    icon: ClipboardList,
+    label: "Audits",
+    desc: "Maintain compliance and quality audit records with clear status tracking.",
+    href: "/Audits",
+    color: "text-teal-600",
+  },
+  {
+    icon: Shield,
+    label: "Admin",
+    desc: "Manage users, roles, and system configuration from a central dashboard.",
+    href: "/Admin",
+    color: "text-slate-700",
+  },
+];
+
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-24 gap-6">
-        <h1 className="text-5xl font-bold tracking-tight">GovernanceHub</h1>
-        <p className="text-xl text-slate-500 font-medium">Governance tools and development workflows</p>
-        <p className="max-w-xl text-slate-600 leading-relaxed">
+    <div className="max-w-5xl mx-auto px-4 py-16 space-y-16">
+      {/* Hero */}
+      <section className="text-center space-y-4">
+        <h1 className="text-4xl font-bold tracking-tight text-slate-900">GovernanceHub</h1>
+        <p className="text-lg text-slate-500 max-w-xl mx-auto">
           A centralized platform for managing governance processes, tracking audits,
           and maintaining visibility across your development lifecycle.
         </p>
-        <div className="flex gap-4 mt-2">
-          <a
-            href="/governance"
-            className="inline-flex items-center justify-center rounded-md bg-slate-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
+        <div className="flex justify-center gap-3 pt-2">
+          <Link
+            to="/Projects"
+            className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
           >
-            View Governance
-          </a>
-          <a
-            href="/docs"
-            className="inline-flex items-center justify-center rounded-md border border-slate-300 px-6 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-50 transition-colors"
+            View Projects <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            to="/Audits"
+            className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
           >
-            Documentation
-          </a>
+            View Audits
+          </Link>
         </div>
       </section>
 
-      {/* Info Section */}
-      <section className="flex flex-col items-center px-6 py-16 bg-slate-50">
-        <div className="max-w-2xl w-full">
-          <h2 className="text-2xl font-semibold mb-4 text-center">What GovernanceHub manages</h2>
-          <p className="text-slate-600 text-center leading-relaxed mb-8">
-            GovernanceHub brings structure to complex development environments by consolidating
-            the tools and records your team needs in one place.
-          </p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { label: "Governance Workflows", desc: "Define and enforce policies across your organization." },
-              { label: "Audits", desc: "Track and review compliance and quality audits." },
-              { label: "Execution Logs", desc: "Maintain a full history of process executions." },
-              { label: "Development Processes", desc: "Align engineering workflows with governance standards." },
-            ].map(({ label, desc }) => (
-              <li key={label} className="rounded-lg border border-slate-200 bg-white p-5">
-                <p className="font-semibold text-slate-800 mb-1">{label}</p>
-                <p className="text-sm text-slate-500">{desc}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Feature cards */}
+      <section className="grid gap-4 sm:grid-cols-3">
+        {FEATURES.map(({ icon: Icon, label, desc, href, color }) => (
+          <Link key={href} to={href}>
+            <Card className="h-full border-slate-200 bg-white hover:shadow-md transition-shadow">
+              <CardContent className="p-6 space-y-3">
+                <Icon className={`w-6 h-6 ${color}`} />
+                <div>
+                  <p className="font-semibold text-slate-800">{label}</p>
+                  <p className="text-sm text-slate-500 mt-1">{desc}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </section>
+
+      {/* Status strip */}
+      <section className="border border-slate-200 rounded-lg bg-white px-6 py-4 flex flex-wrap gap-6 justify-center text-sm text-slate-600">
+        {[
+          { label: "Active Projects", value: "3" },
+          { label: "Audits Completed", value: "3" },
+          { label: "Planned Items", value: "4" },
+          { label: "Platform", value: "Base44" },
+        ].map(({ label, value }) => (
+          <div key={label} className="text-center">
+            <div className="text-xl font-bold text-slate-900">{value}</div>
+            <div className="text-xs text-slate-500">{label}</div>
+          </div>
+        ))}
       </section>
     </div>
   );
