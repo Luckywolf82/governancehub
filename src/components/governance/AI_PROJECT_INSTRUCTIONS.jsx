@@ -21,11 +21,13 @@ Never answer from memory, cached summaries, reposnapshot, or prior chat context.
 Always read live repository files before reporting repository state.
 
 MANUAL REPOSITORY VERIFICATION PROTOCOL
-1. Read src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx
-2. Read src/components/governance/PhaseExecutionLog.jsx
-3. Read src/components/audits/AUDIT_INDEX.jsx
-4. Read src/components/audits/AUDIT_SYSTEM_GUIDE.jsx
-5. Confirm GitHub visibility of all changed files before marking any task complete
+If the AI cannot directly access the repository filesystem:
+
+1. The AI must explicitly request the exact file needed for verification
+2. The user may provide the exact GitHub file URL
+3. The AI must base its verification strictly on the contents of that file
+4. The AI must not assume repository state without reading the active file
+5. Changed files must be confirmed visible in GitHub before any task is marked complete
 
 RULE: REPOSITORY QUESTIONS
 When the user asks about repository structure, file contents, or current state:
@@ -49,7 +51,7 @@ MULTI-PROJECT GOVERNANCE
 - Project identity must be confirmed at the start of every governance session
 - Cross-project actions require explicit identification of each affected project
 - Audits and tasks created without a project reference are invalid
-
+All audits, tasks, and execution logs must include a project reference such as projectId and projectSlug.
 ---
 
 AUDIT SYSTEM
