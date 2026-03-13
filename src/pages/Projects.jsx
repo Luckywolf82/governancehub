@@ -1,49 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FolderKanban } from "lucide-react";
+import { PROJECT_REGISTRY } from "@/components/projects/PROJECT_REGISTRY";
 
-const PROJECTS = [
-  {
-    id: 1,
-    name: "GovernanceHub Core",
-    description: "Core platform infrastructure, routing, and authentication.",
-    status: "active",
-    phase: "Phase 1",
-    owner: "Platform Team",
-  },
-  {
-    id: 2,
-    name: "Audit Trail System",
-    description: "Structured audit logging and compliance reporting for all governance actions.",
-    status: "in-progress",
-    phase: "Phase 2",
-    owner: "Compliance Team",
-  },
-  {
-    id: 3,
-    name: "Admin Dashboard",
-    description: "Administrative panel for managing users, roles, and system configuration.",
-    status: "in-progress",
-    phase: "Phase 1",
-    owner: "Platform Team",
-  },
-  {
-    id: 4,
-    name: "Policy Management",
-    description: "Define, publish, and enforce organizational policies across teams.",
-    status: "planned",
-    phase: "Phase 3",
-    owner: "Governance Team",
-  },
-  {
-    id: 5,
-    name: "Execution Logs",
-    description: "Full history of process executions with filtering and export.",
-    status: "planned",
-    phase: "Phase 3",
-    owner: "Platform Team",
-  },
-];
+const PROJECTS = PROJECT_REGISTRY.entries;
 
 const STATUS_STYLES = {
   active: "bg-green-100 text-green-800",

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { FolderKanban, ClipboardList, Shield, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
+import { PROJECT_REGISTRY } from "@/components/projects/PROJECT_REGISTRY";
 
 const FEATURES = [
   {
