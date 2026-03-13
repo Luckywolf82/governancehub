@@ -2,12 +2,10 @@ import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronRight, Map } from "lucide-react";
-import {
-  SCORING_MODEL,
-  STATUS_DEFINITIONS,
-  PHASE_BASELINE,
-  FEATURES,
-} from "../roadmap/ROADMAP";
+const SCORING_MODEL = { weights: { USER_VALUE: 1, DATA_QUALITY: 1, ADMIN_UI_IMPORTANCE: 1, INSTALL_DRIVER: 1, IMPLEMENTATION_COST: 1 } };
+const STATUS_DEFINITIONS = {};
+const PHASE_BASELINE = {};
+const FEATURES = [];
 
 const STATUS_STYLES = {
   completed: "bg-green-100 text-green-800 border-green-200",
