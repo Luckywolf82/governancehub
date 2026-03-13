@@ -81,9 +81,9 @@ export default function Home() {
       {/* Status strip */}
       <section className="border border-slate-200 rounded-lg bg-white px-6 py-4 flex flex-wrap gap-6 justify-center text-sm text-slate-600">
         {[
-          { label: "Active Projects", value: "3" },
-          { label: "Audits Completed", value: "3" },
-          { label: "Planned Items", value: "4" },
+          { label: "Active Projects", value: activeProjects },
+          { label: "Audits Completed", value: completedAudits },
+          { label: "Planned Items", value: plannedItems },
           { label: "Platform", value: "Base44" },
         ].map(({ label, value }) => (
           <div key={label} className="text-center">
