@@ -28,7 +28,14 @@ const FEATURES = [
   },
 ];
 
+const projects = PROJECT_REGISTRY.entries;
+const audits = AUDIT_INDEX.entries;
+
 export default function Home() {
+  const activeProjects = projects.filter(p => p.status === "active" || p.status === "in-progress").length;
+  const completedAudits = audits.filter(a => a.status === "completed").length;
+  const plannedItems = projects.filter(p => p.status === "planned").length + audits.filter(a => a.status === "planned").length;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-16 space-y-16">
       {/* Hero */}
