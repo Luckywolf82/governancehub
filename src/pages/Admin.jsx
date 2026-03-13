@@ -1,115 +1,213 @@
-import { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Users, FileText, Activity, Lock } from "lucide-react";
+import { ChevronDown, ChevronRight, Map } from "lucide-react";
+import {
+  SCORING_MODEL,
+  STATUS_DEFINITIONS,
+  PHASE_BASELINE,
+  FEATURES,
+} from "../roadmap/ROADMAP";
 
-export default function Admin() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const STATUS_STYLES = {
+  completed: "bg-green-100 text-green-800 border-green-200",
+  active: "bg-blue-100 text-blue-800 border-blue-200",
+  "build-ready": "bg-emerald-100 text-emerald-800 border-emerald-200",
+  "scoping-required": "bg-amber-100 text-amber-800 border-amber-200",
+  planned: "bg-slate-100 text-slate-700 border-slate-200",
+  dependent: "bg-purple-100 text-purple-800 border-purple-200",
+  blocked: "bg-red-100 text-red-800 border-red-200",
+  partial: "bg-orange-100 text-orange-800 border-orange-200",
+  deferred: "bg-slate-100 text-slate-500 border-slate-200",
+};
 
-  useEffect(() => {
-    base44.auth.me().then(setUser).finally(() => setLoading(false));
-  }, []);
+function StatusBadge({ status }) {
+  const cls = STATUS_STYLES[status] || "bg-slate-100 text-slate-600 border-slate-200";
+  return <Badge variant="outline" className={cls}>{status}</Badge>;
+}
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
-      </div>
-    );
-  }
+function SummaryCard({ label, count }) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="text-2xl font-semibold">{count}</div>
+        <div className="text-sm text-muted-foreground">{label}</div>
+      </CardContent>
+    </Card>
+  );
+}
 
-  if (!user || user.role !== "admin") {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <Lock className="w-12 h-12 text-slate-400" />
-        <h2 className="text-xl font-semibold text-slate-700">Tilgang nektet</h2>
-        <p className="text-slate-500">Denne siden krever admin-tilgang.</p>
-      </div>
-    );
-  }
+function FeatureRow({ feature }) {
+  const [open, setOpen] = useState(false);
+
+  const hasExtra =
+    (feature.dependencies?.length || 0) > 0 ||
+    (feature.blockers?.length || 0) > 0 ||
+    Boolean(feature.immediateAction) ||
+    Boolean(feature.note) ||
+    Boolean(feature.northStarNote) ||
+    Boolean(feature.scopingRequired);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Shield className="w-7 h-7 text-slate-700" />
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Admin-panel</h1>
-            <p className="text-sm text-slate-500">GovernanceHub administrasjon</p>
+    <Card className="border-slate-200">
+      <CardContent className="p-4">
+        <button
+          type="button"
+          onClick={() => hasExtra && setOpen((prev) => !prev)}
+          className="w-full text-left"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="font-medium">{feature.title}</div>
+                <StatusBadge status={feature.status} />
+                <Badge variant="secondary">{feature.category}</Badge>
+              </div>
+              <div className="text-sm text-muted-foreground">{feature.description}</div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              {feature.displayScore != null && (
+                <Badge variant="outline">{feature.displayScore}/25</Badge>
+              )}
+              {feature.stabilityAdjustedScore != null && (
+                <Badge variant="outline">adj {feature.stabilityAdjustedScore}</Badge>
+              )}
+              {hasExtra ? (open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />) : null}
+            </div>
           </div>
+        </button>
+
+        {open && hasExtra && (
+          <div className="mt-4 space-y-2 text-sm text-slate-700">
+            <div><span className="font-medium">id:</span> {feature.id}</div>
+            {feature.immediateAction && (
+              <div><span className="font-medium">Action:</span> {feature.immediateAction}</div>
+            )}
+            {feature.scopingRequired && (
+              <div><span className="font-medium">Scoping required:</span> {feature.scopingRequired}</div>
+            )}
+            {feature.dependencies?.length > 0 && (
+              <div><span className="font-medium">Dependencies:</span> {feature.dependencies.join(", ")}</div>
+            )}
+            {feature.blockers?.length > 0 && (
+              <div><span className="font-medium">Blockers:</span> {feature.blockers.join(" · ")}</div>
+            )}
+            {(feature.note || feature.buildNote) && (
+              <div>{feature.note || feature.buildNote}</div>
+            )}
+            {feature.northStarNote && (
+              <div>⭐ {feature.northStarNote}</div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+const PHASE_ORDER = [1, 2, 3, 4, 5, 6];
+
+function PhaseSection({ phaseNum, phaseMeta, features }) {
+  const sorted = [...features].sort((a, b) => (b.displayScore ?? 0) - (a.displayScore ?? 0));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          Phase {phaseNum} · {phaseMeta.title}
+        </CardTitle>
+        <div className="text-sm text-muted-foreground">{phaseMeta.theme}</div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {sorted.length === 0 ? (
+          <div className="text-sm text-muted-foreground">Ingen features i denne fasen.</div>
+        ) : (
+          sorted.map((feature) => <FeatureRow key={feature.id} feature={feature} />)
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function RoadmapAdminPanel() {
+  const total = FEATURES.length;
+
+  const counts = useMemo(() => {
+    const count = (status) => FEATURES.filter((feature) => feature.status === status).length;
+    return {
+      completed: count("completed"),
+      active: count("active"),
+      buildReady: count("build-ready"),
+      scoping: count("scoping-required"),
+      blocked: count("blocked"),
+    };
+  }, []);
+
+  return (
+    <Card className="col-span-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Map className="h-5 w-5" />
+          Produkt-roadmap
+        </CardTitle>
+        <div className="text-sm text-muted-foreground">
+          Read-only · Kilde: ROADMAP.jsx
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        <div className="grid gap-3 md:grid-cols-5">
+          <SummaryCard label="Totale features" count={total} />
+          <SummaryCard label="Completed" count={counts.completed} />
+          <SummaryCard label="Active" count={counts.active} />
+          <SummaryCard label="Build-ready" count={counts.buildReady} />
+          <SummaryCard label="Scoping-required" count={counts.scoping} />
         </div>
 
-        {/* Session info */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Users className="w-4 h-4" /> Innlogget bruker
-            </CardTitle>
+            <CardTitle>Status-definisjoner</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-1 text-sm text-slate-700">
-            <div><span className="font-medium">Navn:</span> {user.full_name}</div>
-            <div><span className="font-medium">E-post:</span> {user.email}</div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium">Rolle:</span>
-              <Badge className="bg-slate-900 text-white text-xs">{user.role}</Badge>
-            </div>
+          <CardContent className="space-y-3">
+            {Object.entries(STATUS_DEFINITIONS).map(([status, definition]) => (
+              <div key={status} className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={status} />
+                </div>
+                {Array.isArray(definition) ? (
+                  <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                    {definition.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                ) : (
+                  <div className="text-sm text-muted-foreground">{definition}</div>
+                )}
+              </div>
+            ))}
           </CardContent>
         </Card>
 
-        {/* Quick links */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[
-            {
-              icon: <FileText className="w-5 h-5 text-blue-600" />,
-              title: "Dokumentasjon",
-              desc: "Governance-dokumenter og guider",
-              href: "/docs",
-            },
-            {
-              icon: <Activity className="w-5 h-5 text-green-600" />,
-              title: "Governance",
-              desc: "Oversikt over governance-prosesser",
-              href: "/governance",
-            },
-          ].map(({ icon, title, desc, href }) => (
-            <a key={title} href={href}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                <CardContent className="p-5 flex items-start gap-4">
-                  <div className="mt-0.5">{icon}</div>
-                  <div>
-                    <p className="font-semibold text-slate-800">{title}</p>
-                    <p className="text-sm text-slate-500">{desc}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </a>
-          ))}
+        <div className="space-y-4">
+          {PHASE_ORDER.map((phaseNum) => {
+            const phaseMeta = PHASE_BASELINE[`phase${phaseNum}`];
+            const phaseFeatures = FEATURES.filter((feature) => feature.phase === phaseNum);
+            return (
+              <PhaseSection
+                key={phaseNum}
+                phaseNum={phaseNum}
+                phaseMeta={phaseMeta}
+                features={phaseFeatures}
+              />
+            );
+          })}
         </div>
 
-        {/* System info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Systeminformasjon</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-slate-600 space-y-2">
-            <div className="flex justify-between">
-              <span>Plattform</span>
-              <span className="font-medium text-slate-800">Base44</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Appnavn</span>
-              <span className="font-medium text-slate-800">GovernanceHub</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Dato</span>
-              <span className="font-medium text-slate-800">{new Date().toLocaleDateString("nb-NO")}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+        <div className="text-xs text-muted-foreground">
+          Scoring model: USER_VALUE ×{SCORING_MODEL.weights.USER_VALUE} · DATA_QUALITY ×{SCORING_MODEL.weights.DATA_QUALITY} ·
+          ADMIN_UI ×{SCORING_MODEL.weights.ADMIN_UI_IMPORTANCE} · INSTALL_DRIVER ×{SCORING_MODEL.weights.INSTALL_DRIVER} ·
+          IMPL_COST ×{SCORING_MODEL.weights.IMPLEMENTATION_COST}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
