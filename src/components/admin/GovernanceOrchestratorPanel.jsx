@@ -228,7 +228,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
   // Auto-check GitHub PR status when audit or repo selection changes
   useEffect(() => {
-    if (!audit || !ghOwner.trim() || !ghRepo.trim()) {
+    if (!audit || !effectiveOwner.trim() || !effectiveRepo.trim()) {
       setPrStatus(null);
       return;
     }
@@ -237,8 +237,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       setCheckingPrStatus(true);
       try {
         const res = await base44.functions.invoke('getGithubPrForAudit', {
-          owner: ghOwner.trim(),
-          repo: ghRepo.trim(),
+          owner: effectiveOwner.trim(),
+          repo: effectiveRepo.trim(),
           auditId: audit.id,
         });
         if (res.data) {
@@ -255,7 +255,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     // Debounce by 500ms to avoid excessive API calls
     const timeoutId = setTimeout(checkPrStatus, 500);
     return () => clearTimeout(timeoutId);
-  }, [audit, ghOwner, ghRepo]);
+  }, [audit, effectiveOwner, effectiveRepo]);
 
   function handleEnrich(name, val) {
     setEnrichment((prev) => ({ ...prev, [name]: val }));
