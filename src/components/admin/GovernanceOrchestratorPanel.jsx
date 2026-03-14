@@ -323,7 +323,13 @@ export default function GovernanceOrchestratorPanel() {
               </div>
             )}
             <p className="text-slate-600"><span className="font-medium">Constraints:</span> {recommendedStep.constraints}</p>
-            <p className="text-slate-600"><span className="font-medium">Akseptansekriterier:</span> {recommendedStep.acceptanceCriteria}</p>
+            <div className="text-slate-600">
+              <span className="font-medium">Akseptansekriterier: </span>
+              {recommendedStep.acceptanceCriteriaMissing
+                ? <span className="text-amber-600 italic flex items-center gap-1 inline-flex"><AlertTriangle className="w-3 h-3" /> Ikke spesifisert i audit — krever manuell definisjon før implementering.</span>
+                : recommendedStep.acceptanceCriteria
+              }
+            </div>
             {recommendedStep.lockedWarning && (
               <div className="bg-red-50 border border-red-200 rounded p-2 text-red-700">
                 <p className="font-medium flex items-center gap-1 mb-1"><Lock className="w-3 h-3" /> Låste filer involvert:</p>
