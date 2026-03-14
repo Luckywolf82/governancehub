@@ -114,6 +114,12 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [confirmedFiles, setConfirmedFiles] = useState("");
   const [actualChangeSummary, setActualChangeSummary] = useState("");
 
+  // ── GitHub Issue Create state ──────────────────────────────────────────────
+  const [ghOwner, setGhOwner] = useState("");
+  const [ghRepo, setGhRepo] = useState("");
+  const [showCreateConfirm, setShowCreateConfirm] = useState(false);
+  const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
+
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
   const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? null);
