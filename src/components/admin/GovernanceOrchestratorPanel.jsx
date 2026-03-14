@@ -430,7 +430,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
           ) : (
             <select
               value={selectedId}
-              onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); }}
+              onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setShowLogAssistant(false); }}
               className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
             >
               <option value="">— Velg en audit fra indeksen —</option>
