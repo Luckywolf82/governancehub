@@ -133,7 +133,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
-  const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? null);
+  const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
 
   // Merge audit index data with manual enrichment; track which fields came from enrichment
   const { audit, enrichedFields } = useMemo(() => {
