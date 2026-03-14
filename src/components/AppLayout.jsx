@@ -24,32 +24,37 @@ export default function AppLayout({ children }) {
           </Link>
           
           {/* Global Active Repo Selector */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md">
-            <GitBranch className="w-4 h-4 text-slate-500" />
-            <select
-              value={activeRepo?.id || ""}
-              onChange={(e) => {
-                if (e.target.value === "") {
-                  clearActiveRepo();
-                } else {
-                  const repo = repos.find((r) => r.id === e.target.value);
-                  if (repo) selectRepo(repo);
-                }
-              }}
-              disabled={repos.length === 0}
-              className="text-xs font-medium text-slate-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <option value="">Velg repo</option>
-              {repos.length === 0 ? (
-                <option disabled value="">Ingen aktive repo</option>
-              ) : (
-                repos.map((repo) => (
-                  <option key={repo.id} value={repo.id}>
-                    {repo.owner}/{repo.repo}
-                  </option>
-                ))
-              )}
-            </select>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-slate-500">Aktivt repo</label>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md">
+              <GitBranch className="w-4 h-4 text-slate-500" />
+              <select
+                value={activeRepo?.id || ""}
+                onChange={(e) => {
+                  if (e.target.value === "") {
+                    clearActiveRepo();
+                  } else {
+                    const repo = repos.find((r) => r.id === e.target.value);
+                    if (repo) selectRepo(repo);
+                  }
+                }}
+                disabled={repos.length === 0}
+                className="text-xs font-medium text-slate-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {repos.length === 0 ? (
+                  <option value="">Ingen aktive repo</option>
+                ) : (
+                  <>
+                    <option value="">Velg repo</option>
+                    {repos.map((repo) => (
+                      <option key={repo.id} value={repo.id}>
+                        {repo.owner}/{repo.repo}
+                      </option>
+                    ))}
+                  </>
+                )}
+              </select>
+            </div>
           </div>
 
           <nav className="flex items-center gap-1">
