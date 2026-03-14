@@ -76,7 +76,12 @@ export default function Admin() {
 
         {/* Tab: Operations */}
         {tab === "Operations" && (
-          <GovernanceOrchestratorPanel />
+          <div className="space-y-6">
+            <GovernanceOrchestratorPanel />
+            <div className="border-t border-slate-200 pt-4">
+              <AuditRunnerPanel />
+            </div>
+          </div>
         )}
 
         {/* Tab: Repo Tools */}
