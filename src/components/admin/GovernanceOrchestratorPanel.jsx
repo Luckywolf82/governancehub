@@ -224,7 +224,7 @@ export default function GovernanceOrchestratorPanel() {
       `Scope: ${recommendedStep.scope}`,
       `Affected Files:\n${recommendedStep.affectedFiles.map((f) => `  - ${f}`).join("\n") || "  (none specified)"}`,
       `Constraints: ${recommendedStep.constraints}`,
-      `Acceptance Criteria: ${recommendedStep.acceptanceCriteria}`,
+      `Acceptance Criteria: ${recommendedStep.acceptanceCriteriaMissing ? "Missing — manual definition required before implementation" : recommendedStep.acceptanceCriteria}`,
       recommendedStep.lockedWarning ? `\nLocked File Caution:\n${recommendedStep.lockedWarning}` : "",
     ].filter(Boolean).join("\n");
   }, [recommendedStep]);
