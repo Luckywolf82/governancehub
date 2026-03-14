@@ -273,69 +273,17 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // ── Execution Log Draft ────────────────────────────────────────────────────
 
   const logDraft = useMemo(() => {
-    if (!audit) return null;
-    const today = new Date().toISOString().slice(0, 10);
-    const source = isInjected ? "Audit Runner" : "AUDIT_INDEX";
-    const expectedFiles = Array.isArray(audit.affectedFiles) ? audit.affectedFiles : [];
-    const lockedInvolved = expectedFiles.filter(isLockedPath);
-
-    const confirmedList = confirmedFiles.trim()
-      ? confirmedFiles.split("\n").map((s) => s.trim()).filter(Boolean)
-      : null;
-
-    const filesSection = confirmedList
-      ? confirmedList.map((f) => `  - ${f}`).join("\n")
-      : expectedFiles.length > 0
-        ? expectedFiles.map((f) => `  - ${f} (expected — confirm after implementation)`).join("\n")
-        : "  (none specified — fill in manually)";
-
-    const lockedNote = lockedInvolved.length > 0
-      ? `\nLOCKED FILE VERIFICATION REQUIRED\n${lockedInvolved.map((p) => `  - ${p} — ${lockedRuleFor(p)}`).join("\n")}\n  Confirm these files were not modified except through explicitly allowed operations.`
-      : "";
-
-    // planned = what the audit said should be done (requiredChange)
-    const plannedChange = audit.requiredChange ?? "(not specified in audit — fill in manually)";
-    // actual = what the operator confirms was actually done (user-editable)
-    const actualChange = actualChangeSummary.trim() || "(not yet confirmed — fill in above before appending to log)";
-    const actualIsConfirmed = !!actualChangeSummary.trim();
-
-    const fullDraft = [
-      `EXECUTION LOG DRAFT — VERIFY BEFORE APPENDING TO PhaseExecutionLog.jsx`,
-      `Do not append until GitHub visibility is confirmed and implementation is verified.`,
-      ``,
-      `id: (assign next sequential entry id)`,
-      `date: ${today}`,
-      `task: ${audit.title}`,
-      `auditId: ${audit.id}`,
-      `source: ${source}`,
-      `readiness: ${readiness ?? "unknown"}`,
-      `evidenceSource: ${audit.evidenceSource ?? "unknown"}`,
-      ``,
-      `CHANGED FILES`,
-      filesSection,
-      lockedNote,
-      ``,
-      `PLANNED CHANGE (taskRequested — from audit.requiredChange)`,
-      plannedChange,
-      ``,
-      `ACTUAL CHANGE SUMMARY (diffSummary — operator-confirmed)`,
-      actualIsConfirmed ? actualChange : `⚠ ${actualChange}`,
-      ``,
-      `githubVisibility: Not yet verified — confirm before finalizing`,
-      `lockedFileVerification: ${lockedInvolved.length > 0 ? "Required — see locked file section above" : "No locked files involved — standard verification applies"}`,
-      ``,
-      `FOLLOW-UP`,
-      audit.oneSafeNextStep ? `Registry next safe step: ${audit.oneSafeNextStep}` : "(no oneSafeNextStep defined — review manually)",
-      hasManualData ? `Note: Manual enrichment was applied for: ${enrichedFields.join(", ")}` : null,
-    ].filter((l) => l !== null).join("\n").trim();
-
-    const summaryOnly = `${today} — ${audit.title} (${audit.id}) — ${source} — ${readiness ?? "unknown"}`;
-
-    const followUpNote = audit.oneSafeNextStep
-      ? `Follow-up after ${audit.id}: ${audit.oneSafeNextStep}`
-      : `Follow-up after ${audit.id}: Review next safe step manually — oneSafeNextStep not defined.`;
-
-    return { fullDraft, summaryOnly, followUpNote, expectedFiles, lockedInvolved, actualIsConfirmed };
+    return buildExecutionLogDraft(
+      audit,
+      readiness,
+      isInjected,
+      confirmedFiles,
+      actualChangeSummary,
+      hasManualData,
+      enrichedFields,
+      isLockedPath,
+      lockedRuleFor
+    );
   }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
 
   // ── Derived guards ─────────────────────────────────────────────────────────
