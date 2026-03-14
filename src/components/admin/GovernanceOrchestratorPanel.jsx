@@ -126,6 +126,11 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // ── GitHub Issue Status Check state ────────────────────────────────────────
   const [issueStatus, setIssueStatus] = useState(null); // null | {found: false} | {found: true, number, url, title, state}
   const [checkingIssueStatus, setCheckingIssueStatus] = useState(false);
+
+  // ── GitHub PR Status Check state ──────────────────────────────────────────
+  const [prStatus, setPrStatus] = useState(null); // null | {found: false} | {found: true, number, url, title, state}
+  const [checkingPrStatus, setCheckingPrStatus] = useState(false);
+
   const abortControllerRef = useRef(null);
 
   const orderedEntries = useMemo(() => {
@@ -187,6 +192,37 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
     // Debounce by 500ms to avoid excessive API calls
     const timeoutId = setTimeout(checkStatus, 500);
+    return () => clearTimeout(timeoutId);
+  }, [audit, ghOwner, ghRepo]);
+
+  // Auto-check GitHub PR status when audit or repo selection changes
+  useEffect(() => {
+    if (!audit || !ghOwner.trim() || !ghRepo.trim()) {
+      setPrStatus(null);
+      return;
+    }
+
+    const checkPrStatus = async () => {
+      setCheckingPrStatus(true);
+      try {
+        const res = await base44.functions.invoke('getGithubPrForAudit', {
+          owner: ghOwner.trim(),
+          repo: ghRepo.trim(),
+          auditId: audit.id,
+        });
+        if (res.data) {
+          setPrStatus(res.data);
+        }
+      } catch (err) {
+        // Silent fail — status check is non-critical
+        setPrStatus(null);
+      } finally {
+        setCheckingPrStatus(false);
+      }
+    };
+
+    // Debounce by 500ms to avoid excessive API calls
+    const timeoutId = setTimeout(checkPrStatus, 500);
     return () => clearTimeout(timeoutId);
   }, [audit, ghOwner, ghRepo]);
   const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
@@ -754,6 +790,53 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 )}
                 {!checkingIssueStatus && !issueStatus?.found && (
                   <p className="text-xs text-slate-500 italic">No GitHub issue exists for this audit.</p>
+                )}
+              </div>
+            )}
+
+            {/* ── GitHub PR Status Check ── */}
+            {(ghOwner.trim() || ghRepo.trim()) && (
+              <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2">
+                <p className="text-xs font-medium text-blue-700 mb-1.5 flex items-center gap-1">
+                  <Github className="w-3 h-3" />
+                  GitHub PR Status
+                </p>
+                {checkingPrStatus && (
+                  <div className="flex items-center gap-2 text-xs text-blue-600">
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
+                    Checking...
+                  </div>
+                )}
+                {!checkingPrStatus && prStatus?.found && (
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="text-xs">
+                      <p className="font-semibold text-blue-900 mb-0.5">
+                        PR #{prStatus.number}
+                      </p>
+                      <p className="text-blue-700 mb-1">{prStatus.title}</p>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                          prStatus.state === 'open'
+                            ? 'bg-blue-200 text-blue-900'
+                            : 'bg-purple-100 text-purple-900'
+                        }`}>
+                          {prStatus.state === 'open' ? 'OPEN' : 'CLOSED'}
+                        </span>
+                      </div>
+                    </div>
+                    <a
+                      href={prStatus.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 text-blue-400 hover:text-blue-600 transition-colors"
+                      title="Open in GitHub"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+                {!checkingPrStatus && !prStatus?.found && (
+                  <p className="text-xs text-blue-600 italic">No open PR found for this audit.</p>
                 )}
               </div>
             )}
