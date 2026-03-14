@@ -141,6 +141,13 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       setSelectedId(orderedEntries[0].id);
     }
   }, [isInjected, selectedId, orderedEntries]);
+
+  // Auto-open outputs section for execution-ready audits
+  useEffect(() => {
+    if (audit && readiness === "execution-ready") {
+      setShowOutputs(true);
+    }
+  }, [audit, readiness]);
   const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
 
   // Merge audit index data with manual enrichment; track which fields came from enrichment
