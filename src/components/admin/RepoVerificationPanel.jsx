@@ -198,6 +198,26 @@ export default function RepoVerificationPanel() {
         </CardContent>
       </Card>
 
+      {/* ── Copy All Raw URLs ── */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base text-slate-800">Kopier raw URLs</CardTitle>
+          <p className="text-xs text-slate-400">Kopier alle raw-lenker for en kategori, eller alle på én gang</p>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex flex-wrap gap-2">
+            <CopyAllButton urls={allCategoryUrls.priority}   label="Priority-filer" />
+            <CopyAllButton urls={allCategoryUrls.governance} label="Governance" />
+            <CopyAllButton urls={allCategoryUrls.admin}      label="Admin" />
+            <CopyAllButton urls={allCategoryUrls.routing}    label="Routing" />
+            <CopyAllButton urls={allCategoryUrls.bootstrap}  label="Bootstrap" />
+          </div>
+          <div className="mt-3">
+            <CopyAllButton urls={allRawUrls} label={`Kopier alle (${allRawUrls.length} filer)`} />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ── Verification Start Pack ── */}
       <Card>
         <CardHeader className="pb-2">
