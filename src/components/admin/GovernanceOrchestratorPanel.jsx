@@ -119,6 +119,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [ghRepo, setGhRepo] = useState("");
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
+  const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
 
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
