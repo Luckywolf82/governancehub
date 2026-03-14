@@ -860,14 +860,14 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       <div className="flex gap-2 pt-1">
                         <button
                           onClick={handleCreateIssue}
-                          disabled={createState === "loading"}
+                          disabled={!canSubmitCreate}
                           className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           <Github className="w-3.5 h-3.5" />
                           {createState === "loading" ? "Oppretter…" : "Bekreft og opprett issue"}
                         </button>
                         <button
-                          onClick={() => setShowCreateConfirm(false)}
+                          onClick={() => { setShowCreateConfirm(false); }}
                           className="text-xs px-3 py-1.5 rounded border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors"
                         >Avbryt</button>
                       </div>
