@@ -66,13 +66,6 @@ export default function RepoVerificationPanel() {
   const [filterMissing, setFilterMissing] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
 
-  // Pick first existing canonical artifact, else null
-  const canonical = CANONICAL_ARTIFACTS.find((a) => a.exists) ?? null;
-  const [selectedKey, setSelectedKey] = useState(
-    CANONICAL_ARTIFACTS.find((a) => a.exists)?.key ?? CANONICAL_ARTIFACTS[0].key
-  );
-  const selectedArtifact = CANONICAL_ARTIFACTS.find((a) => a.key === selectedKey);
-
   function copyWithFeedback(value, key) {
     navigator.clipboard.writeText(value);
     setCopiedKey(key);
