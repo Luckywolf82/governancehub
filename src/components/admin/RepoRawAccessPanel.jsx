@@ -2,7 +2,8 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Copy, ExternalLink, Lock, Search, FileText } from "lucide-react";
+import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle, Github } from "lucide-react";
+import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 // ── Inline manifest data ──────────────────────────────────────────────────────
 // Data sourced from REPO_FILE_MANIFEST.json and PRIORITY_REPO_FILES.json.
@@ -190,6 +191,7 @@ function PriorityRow({ file }) {
 // ── Main panel ────────────────────────────────────────────────────────────────
 
 export default function RepoRawAccessPanel() {
+  const { activeRepo } = useActiveRepo();
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [folderFilter, setFolderFilter] = useState("all");
@@ -235,6 +237,12 @@ export default function RepoRawAccessPanel() {
 
   return (
     <div className="space-y-4">
+      {!activeRepo && (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
+          <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+          <span>Ingen aktivt repo valgt. Velg et repo fra Aktivt repo-selektøren i topptitlelinjen for å se filinnhold.</span>
+        </div>
+      )}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -243,15 +251,23 @@ export default function RepoRawAccessPanel() {
               <p className="text-xs text-slate-400 mt-0.5">
                 {allFiles.length} files indexed · Generated {MANIFEST._meta?.generatedAt}
               </p>
+              {activeRepo && (
+                <div className="flex items-center gap-2 mt-1 text-xs text-slate-600 bg-blue-50 border border-blue-200 rounded px-2 py-1 w-fit">
+                  <Github className="w-3 h-3" />
+                  <span>Bruker aktivt repo: <span className="font-mono font-semibold">{activeRepo.owner}/{activeRepo.repo}</span></span>
+                </div>
+              )}
             </div>
-            <a
-              href="https://github.com/Luckywolf82/governancehub"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1"
-            >
-              <ExternalLink className="w-3 h-3" /> GitHub
-            </a>
+            {activeRepo && (
+              <a
+                href={`https://github.com/${activeRepo.owner}/${activeRepo.repo}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1"
+              >
+                <ExternalLink className="w-3 h-3" /> GitHub
+              </a>
+            )}
           </div>
 
           {/* Tabs */}
