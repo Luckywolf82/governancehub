@@ -290,6 +290,12 @@ export default function RepoVerificationPanel() {
               </button>
             ))}
           </div>
+          <div className="mt-2">
+            <CopyAllButton
+              urls={READ_THIS_FIRST[activeFlow].map((i) => i.rawUrl)}
+              label={`Kopier alle raw (${FLOW_LABELS[activeFlow]})`}
+            />
+          </div>
         </CardHeader>
         <CardContent className="pt-0">
           {READ_THIS_FIRST[activeFlow].map((item) => (
