@@ -111,6 +111,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [showOutputs, setShowOutputs] = useState(false);
   const [showLogAssistant, setShowLogAssistant] = useState(false);
   const [confirmedFiles, setConfirmedFiles] = useState("");
+  const [actualChangeSummary, setActualChangeSummary] = useState("");
 
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
@@ -338,7 +339,11 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       ? `\nLOCKED FILE VERIFICATION REQUIRED\n${lockedInvolved.map((p) => `  - ${p} — ${lockedRuleFor(p)}`).join("\n")}\n  Confirm these files were not modified except through explicitly allowed operations.`
       : "";
 
-    const summaryText = audit.requiredChange ?? "(required change not specified — fill in manually)";
+    // planned = what the audit said should be done (requiredChange)
+    const plannedChange = audit.requiredChange ?? "(not specified in audit — fill in manually)";
+    // actual = what the operator confirms was actually done (user-editable)
+    const actualChange = actualChangeSummary.trim() || "(not yet confirmed — fill in above before appending to log)";
+    const actualIsConfirmed = !!actualChangeSummary.trim();
 
     const fullDraft = [
       `EXECUTION LOG DRAFT — VERIFY BEFORE APPENDING TO PhaseExecutionLog.jsx`,
@@ -356,8 +361,11 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       filesSection,
       lockedNote,
       ``,
-      `SUMMARY OF CHANGE`,
-      summaryText,
+      `PLANNED CHANGE (taskRequested — from audit.requiredChange)`,
+      plannedChange,
+      ``,
+      `ACTUAL CHANGE SUMMARY (diffSummary — operator-confirmed)`,
+      actualIsConfirmed ? actualChange : `⚠ ${actualChange}`,
       ``,
       `githubVisibility: Not yet verified — confirm before finalizing`,
       `lockedFileVerification: ${lockedInvolved.length > 0 ? "Required — see locked file section above" : "No locked files involved — standard verification applies"}`,
@@ -373,8 +381,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       ? `Follow-up after ${audit.id}: ${audit.oneSafeNextStep}`
       : `Follow-up after ${audit.id}: Review next safe step manually — oneSafeNextStep not defined.`;
 
-    return { fullDraft, summaryOnly, followUpNote, expectedFiles, lockedInvolved };
-  }, [audit, readiness, isInjected, confirmedFiles, hasManualData, enrichedFields]);
+    return { fullDraft, summaryOnly, followUpNote, expectedFiles, lockedInvolved, actualIsConfirmed };
+  }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
 
   const recommendedStepText = useMemo(() => {
     if (!recommendedStep) return null;
