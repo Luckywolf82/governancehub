@@ -40,6 +40,21 @@ function CopyButton({ value }) {
   );
 }
 
+function CopyAllButton({ urls, label }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => { navigator.clipboard.writeText(urls.join("\n")); setCopied(true); setTimeout(() => setCopied(false), 1800); }}
+      className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded border transition-colors ${
+        copied ? "bg-green-100 text-green-700 border-green-300" : "border-slate-300 text-slate-600 hover:border-slate-500 hover:bg-slate-50"
+      }`}
+    >
+      <Copy className="w-3 h-3" />
+      {copied ? "Kopiert!" : label}
+    </button>
+  );
+}
+
 function OpenButton({ url }) {
   return (
     <a href={url} target="_blank" rel="noopener noreferrer"
