@@ -7,6 +7,7 @@ export function ActiveRepoProvider({ children }) {
   const [activeRepo, setActiveRepo] = useState(null);
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Load enabled GitHub repositories on mount
   useEffect(() => {
@@ -36,6 +37,7 @@ export function ActiveRepoProvider({ children }) {
   };
 
   const refreshRepos = async () => {
+    setIsRefreshing(true);
     try {
       const result = await base44.entities.Repository.filter({
         provider: "github",
@@ -44,12 +46,17 @@ export function ActiveRepoProvider({ children }) {
       const updatedRepos = result || [];
       setRepos(updatedRepos);
       
-      // If current activeRepo is no longer in the refreshed list, clear it
-      if (activeRepo && !updatedRepos.find(r => r.id === activeRepo.id)) {
-        setActiveRepo(null);
-      }
+      // Validate activeRepo against updated list using closure-safe reference
+      setActiveRepo((currentActiveRepo) => {
+        if (currentActiveRepo && !updatedRepos.find(r => r.id === currentActiveRepo.id)) {
+          return null;
+        }
+        return currentActiveRepo;
+      });
     } catch (err) {
       console.warn("Failed to refresh repositories:", err);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -59,6 +66,7 @@ export function ActiveRepoProvider({ children }) {
         activeRepo,
         repos,
         loading,
+        isRefreshing,
         selectRepo,
         clearActiveRepo,
         refreshRepos,
