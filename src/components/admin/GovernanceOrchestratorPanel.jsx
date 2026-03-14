@@ -850,11 +850,9 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       <p><span className="text-slate-400">Labels:</span> {issuePrep.labels.join(", ")}</p>
                       <p>
                         <span className="text-slate-400">Readiness:</span>{" "}
-                        <span className={
-                          readiness === "execution-ready"   ? "text-green-700 font-medium" :
-                          readiness === "remediation-first" ? "text-red-700 font-medium" :
-                          "text-amber-700 font-medium"
-                        }>{issuePrep.githubSignal}</span>
+                        {readiness === "execution-ready" && <span className="text-green-700 font-medium">Execution-ready — verifisert implementeringsissue</span>}
+                        {readiness === "remediation-first" && <span className="text-red-700 font-medium">Remediation-first — dette er en remedierings-issue, ikke normal implementering</span>}
+                        {readiness === "analysis-first" && <span className="text-blue-700 font-medium">Planning/analysis — ikke verifisert implementeringsgrunnlag; opprettes som planleggingsissue</span>}
                       </p>
                       <p><span className="text-slate-400">Kilde:</span> {issuePrep.source} · <span className="font-mono">{audit.id}</span> · evidence: {issuePrep.evidenceSrc}</p>
                       <p className="text-slate-400 italic">Body-forhåndsvisning (første 200 tegn):</p>
