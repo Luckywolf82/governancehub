@@ -289,7 +289,12 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             <div className={`text-xs space-y-1 border rounded p-2 ${isInjected ? "border-indigo-100 bg-indigo-50/40" : "border-slate-100 bg-slate-50"}`}>
               <div className="flex flex-wrap gap-1.5 mb-1">
                 <Badge className="bg-blue-100 text-blue-800 text-xs">{audit.category}</Badge>
-                <Badge className={`text-xs ${audit.status === "completed" ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>{audit.status}</Badge>
+                <Badge className={`text-xs ${
+                  audit.status === "verified"  ? "bg-green-100 text-green-800" :
+                  audit.status === "orphaned"  ? "bg-red-100 text-red-700" :
+                  audit.status === "completed" ? "bg-green-100 text-green-800" :
+                  "bg-amber-100 text-amber-800"
+                }`}>{audit.status}</Badge>
                 {audit.date && <span className="text-slate-400">{audit.date}</span>}
               </div>
               <p className="text-slate-600">{audit.summary}</p>
