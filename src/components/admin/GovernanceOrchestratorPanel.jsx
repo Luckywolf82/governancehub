@@ -128,6 +128,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // Effective repo source: prioritize activeRepo if available, else use manual input
   const effectiveOwner = activeRepo ? activeRepo.owner : ghOwner;
   const effectiveRepo = activeRepo ? activeRepo.repo : ghRepo;
+  const repoSourceLabel = activeRepo ? "Aktivt repo" : "Manuell repo-input";
 
   // ── GitHub Issue Status Check state ────────────────────────────────────────
   const [issueStatus, setIssueStatus] = useState(null); // null | {found: false} | {found: true, number, url, title, state}
@@ -926,17 +927,29 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               {!createState?.success && (
                 <>
                   {activeRepo ? (
-                    <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
-                      <Github className="w-3.5 h-3.5 shrink-0" />
-                      <div className="flex-1">
-                        <span className="font-medium">Bruker aktivt repo:</span>
-                        <span className="font-mono ml-1">{activeRepo.owner}/{activeRepo.repo}</span>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
+                        <Github className="w-3.5 h-3.5 shrink-0" />
+                        <div className="flex-1">
+                          <span className="font-medium">Oppretter issue i:</span>
+                          <span className="font-mono ml-1">{activeRepo.owner}/{activeRepo.repo}</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-600 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded">
+                        <span className="font-medium">Kilde:</span>{" "}
+                        <span className="text-blue-700">{repoSourceLabel} (velges i toppmenyen)</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800 mb-2">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      <span>Ingen aktivt repo valgt — bruker manuell repo-input</span>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                        <span>Ingen aktivt repo valgt</span>
+                      </div>
+                      <div className="text-xs text-slate-600 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded">
+                        <span className="font-medium">Kilde:</span>{" "}
+                        <span className="text-amber-700">{repoSourceLabel}</span>
+                      </div>
                     </div>
                   )}
 
@@ -970,7 +983,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                   {!createState?.error && showCreateConfirm && effectiveOwner.trim() && effectiveRepo.trim() && githubIssue && (
                     <div className="border border-slate-200 rounded bg-slate-50 p-3 space-y-2 text-xs">
                       <p className="font-semibold text-slate-700">Bekreft før oppretting</p>
-                      <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{effectiveOwner.trim()}/{effectiveRepo.trim()}</span></p>
+                      <div className="space-y-1">
+                        <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{effectiveOwner.trim()}/{effectiveRepo.trim()}</span></p>
+                        <p><span className="text-slate-400">Kilde:</span> <span className="font-medium text-slate-700">{repoSourceLabel}</span></p>
+                      </div>
                       <p><span className="text-slate-400">Tittel:</span> <span className="font-medium text-slate-800">{issuePrep.issueTitle}</span></p>
                       <p><span className="text-slate-400">Labels:</span> {issuePrep.labels.join(", ")}</p>
                       <p>
@@ -979,7 +995,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                         {readiness === "remediation-first" && <span className="text-red-700 font-medium">Remediation-first — dette er en remedierings-issue, ikke normal implementering</span>}
                         {readiness === "analysis-first" && <span className="text-blue-700 font-medium">Planning/analysis — ikke verifisert implementeringsgrunnlag; opprettes som planleggingsissue</span>}
                       </p>
-                      <p><span className="text-slate-400">Kilde:</span> {issuePrep.source} · <span className="font-mono">{audit.id}</span> · evidence: {issuePrep.evidenceSrc}</p>
+                      <p><span className="text-slate-400">Audit:</span> <span className="font-mono">{audit.id}</span></p>
                       <p className="text-slate-400 italic">Body-forhåndsvisning (første 200 tegn):</p>
                       <pre className="text-xs font-mono bg-white border border-slate-100 rounded p-2 whitespace-pre-wrap text-slate-600 max-h-24 overflow-y-auto">{githubIssue.slice(0, 200)}{githubIssue.length > 200 ? "…" : ""}</pre>
                       <div className="flex gap-2 pt-1">
