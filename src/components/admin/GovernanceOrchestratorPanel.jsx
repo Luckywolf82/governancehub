@@ -420,7 +420,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 </div>
               </div>
               <button
-                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); }}
+                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setShowLogAssistant(false); }}
                 className="shrink-0 text-indigo-400 hover:text-indigo-700 transition-colors"
                 title="Fjern injisert audit og gå tilbake til AUDIT_INDEX"
               >
