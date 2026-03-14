@@ -397,6 +397,11 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     return { fullDraft, summaryOnly, followUpNote, expectedFiles, lockedInvolved, actualIsConfirmed };
   }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
 
+  // ── Derived guards ─────────────────────────────────────────────────────────
+  const requiresAnalysisConfirm = readiness === "analysis-first";
+  const canOpenCreateConfirm = !!ghOwner.trim() && !!ghRepo.trim() && !!githubIssue && (!requiresAnalysisConfirm || analysisConfirmed);
+  const canSubmitCreate = canOpenCreateConfirm && createState !== "loading";
+
   async function handleCreateIssue() {
     if (!issuePrep || !githubIssue || !ghOwner.trim() || !ghRepo.trim()) return;
     setCreateState("loading");
