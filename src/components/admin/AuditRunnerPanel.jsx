@@ -12,7 +12,9 @@ import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
 
 const REQUIRED_AUDIT_FIELDS = ["problem", "impact", "affectedFiles", "requiredChange", "constraints", "acceptanceCriteria"];
 
-const PLACEHOLDER_PATTERNS = ["New Base44 App", "Bootstrap", "YYYY-MM-DD", "yourname/yourrepo", "your-repo", "placeholder"];
+// Explicit bootstrap placeholder patterns only — generic words like "placeholder" or "Bootstrap"
+// are intentionally excluded to avoid false positives on legitimate content.
+const PLACEHOLDER_PATTERNS = ["New Base44 App", "YYYY-MM-DD", "yourname/yourrepo", "your-repo"];
 
 // Extract locked file paths mentioned in AI_PROJECT_INSTRUCTIONS text
 function extractLockedPathsFromInstructions(text) {
@@ -107,7 +109,7 @@ function runChecks(manualEvidence) {
     title: "Governance Placeholder State",
     description: "Detects obvious placeholder values in governance core files.",
     status: placeholderStatus,
-    evidenceSource: phaseLogContent ? "manual evidence" : "repo-derived",
+    evidenceSource: phaseLogContent ? "repo-derived + manual evidence" : "repo-derived",
     findings: placeholderFindings.length > 0 ? placeholderFindings : ["No placeholder values detected in AI_STATE or NextSafeStep."],
     affectedFiles: ["src/components/governance/AI_STATE.jsx", "src/components/governance/NextSafeStep.jsx", "src/components/governance/PhaseExecutionLog.jsx"],
     manualRequired: !phaseLogContent,
@@ -149,9 +151,9 @@ function runChecks(manualEvidence) {
     const hasBoth = hasPagesConfig && hasExplicitRoute;
     routingStatus = hasBoth ? "warn" : "pass";
     if (hasBoth) {
-      routingFindings.push("App.jsx uses both pagesConfig loop and explicit <Route> elements — dual routing source detected.");
+      routingFindings.push("Heuristic: both pagesConfig loop and explicit <Route> elements detected in App.jsx. This may indicate dual routing responsibility — manual verification required to confirm whether this is intentional.");
     } else {
-      routingFindings.push("Routing source appears consistent.");
+      routingFindings.push("No dual routing pattern detected. Routing source appears consistent based on heuristic check.");
     }
   } else {
     routingFindings.push("App.jsx content not supplied — cannot determine routing source-of-truth. Paste App.jsx content to enable this check.");
@@ -160,7 +162,7 @@ function runChecks(manualEvidence) {
   checks.push({
     id: "check-3",
     title: "Routing Source-of-Truth Mismatch",
-    description: "Detects whether App.jsx uses conflicting route definitions.",
+    description: "Heuristic check for dual routing patterns in App.jsx — does not definitively confirm routing conflicts.",
     status: routingStatus,
     evidenceSource: appJsxContent ? "manual evidence" : "manual evidence",
     findings: routingFindings,
@@ -207,11 +209,12 @@ function runChecks(manualEvidence) {
 
 function buildAuditObject(checks, runId) {
   const failedChecks = checks.filter(c => c.status === "fail" || c.status === "warn");
-  const hasManual = checks.some(c => c.evidenceSource === "manual evidence" && !c.manualRequired);
+  // A check counts as using manual evidence if its evidenceSource includes "manual" AND the evidence was actually supplied (manualRequired === false means evidence was present)
+  const hasManual = checks.some(c => c.evidenceSource.includes("manual") && !c.manualRequired);
   const allPass = checks.every(c => c.status === "pass");
 
   const problem = failedChecks.length > 0
-    ? failedChecks.map(c => `[${c.title}] ${c.findings[0]}`).join("\n")
+    ? failedChecks.map(c => `[${c.title}]\n${c.findings.map(f => `  - ${f}`).join("\n")}`).join("\n\n")
     : "No issues detected in this audit run.";
 
   const affectedFiles = [...new Set(failedChecks.flatMap(c => c.affectedFiles))];
@@ -228,11 +231,23 @@ function buildAuditObject(checks, runId) {
     impact: "Governance drift, locked-file policy inconsistency, or thin audit entries reduce the reliability of the governance system.",
     affectedFiles,
     requiredChange: failedChecks.length > 0
-      ? "Review and resolve each flagged check. Update canonical governance files through the standard locked-file procedure."
+      ? failedChecks.map(c => {
+          if (c.id === "check-1") return "Remove or replace placeholder values in governance core files. Update PhaseExecutionLog with a verified entry after changes.";
+          if (c.id === "check-2") return "Reconcile the locked-file list between LockedFiles.jsx and AI_PROJECT_INSTRUCTIONS. Both registries must reference the same set of paths.";
+          if (c.id === "check-3") return "Inspect App.jsx routing manually. If both pagesConfig loop and explicit <Route> elements are present intentionally, document the rationale. Otherwise consolidate to a single routing source.";
+          if (c.id === "check-4") return `Enrich thin AUDIT_INDEX entries with missing required fields (problem, impact, affectedFiles, requiredChange, constraints, acceptanceCriteria). Affected: ${c.findings.join("; ")}`;
+          return `Resolve findings for: ${c.title}`;
+        }).join("\n")
       : "No changes required.",
     constraints: "Follow locked-file policy. One structural change at a time. Update PhaseExecutionLog after each verified change.",
     acceptanceCriteria: failedChecks.length > 0
-      ? failedChecks.map(c => `${c.title}: all findings resolved and confirmed in GitHub`).join("\n")
+      ? failedChecks.map(c => {
+          if (c.id === "check-1") return "Governance Placeholder State: no placeholder patterns remain in AI_STATE, NextSafeStep, or PhaseExecutionLog after re-run.";
+          if (c.id === "check-2") return "Locked-File Policy Mismatch: LockedFiles.jsx and AI_PROJECT_INSTRUCTIONS reference identical locked file paths.";
+          if (c.id === "check-3") return "Routing Source-of-Truth: App.jsx routing responsibility is verified as intentional or consolidated. Documented in PhaseExecutionLog.";
+          if (c.id === "check-4") return "Audit Object Thinness: all AUDIT_INDEX entries contain the required fields and are usable by TaskGenerator without enrichment.";
+          return `${c.title}: findings resolved.`;
+        }).join("\n")
       : "All checks pass. No further action required.",
     evidenceSource: hasManual ? "repo-derived + manual evidence" : "repo-derived",
     manualEvidenceUsed: hasManual,
