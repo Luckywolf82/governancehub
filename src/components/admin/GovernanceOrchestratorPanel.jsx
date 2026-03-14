@@ -194,17 +194,24 @@ export default function GovernanceOrchestratorPanel() {
     if (!audit) return null;
     const files = Array.isArray(audit.affectedFiles) ? audit.affectedFiles : [];
     const locked = files.filter(isLockedPath);
+    const lockedInConstraints = audit.constraints && LOCKED_FILES.files.some((lf) => audit.constraints.includes(lf.path));
+    const followUpAuditAssessment =
+      locked.length > 0
+        ? "Yes — locked files are involved; an audit entry is required"
+        : lockedInConstraints
+        ? "Likely — locked file paths referenced in constraints; verify audit requirement"
+        : "Requires manual review — insufficient data to determine automatically";
     return [
       `VERIFICATION CHECKLIST — ${audit.title}`,
       ``,
-      `□ Expected files changed:`,
-      files.length > 0 ? files.map((f) => `  - ${f}`).join("\n") : "  (no files specified — manual check required)",
+      `□ Verify that the following files were changed as expected:`,
+      files.length > 0 ? files.map((f) => `  - ${f}`).join("\n") : "  (no files specified — verify manually)",
       ``,
-      locked.length > 0 ? [`□ Locked files to re-check:`, ...locked.map((p) => `  - ${p}`), ``].join("\n") : "",
-      `□ Execution log updated: PhaseExecutionLog.jsx — new entry appended`,
-      `□ GitHub visibility confirmed: all changed files visible in repo`,
-      `□ Follow-up audit likely needed: ${audit.category === "Governance" ? "Yes — governance changes require audit trail" : "Review after implementation"}`,
-      `□ Locked files confirmed unmodified: re-read LockedFiles.jsx and AI_PROJECT_INSTRUCTIONS.jsx`,
+      locked.length > 0 ? [`□ Re-read locked files and confirm they were not modified except through allowed operations:`, ...locked.map((p) => `  - ${p}`), ``].join("\n") : "",
+      `□ Confirm execution log entry has been appended to PhaseExecutionLog.jsx (do not rewrite existing entries)`,
+      `□ Confirm all changed files are visible in the GitHub repository`,
+      `□ Follow-up audit assessment: ${followUpAuditAssessment}`,
+      `□ Re-read LockedFiles.jsx and AI_PROJECT_INSTRUCTIONS.jsx to confirm locked file integrity`,
     ].filter((l) => l !== undefined).join("\n").trim();
   }, [audit]);
 
