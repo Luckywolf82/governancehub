@@ -793,11 +793,25 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 </div>
               )}
 
-              {/* Readiness guardrail for analysis-first */}
+              {/* Analysis-first: explicit acknowledgement required */}
               {readiness === "analysis-first" && !createState?.success && (
-                <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
-                  <BookOpen className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                  <p><span className="font-semibold">Analysis-first:</span> Dette er et foreløpig/uverifisert audit-scope. Issue vil bli markert som draft-orientert i provenance-footer.</p>
+                <div className="border border-blue-200 rounded bg-blue-50 px-3 py-3 space-y-2">
+                  <div className="flex items-start gap-2 text-xs text-blue-800">
+                    <BookOpen className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold">Analysis-first — bekreftelse kreves</p>
+                      <p className="mt-0.5 opacity-80">Dette er et foreløpig eller uverifisert audit-scope. Issuen er <strong>ikke</strong> verifisert implementeringsgrunnlag — den er planleggings- og analyseorientert. Labels vil inkludere <span className="font-mono">planning</span> og <span className="font-mono">needs-verification</span>.</p>
+                    </div>
+                  </div>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={analysisConfirmed}
+                      onChange={(e) => setAnalysisConfirmed(e.target.checked)}
+                      className="mt-0.5 accent-blue-600"
+                    />
+                    <span className="text-xs text-blue-900">Jeg bekrefter at denne opprettes som plan-/analyseissue og ikke som verifisert implementeringsoppgave.</span>
+                  </label>
                 </div>
               )}
 
