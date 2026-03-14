@@ -747,6 +747,127 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               <CopyBtn value={githubIssue}             label="Kopier issue body" />
               <CopyBtn value={issuePrep.fullPackage}   label="Kopier full pakke" />
             </div>
+
+            {/* ── GitHub Issue Create flow ── */}
+            <div className="border-t border-slate-100 pt-3 space-y-3">
+
+              {/* Success state */}
+              {createState?.success && (
+                <div className="flex items-start justify-between gap-2 bg-green-50 border border-green-200 rounded px-3 py-2">
+                  <div className="flex items-start gap-2 text-xs text-green-800">
+                    <CheckCheck className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold">Issue opprettet — #{createState.number}</p>
+                      <a href={createState.url} target="_blank" rel="noopener noreferrer"
+                        className="font-mono underline flex items-center gap-1 mt-0.5 text-green-700 hover:text-green-900">
+                        {createState.url} <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                  <button onClick={() => setCreateState(null)} className="text-green-400 hover:text-green-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                </div>
+              )}
+
+              {/* Error state */}
+              {createState && !createState.success && createState !== "loading" && (
+                <div className="flex items-start justify-between gap-2 bg-red-50 border border-red-200 rounded px-3 py-2">
+                  <div className="flex items-start gap-2 text-xs text-red-800">
+                    <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold">Feil ved oppretting</p>
+                      <p className="opacity-80 mt-0.5">{createState.message}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setCreateState(null)} className="text-red-400 hover:text-red-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                </div>
+              )}
+
+              {/* Readiness guardrail for analysis-first */}
+              {readiness === "analysis-first" && !createState?.success && (
+                <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
+                  <BookOpen className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  <p><span className="font-semibold">Analysis-first:</span> Dette er et foreløpig/uverifisert audit-scope. Issue vil bli markert som draft-orientert i provenance-footer.</p>
+                </div>
+              )}
+
+              {/* Repo input + trigger — hidden after success */}
+              {!createState?.success && (
+                <>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="text-xs text-slate-400 block mb-0.5">GitHub owner</label>
+                      <input
+                        type="text"
+                        value={ghOwner}
+                        onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); }}
+                        placeholder="e.g. my-org"
+                        className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-xs text-slate-400 block mb-0.5">Repository</label>
+                      <input
+                        type="text"
+                        value={ghRepo}
+                        onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); }}
+                        placeholder="e.g. governance-hub"
+                        className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Pre-send review */}
+                  {showCreateConfirm && ghOwner.trim() && ghRepo.trim() && githubIssue && (
+                    <div className="border border-slate-200 rounded bg-slate-50 p-3 space-y-2 text-xs">
+                      <p className="font-semibold text-slate-700">Bekreft før oppretting</p>
+                      <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{ghOwner.trim()}/{ghRepo.trim()}</span></p>
+                      <p><span className="text-slate-400">Tittel:</span> <span className="font-medium text-slate-800">{issuePrep.issueTitle}</span></p>
+                      <p><span className="text-slate-400">Labels:</span> {issuePrep.labels.join(", ")}</p>
+                      <p>
+                        <span className="text-slate-400">Readiness:</span>{" "}
+                        <span className={
+                          readiness === "execution-ready"   ? "text-green-700 font-medium" :
+                          readiness === "remediation-first" ? "text-red-700 font-medium" :
+                          "text-amber-700 font-medium"
+                        }>{issuePrep.githubSignal}</span>
+                      </p>
+                      <p><span className="text-slate-400">Kilde:</span> {issuePrep.source} · <span className="font-mono">{audit.id}</span> · evidence: {issuePrep.evidenceSrc}</p>
+                      <p className="text-slate-400 italic">Body-forhåndsvisning (første 200 tegn):</p>
+                      <pre className="text-xs font-mono bg-white border border-slate-100 rounded p-2 whitespace-pre-wrap text-slate-600 max-h-24 overflow-y-auto">{githubIssue.slice(0, 200)}{githubIssue.length > 200 ? "…" : ""}</pre>
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={handleCreateIssue}
+                          disabled={createState === "loading"}
+                          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <Github className="w-3.5 h-3.5" />
+                          {createState === "loading" ? "Oppretter…" : "Bekreft og opprett issue"}
+                        </button>
+                        <button
+                          onClick={() => setShowCreateConfirm(false)}
+                          className="text-xs px-3 py-1.5 rounded border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors"
+                        >Avbryt</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Primary create trigger */}
+                  {!showCreateConfirm && (
+                    <button
+                      onClick={() => { setShowCreateConfirm(true); setCreateState(null); }}
+                      disabled={!ghOwner.trim() || !ghRepo.trim() || !githubIssue}
+                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:border-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                      Opprett GitHub issue
+                    </button>
+                  )}
+                  {!githubIssue && (
+                    <p className="text-xs text-amber-600 italic flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Issue body ikke tilgjengelig — fyll inn påkrevde audit-felt først.</p>
+                  )}
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
