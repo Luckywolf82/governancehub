@@ -161,24 +161,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // ── Generated outputs ──────────────────────────────────────────────────────
 
   const recommendedStep = useMemo(() => {
-    if (!audit) return null;
-    const affectedFiles = Array.isArray(audit.affectedFiles) ? audit.affectedFiles : [];
-    const lockedInvolved = affectedFiles.filter(isLockedPath);
-    return {
-      title: `${audit.title} — Implementation`,
-      why: isInjected
-        ? `This recommendation is based on an Audit Runner generated result (${audit.id}). Evidence source: ${audit.evidenceSource ?? "unknown"}. Verify independently before acting.`
-        : `This recommendation is based on the selected audit (${audit.id}). No priority ranking has been computed — verify independently before acting.`,
-      scope: audit.category,
-      affectedFiles,
-      constraints: audit.constraints ?? "Follow locked file policy. One structural change only.",
-      acceptanceCriteria: audit.acceptanceCriteria ?? null,
-      acceptanceCriteriaMissing: !audit.acceptanceCriteria,
-      lockedWarning: lockedInvolved.length > 0
-        ? lockedInvolved.map((p) => `${p} — ${lockedRuleFor(p)}`).join("\n")
-        : null,
-    };
-  }, [audit]);
+    return buildRecommendedStep(audit, isInjected, isLockedPath, lockedRuleFor);
+  }, [audit, isInjected]);
 
   const copilotTask = useMemo(() => {
     if (!isReady) return null;
