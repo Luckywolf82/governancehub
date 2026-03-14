@@ -770,8 +770,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                     </div>
                   </div>
 
-                  {/* Pre-send review */}
-                  {showCreateConfirm && ghOwner.trim() && ghRepo.trim() && githubIssue && (
+                  {/* Pre-send review — hidden if duplicate detected */}
+                  {!createState?.error && showCreateConfirm && ghOwner.trim() && ghRepo.trim() && githubIssue && (
                     <div className="border border-slate-200 rounded bg-slate-50 p-3 space-y-2 text-xs">
                       <p className="font-semibold text-slate-700">Bekreft før oppretting</p>
                       <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{ghOwner.trim()}/{ghRepo.trim()}</span></p>
