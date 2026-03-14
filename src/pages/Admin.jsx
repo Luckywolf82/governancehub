@@ -14,6 +14,7 @@ export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("Operations");
+  const [injectedAudit, setInjectedAudit] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(setUser).finally(() => setLoading(false));
@@ -77,9 +78,9 @@ export default function Admin() {
         {/* Tab: Operations */}
         {tab === "Operations" && (
           <div className="space-y-6">
-            <GovernanceOrchestratorPanel />
+            <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
             <div className="border-t border-slate-200 pt-4">
-              <AuditRunnerPanel />
+              <AuditRunnerPanel onUseInOrchestrator={(obj) => { setInjectedAudit(obj); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             </div>
           </div>
         )}
