@@ -263,6 +263,56 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     ].filter((l) => l !== undefined).join("\n").trim();
   }, [audit]);
 
+  // ── Issue Dispatch Prep ────────────────────────────────────────────────────
+
+  const issuePrep = useMemo(() => {
+    if (!audit) return null;
+
+    // Title: cleaner, operational format
+    const categoryTag = audit.category ? `[${audit.category}]` : "";
+    const baseTitle = audit.title ?? "Untitled audit";
+    const issueTitle = `${categoryTag} ${baseTitle}`.trim();
+
+    // Labels: 2–4 based on category + state
+    const labels = [];
+    if (audit.category) labels.push(audit.category.toLowerCase());
+    labels.push("audit");
+    if (audit.status === "orphaned") labels.push("remediation");
+    if (audit.preliminary) labels.push("preliminary");
+    if (audit.status === "verified" && !audit.preliminary) labels.push("verified");
+
+    // Readiness → GitHub signal
+    const githubSignal =
+      readiness === "execution-ready" ? "Ready for GitHub" :
+      readiness === "remediation-first" ? "Ready — remediation-focused" :
+      "Draft only — review before issue creation";
+
+    // Provenance
+    const source = isInjected ? "Audit Runner" : "AUDIT_INDEX";
+    const evidenceSrc = audit.evidenceSource ?? "unknown";
+    const enrichmentNote = hasManualData ? `Manual enrichment applied (${enrichedFields.join(", ")})` : null;
+
+    // Full package text for copy
+    const fullPackage = [
+      `ISSUE DISPATCH PACKAGE`,
+      ``,
+      `Title: ${issueTitle}`,
+      `Labels: ${labels.join(", ")}`,
+      `Priority/Readiness: ${readiness ?? "unknown"} — ${githubSignal}`,
+      ``,
+      `PROVENANCE`,
+      `Source: ${source}`,
+      `Audit ID: ${audit.id}`,
+      `Evidence: ${evidenceSrc}`,
+      enrichmentNote ? `Enrichment: ${enrichmentNote}` : null,
+      ``,
+      `ISSUE BODY`,
+      githubIssue ?? "(incomplete — fill required fields)",
+    ].filter((l) => l !== null).join("\n").trim();
+
+    return { issueTitle, labels, githubSignal, source, evidenceSrc, enrichmentNote, fullPackage };
+  }, [audit, readiness, isInjected, hasManualData, enrichedFields, githubIssue]);
+
   const recommendedStepText = useMemo(() => {
     if (!recommendedStep) return null;
     return [
