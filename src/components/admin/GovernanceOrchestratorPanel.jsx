@@ -409,6 +409,12 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             <p className="font-semibold text-slate-800">{recommendedStep.title}</p>
             <p className="text-slate-600"><span className="font-medium">Hvorfor:</span> {recommendedStep.why}</p>
             <p className="text-slate-600"><span className="font-medium">Scope:</span> {recommendedStep.scope}</p>
+            {audit?.oneSafeNextStep && (
+              <div className="flex items-start gap-1.5 bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-xs text-slate-700">
+                <ShieldCheck className="w-3 h-3 mt-0.5 shrink-0 text-slate-400" />
+                <span><span className="font-medium">Registry one safe next step:</span> {audit.oneSafeNextStep}</span>
+              </div>
+            )}
             {recommendedStep.affectedFiles.length > 0 && (
               <div>
                 <span className="font-medium text-slate-600">Berørte filer:</span>
