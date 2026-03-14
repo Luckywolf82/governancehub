@@ -7,6 +7,7 @@ import RepoRawAccessPanel from "@/components/admin/RepoRawAccessPanel";
 import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
 import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestratorPanel";
 import AuditRunnerPanel from "@/components/admin/AuditRunnerPanel";
+import RepositoryManagerPanel from "@/components/admin/RepositoryManagerPanel";
 
 const TABS = ["Operations", "Repo Tools", "System"];
 
@@ -88,6 +89,7 @@ export default function Admin() {
         {/* Tab: Repo Tools */}
         {tab === "Repo Tools" && (
           <div className="space-y-6">
+            <RepositoryManagerPanel />
             <RepoRawAccessPanel />
             <RepoVerificationPanel />
           </div>
