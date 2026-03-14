@@ -789,7 +789,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       <p className="opacity-80 mt-0.5">{createState.message}</p>
                     </div>
                   </div>
-                  <button onClick={() => setCreateState(null)} className="text-red-400 hover:text-red-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => { setCreateState(null); setAnalysisConfirmed(false); }} className="text-red-400 hover:text-red-700"><RotateCcw className="w-3.5 h-3.5" /></button>
                 </div>
               )}
 
