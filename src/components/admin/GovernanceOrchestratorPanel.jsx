@@ -348,6 +348,11 @@ export default function GovernanceOrchestratorPanel() {
               <CardTitle className="text-sm text-slate-700">3. Genererte handoff-outputs</CardTitle>
               <div className="flex items-center gap-2">
                 {!isReady && <Badge className="bg-amber-100 text-amber-700 text-xs">Begrenset — data mangler</Badge>}
+                {isReady && hasManualData && (
+                  <Badge className="bg-amber-100 text-amber-700 text-xs flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" /> Bruker manuell data ({enrichedFields.join(", ")})
+                  </Badge>
+                )}
                 {showOutputs ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </div>
             </div>
