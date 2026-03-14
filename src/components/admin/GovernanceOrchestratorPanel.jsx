@@ -690,8 +690,26 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 </div>
               )}
 
+              {/* Duplicate issue detected state */}
+              {createState && !createState.success && createState.error === 'issue_already_exists' && (
+                <div className="flex items-start justify-between gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2">
+                  <div className="flex items-start gap-2 text-xs text-blue-800">
+                    <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold">Issue finnes allerede for denne auditen</p>
+                      <p className="opacity-80 mt-0.5">{createState.message}</p>
+                      <a href={createState.existing_issue_url} target="_blank" rel="noopener noreferrer"
+                        className="font-mono underline flex items-center gap-1 mt-1 text-blue-700 hover:text-blue-900">
+                        #{createState.existing_issue_number} — {createState.existing_issue_title} <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                  <button onClick={() => { setCreateState(null); setAnalysisConfirmed(false); }} className="text-blue-400 hover:text-blue-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                </div>
+              )}
+
               {/* Error state */}
-              {createState && !createState.success && createState !== "loading" && (
+              {createState && !createState.success && createState !== "loading" && createState.error !== 'issue_already_exists' && (
                 <div className="flex items-start justify-between gap-2 bg-red-50 border border-red-200 rounded px-3 py-2">
                   <div className="flex items-start gap-2 text-xs text-red-800">
                     <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
