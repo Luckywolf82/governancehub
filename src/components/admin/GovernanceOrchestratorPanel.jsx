@@ -343,13 +343,26 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             </div>
           )}
 
-          {/* Show preliminary warning if the entry is marked as such */}
-          {audit && !isInjected && audit.preliminary && (
-            <div className="flex items-start gap-1.5 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
-              <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-              <span><strong>Preliminary audit:</strong> {audit.preliminaryNote ?? "Some fields are scope definitions only — not verified evidence."}</span>
-            </div>
-          )}
+          {/* Readiness banner — shown for all non-injected audits */}
+          {audit && !isInjected && readinessConfig && (() => {
+            const Icon = readinessConfig.icon;
+            return (
+              <div className={`flex items-start gap-2 border rounded px-3 py-2 ${readinessConfig.bg}`}>
+                <Icon className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${readinessConfig.text}`} />
+                <div className={`text-xs ${readinessConfig.text}`}>
+                  <span className="font-semibold">{readinessConfig.label}</span>
+                  {" — "}
+                  {readinessConfig.message}
+                  {audit.preliminary && audit.preliminaryNote && (
+                    <p className="mt-1 opacity-80">{audit.preliminaryNote}</p>
+                  )}
+                  {audit.evidenceSource && (
+                    <p className="mt-1 font-mono opacity-70">Evidence source: {audit.evidenceSource}</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Enrichment area — only for AUDIT_INDEX audits, not injected */}
           {audit && !isInjected && missing.length > 0 && (
