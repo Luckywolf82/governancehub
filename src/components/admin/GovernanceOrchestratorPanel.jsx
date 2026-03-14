@@ -121,6 +121,16 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
   const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
 
+  const orderedEntries = useMemo(() => {
+    const rank = { verified: 0, orphaned: 1, planned: 2 };
+    return [...AUDIT_INDEX.entries].sort((a, b) => {
+      const aRank = rank[a.status] ?? 99;
+      const bRank = rank[b.status] ?? 99;
+      if (aRank !== bRank) return aRank - bRank;
+      return String(b.date ?? "").localeCompare(String(a.date ?? ""));
+    });
+  }, []);
+
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
   const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? null);
