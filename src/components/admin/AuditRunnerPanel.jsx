@@ -1,12 +1,13 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, CheckCircle2, HelpCircle, Play, ChevronDown, ChevronUp, ArrowRightCircle } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, CheckCircle2, HelpCircle, Play, ChevronDown, ChevronUp, ArrowRightCircle, Github } from "lucide-react";
 import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { AI_PROJECT_INSTRUCTIONS } from "@/components/governance/AI_PROJECT_INSTRUCTIONS";
 import { AI_STATE } from "@/components/governance/AI_STATE";
 import { NEXT_SAFE_STEP } from "@/components/governance/NextSafeStep";
 import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
+import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -207,7 +208,7 @@ function runChecks(manualEvidence) {
 
 // ── Build audit output object ──────────────────────────────────────────────────
 
-function buildAuditObject(checks, runId) {
+function buildAuditObject(checks, runId, targetMode, targetRepoFullName) {
   const failedChecks = checks.filter(c => c.status === "fail" || c.status === "warn");
   // A check counts as using manual evidence if its evidenceSource includes "manual" AND the evidence was actually supplied (manualRequired === false means evidence was present)
   const hasManual = checks.some(c => c.evidenceSource.includes("manual") && !c.manualRequired);
@@ -219,7 +220,7 @@ function buildAuditObject(checks, runId) {
 
   const affectedFiles = [...new Set(failedChecks.flatMap(c => c.affectedFiles))];
 
-  return {
+  const auditObj = {
     id: runId,
     title: "GovernanceHub Automated Governance Audit",
     category: "Governance",
@@ -252,7 +253,11 @@ function buildAuditObject(checks, runId) {
     evidenceSource: hasManual ? "repo-derived + manual evidence" : "repo-derived",
     manualEvidenceUsed: hasManual,
     checksRun: checks.map(c => ({ id: c.id, title: c.title, status: c.status, evidenceSource: c.evidenceSource })),
+    // Audit target context (additive metadata)
+    auditTargetMode: targetMode,
+    auditTargetRepoFullName: targetRepoFullName,
   };
+  return auditObj;
 }
 
 function formatAuditAsText(obj) {
@@ -354,6 +359,54 @@ export default function AuditRunnerPanel({ onUseInOrchestrator }) {
         </div>
         <Badge className="bg-slate-100 text-slate-600 text-xs">Beta</Badge>
       </div>
+
+      {/* Target Mode Selection */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm text-slate-700">Audit-kontekst</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0 space-y-2">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setTargetMode("active-repo")}
+              disabled={!activeRepo}
+              className={`flex-1 flex items-center justify-center gap-2 text-xs font-medium px-3 py-1.5 rounded border transition-colors ${
+                targetMode === "active-repo"
+                  ? "bg-blue-100 border-blue-300 text-blue-800"
+                  : activeRepo
+                  ? "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  : "border-slate-100 text-slate-400 cursor-not-allowed opacity-50"
+              }`}
+            >
+              <Github className="w-3 h-3" />
+              Aktivt repo
+            </button>
+            <button
+              onClick={() => setTargetMode("canonical")}
+              className={`flex-1 flex items-center justify-center gap-2 text-xs font-medium px-3 py-1.5 rounded border transition-colors ${
+                targetMode === "canonical"
+                  ? "bg-slate-100 border-slate-300 text-slate-800"
+                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              GovernanceHub canonical
+            </button>
+          </div>
+          {targetMode === "active-repo" && activeRepo ? (
+            <div className="text-xs text-slate-600 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
+              <span className="font-medium">Kjører for:</span> <span className="font-mono">{activeRepo.owner}/{activeRepo.repo}</span>
+            </div>
+          ) : targetMode === "canonical" ? (
+            <div className="text-xs text-slate-600 bg-slate-100 border border-slate-300 rounded px-2 py-1.5">
+              <span className="font-medium">Kjører for:</span> GovernanceHub canonical governance
+            </div>
+          ) : (
+            <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+              <span className="font-medium">Ingen aktivt repo valgt</span> — bruk GovernanceHub canonical
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Checks overview */}
       <Card>
