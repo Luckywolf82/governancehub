@@ -79,6 +79,7 @@ export default function Admin() {
           ))}
         </div>
 
+        <GovernanceOrchestratorPanel />
         <RepoRawAccessPanel />
         <RepoVerificationPanel />
 
