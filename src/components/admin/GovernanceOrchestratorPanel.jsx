@@ -249,7 +249,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     // Debounce by 500ms to avoid excessive API calls
     const timeoutId = setTimeout(checkPrStatus, 500);
     return () => clearTimeout(timeoutId);
-  }, [audit, ghOwner, ghRepo];
+  }, [audit, ghOwner, ghRepo]);
 
   function handleEnrich(name, val) {
     setEnrichment((prev) => ({ ...prev, [name]: val }));
