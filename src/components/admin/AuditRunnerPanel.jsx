@@ -532,6 +532,15 @@ export default function AuditRunnerPanel({ onUseInOrchestrator }) {
                 </div>
               )}
 
+              <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded px-2 py-1.5">
+                <span className="font-medium">Audit-kontekst:</span>{" "}
+                {auditObject.auditTargetMode === "active-repo" && auditObject.auditTargetRepoFullName ? (
+                  <span>Aktivt repo <span className="font-mono">({auditObject.auditTargetRepoFullName})</span></span>
+                ) : (
+                  <span>GovernanceHub canonical</span>
+                )}
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 {onUseInOrchestrator && (
                   <button
