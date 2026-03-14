@@ -6,6 +6,7 @@ import { Shield, Users, FileText, Activity, Lock } from "lucide-react";
 import RepoRawAccessPanel from "@/components/admin/RepoRawAccessPanel";
 import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
 import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestratorPanel";
+import AuditRunnerPanel from "@/components/admin/AuditRunnerPanel";
 
 const TABS = ["Operations", "Repo Tools", "System"];
 
