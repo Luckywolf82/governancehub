@@ -280,7 +280,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             >
               <option value="">— Velg en audit fra indeksen —</option>
               {AUDIT_INDEX.entries.map((e) => (
-                <option key={e.id} value={e.id}>{e.id} — {e.title} [{e.status}]</option>
+                <option key={e.id} value={e.id}>{e.id} — {e.title} [{e.status}{e.preliminary ? " / preliminary" : ""}]</option>
               ))}
             </select>
           )}
