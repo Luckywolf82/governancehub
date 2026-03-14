@@ -12,8 +12,6 @@ import { getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDr
 
 const REQUIRED_FIELDS = ["problem", "impact", "affectedFiles", "requiredChange", "constraints", "acceptanceCriteria"];
 
-
-
 const READINESS_CONFIG = {
   "execution-ready": {
     icon: ShieldCheck,
