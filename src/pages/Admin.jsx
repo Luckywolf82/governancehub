@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Users, FileText, Activity, Lock } from "lucide-react";
 import RepoRawAccessPanel from "@/components/admin/RepoRawAccessPanel";
 import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
+import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestratorPanel";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
