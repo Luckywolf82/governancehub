@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp, X, FlaskConical } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp, X, FlaskConical, ShieldCheck, Wrench, BookOpen } from "lucide-react";
 import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
 import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { generateCopilotTask } from "@/components/governance/TaskGenerator";
@@ -9,6 +9,46 @@ import { generateCopilotTask } from "@/components/governance/TaskGenerator";
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const REQUIRED_FIELDS = ["problem", "impact", "affectedFiles", "requiredChange", "constraints", "acceptanceCriteria"];
+
+// ── Readiness model ────────────────────────────────────────────────────────
+// Derived from audit.status + audit.preliminary — no new canonical fields needed.
+//   "execution-ready"    → verified + preliminary: false
+//   "remediation-first"  → orphaned
+//   "analysis-first"     → planned OR preliminary: true (any status)
+
+function getReadiness(audit) {
+  if (!audit) return null;
+  if (audit.status === "orphaned") return "remediation-first";
+  if (audit.status === "verified" && audit.preliminary === false) return "execution-ready";
+  return "analysis-first";
+}
+
+const READINESS_CONFIG = {
+  "execution-ready": {
+    icon: ShieldCheck,
+    bg: "bg-green-50 border-green-200",
+    text: "text-green-800",
+    label: "Execution-ready",
+    message: "Findings verified by direct file inspection and safe to use for implementation planning.",
+    outputNote: null,
+  },
+  "remediation-first": {
+    icon: Wrench,
+    bg: "bg-red-50 border-red-200",
+    text: "text-red-800",
+    label: "Remediation-first",
+    message: "Orphaned audit — findings indicate structural problems, but the canonical audit content file is missing or contains wrong data. Resolve the structural issue before using this for normal implementation workflow.",
+    outputNote: "Outputs below are remediation-oriented. Resolve the orphaned file state before treating this as an implementation task.",
+  },
+  "analysis-first": {
+    icon: BookOpen,
+    bg: "bg-blue-50 border-blue-200",
+    text: "text-blue-800",
+    label: "Analysis-first",
+    message: "Preliminary audit scope — this is a planned audit definition or unexecuted scope, not a verified audit result. Use for planning and scoping, not direct implementation guidance.",
+    outputNote: "Outputs below are planning-oriented and based on preliminary scope definitions, not verified findings.",
+  },
+};
 
 function missingFields(audit) {
   return REQUIRED_FIELDS.filter((f) => {
