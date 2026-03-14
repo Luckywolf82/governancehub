@@ -79,6 +79,7 @@ export default function Admin() {
         </div>
 
         <RepoRawAccessPanel />
+        <RepoVerificationPanel />
 
         <Card>
           <CardHeader>
