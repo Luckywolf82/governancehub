@@ -1013,6 +1013,9 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       {!githubIssue && (
                         <p className="text-xs text-amber-600 italic flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Issue body ikke tilgjengelig — fyll inn påkrevde audit-felt først.</p>
                       )}
+                      {!effectiveOwner.trim() || !effectiveRepo.trim() && (
+                        <p className="text-xs text-amber-600 italic flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Repo owner og repo navn kreves — velg repo eller fyll inn manuelt.</p>
+                      )}
                       {requiresAnalysisConfirm && !analysisConfirmed && githubIssue && (
                         <p className="text-xs text-blue-600 italic flex items-center gap-1"><BookOpen className="w-3 h-3" />Kryss av bekreftelsen over for å aktivere oppretting.</p>
                       )}
