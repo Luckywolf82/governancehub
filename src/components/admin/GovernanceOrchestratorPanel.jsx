@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp, X, FlaskConical } from "lucide-react";
 import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
 import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { generateCopilotTask } from "@/components/governance/TaskGenerator";
@@ -65,16 +65,20 @@ function EnrichField({ label, name, value, onChange, isArray }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function GovernanceOrchestratorPanel() {
+export default function GovernanceOrchestratorPanel({ injectedAudit = null, onClearInjected }) {
   const [selectedId, setSelectedId] = useState("");
   const [enrichment, setEnrichment] = useState({});
   const [showOutputs, setShowOutputs] = useState(false);
 
-  const baseAudit = AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? null;
+  // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
+  const isInjected = !!injectedAudit;
+  const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? null);
 
   // Merge audit index data with manual enrichment; track which fields came from enrichment
   const { audit, enrichedFields } = useMemo(() => {
     if (!baseAudit) return { audit: null, enrichedFields: [] };
+    // For injected audits, skip enrichment merge — fields are already populated by Audit Runner
+    if (isInjected) return { audit: baseAudit, enrichedFields: [] };
     const merged = { ...baseAudit };
     const used = [];
     REQUIRED_FIELDS.forEach((f) => {
@@ -247,19 +251,40 @@ export default function GovernanceOrchestratorPanel() {
           <CardTitle className="text-sm text-slate-700">1. Velg audit</CardTitle>
         </CardHeader>
         <CardContent className="pt-0 space-y-3">
-          <select
-            value={selectedId}
-            onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); }}
-            className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
-          >
-            <option value="">— Velg en audit fra indeksen —</option>
-            {AUDIT_INDEX.entries.map((e) => (
-              <option key={e.id} value={e.id}>{e.id} — {e.title} [{e.status}]</option>
-            ))}
-          </select>
+
+          {/* Injected audit banner */}
+          {isInjected ? (
+            <div className="flex items-start justify-between gap-2 bg-indigo-50 border border-indigo-200 rounded px-3 py-2">
+              <div className="flex items-start gap-2 text-xs text-indigo-800">
+                <FlaskConical className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold">Audit Runner result</p>
+                  <p className="text-indigo-600">Injisert fra Audit Runner — ikke hentet fra AUDIT_INDEX. Kilde: <span className="font-mono">{injectedAudit.evidenceSource ?? "ukjent"}</span></p>
+                </div>
+              </div>
+              <button
+                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); }}
+                className="shrink-0 text-indigo-400 hover:text-indigo-700 transition-colors"
+                title="Fjern injisert audit og gå tilbake til AUDIT_INDEX"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <select
+              value={selectedId}
+              onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); }}
+              className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
+            >
+              <option value="">— Velg en audit fra indeksen —</option>
+              {AUDIT_INDEX.entries.map((e) => (
+                <option key={e.id} value={e.id}>{e.id} — {e.title} [{e.status}]</option>
+              ))}
+            </select>
+          )}
 
           {audit && (
-            <div className="text-xs space-y-1 border border-slate-100 rounded p-2 bg-slate-50">
+            <div className={`text-xs space-y-1 border rounded p-2 ${isInjected ? "border-indigo-100 bg-indigo-50/40" : "border-slate-100 bg-slate-50"}`}>
               <div className="flex flex-wrap gap-1.5 mb-1">
                 <Badge className="bg-blue-100 text-blue-800 text-xs">{audit.category}</Badge>
                 <Badge className={`text-xs ${audit.status === "completed" ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>{audit.status}</Badge>
@@ -269,8 +294,8 @@ export default function GovernanceOrchestratorPanel() {
             </div>
           )}
 
-          {/* Enrichment area for missing fields */}
-          {audit && missing.length > 0 && (
+          {/* Enrichment area — only for AUDIT_INDEX audits, not injected */}
+          {audit && !isInjected && missing.length > 0 && (
             <div className="border border-amber-200 rounded p-3 bg-amber-50/50">
               <p className="text-xs font-medium text-amber-700 mb-2 flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3" />
@@ -293,7 +318,12 @@ export default function GovernanceOrchestratorPanel() {
           {audit && (
             <div className={`text-xs px-2 py-1 rounded flex items-center gap-1.5 ${isReady ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}`}>
               {isReady ? <CheckCheck className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
-              {isReady ? "Audit er komplett — alle outputs tilgjengelig." : `Mangler: ${missing.join(", ")} — outputs vil reflektere usikkerhet.`}
+              {isReady
+                ? isInjected
+                  ? "Audit Runner result er komplett — alle outputs tilgjengelig."
+                  : "Audit er komplett — alle outputs tilgjengelig."
+                : `Mangler: ${missing.join(", ")} — outputs vil reflektere usikkerhet.`
+              }
             </div>
           )}
         </CardContent>
