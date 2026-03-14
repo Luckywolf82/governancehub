@@ -192,7 +192,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
   // Auto-check GitHub issue status when audit or repo selection changes
   useEffect(() => {
-    if (!audit || !ghOwner.trim() || !ghRepo.trim()) {
+    if (!audit || !effectiveOwner.trim() || !effectiveRepo.trim()) {
       setIssueStatus(null);
       return;
     }
@@ -206,8 +206,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       setCheckingIssueStatus(true);
       try {
         const res = await base44.functions.invoke('getGithubIssueForAudit', {
-          owner: ghOwner.trim(),
-          repo: ghRepo.trim(),
+          owner: effectiveOwner.trim(),
+          repo: effectiveRepo.trim(),
           auditId: audit.id,
         });
         if (res.data) {
@@ -224,7 +224,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     // Debounce by 500ms to avoid excessive API calls
     const timeoutId = setTimeout(checkStatus, 500);
     return () => clearTimeout(timeoutId);
-  }, [audit, ghOwner, ghRepo]);
+  }, [audit, effectiveOwner, effectiveRepo];
 
   // Auto-check GitHub PR status when audit or repo selection changes
   useEffect(() => {
