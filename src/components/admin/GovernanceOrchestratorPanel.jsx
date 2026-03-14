@@ -803,12 +803,12 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                     </div>
                   )}
 
-                  {/* Primary create trigger */}
+                  {/* Primary create trigger — disabled if duplicate detected */}
                   {!showCreateConfirm && (
                     <div className="space-y-1">
                       <button
                         onClick={() => { setShowCreateConfirm(true); setCreateState(null); }}
-                        disabled={!canOpenCreateConfirm}
+                        disabled={!canOpenCreateConfirm || createState?.error === 'issue_already_exists'}
                         className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:border-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         <Github className="w-3.5 h-3.5" />
