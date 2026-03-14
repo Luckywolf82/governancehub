@@ -134,6 +134,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
   const missing = audit ? missingFields(audit) : [];
   const isReady = audit && missing.length === 0;
+  const readiness = getReadiness(audit);
+  const readinessConfig = readiness ? READINESS_CONFIG[readiness] : null;
 
   function handleEnrich(name, val) {
     setEnrichment((prev) => ({ ...prev, [name]: val }));
