@@ -55,6 +55,20 @@ function lockedRuleFor(path) {
   return LOCKED_FILES.files.find((lf) => lf.path === path)?.rule;
 }
 
+// ── Helpers: Auto-select best default audit ────────────────────────────────
+
+function getBestDefaultAudit(entries) {
+  if (!entries || entries.length === 0) return "";
+  // Priority: verified+preliminary:false → orphaned → planned → other
+  const verified = entries.find((e) => e.status === "verified" && e.preliminary === false);
+  if (verified) return verified.id;
+  const orphaned = entries.find((e) => e.status === "orphaned");
+  if (orphaned) return orphaned.id;
+  const planned = entries.find((e) => e.status === "planned");
+  if (planned) return planned.id;
+  return entries[0]?.id ?? "";
+}
+
 // ── CopyBtn ─────────────────────────────────────────────────────────────────
 
 function CopyBtn({ value, label }) {
@@ -95,7 +109,7 @@ function EnrichField({ label, name, value, onChange, isArray }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function GovernanceOrchestratorPanel({ injectedAudit = null, onClearInjected }) {
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState(() => getBestDefaultAudit(AUDIT_INDEX.entries));
   const [enrichment, setEnrichment] = useState({});
   const [showOutputs, setShowOutputs] = useState(false);
   const [showLogAssistant, setShowLogAssistant] = useState(false);
@@ -369,16 +383,19 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               </button>
             </div>
           ) : (
-            <select
-              value={selectedId}
-              onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
-              className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
-            >
-              <option value="">— Velg en audit fra indeksen —</option>
-              {orderedEntries.map((e) => (
-                <option key={e.id} value={e.id}>{e.id} — {e.title} [{e.status}{e.preliminary ? " / preliminary" : ""}]</option>
-              ))}
-            </select>
+            <div>
+              <select
+                value={selectedId}
+                onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
+              >
+                <option value="">— Velg en audit fra indeksen —</option>
+                {orderedEntries.map((e) => (
+                  <option key={e.id} value={e.id}>{e.id} — {e.title} [{e.status}{e.preliminary ? " / preliminary" : ""}]</option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-400 mt-1">Auto-valgt høyest prioriterte audit fra indeksen.</p>
+            </div>
           )}
 
           {audit && (
