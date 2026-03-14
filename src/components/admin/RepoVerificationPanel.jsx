@@ -171,6 +171,20 @@ export default function RepoVerificationPanel() {
   const [filterCritical, setFilterCritical] = useState(false);
   const [filterLocked, setFilterLocked] = useState(false);
   const [filterMissing, setFilterMissing] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(null);
+
+  // Pick first existing canonical artifact, else null
+  const canonical = CANONICAL_ARTIFACTS.find((a) => a.exists) ?? null;
+  const [selectedKey, setSelectedKey] = useState(
+    CANONICAL_ARTIFACTS.find((a) => a.exists)?.key ?? CANONICAL_ARTIFACTS[0].key
+  );
+  const selectedArtifact = CANONICAL_ARTIFACTS.find((a) => a.key === selectedKey);
+
+  function copyWithFeedback(value, key) {
+    navigator.clipboard.writeText(value);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 1800);
+  }
 
   const bundle = VERIFICATION_BUNDLE;
   const missingCount = bundle.missingCriticalFiles.length;
