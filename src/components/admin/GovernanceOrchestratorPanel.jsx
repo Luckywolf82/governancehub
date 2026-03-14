@@ -391,6 +391,34 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     return { fullDraft, summaryOnly, followUpNote, expectedFiles, lockedInvolved, actualIsConfirmed };
   }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
 
+  async function handleCreateIssue() {
+    if (!issuePrep || !githubIssue || !ghOwner.trim() || !ghRepo.trim()) return;
+    setCreateState("loading");
+    try {
+      const res = await base44.functions.invoke("createGithubIssue", {
+        owner: ghOwner.trim(),
+        repo: ghRepo.trim(),
+        title: issuePrep.issueTitle,
+        body: githubIssue,
+        labels: issuePrep.labels,
+        auditId: audit.id,
+        readiness,
+        source: issuePrep.source,
+      });
+      const data = res.data;
+      if (data?.success) {
+        setCreateState({ success: true, url: data.issue_url, number: data.issue_number, title: data.title });
+        setShowCreateConfirm(false);
+      } else if (data?.error === "github_not_connected") {
+        setCreateState({ success: false, message: "GitHub-kobling ikke aktiv. Aktiver GitHub-connector i admin-innstillingene." });
+      } else {
+        setCreateState({ success: false, message: data?.message ?? "Ukjent feil fra GitHub API." });
+      }
+    } catch (e) {
+      setCreateState({ success: false, message: e.message ?? "Nettverksfeil — prøv igjen." });
+    }
+  }
+
   const recommendedStepText = useMemo(() => {
     if (!recommendedStep) return null;
     return [
