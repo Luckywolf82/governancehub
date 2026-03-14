@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, ExternalLink, Lock, CheckCircle2, BookOpen, Link2 } from "lucide-react";
+import { Copy, ExternalLink, Lock, CheckCircle2, BookOpen, Link2, AlertTriangle, Github } from "lucide-react";
 import { CHATGPT_REPO_INDEX } from "@/components/governance/CHATGPT_REPO_INDEX";
+import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 // ── Canonical single artifact — lives as a committed source file ──────────────
 // Published to GitHub via Base44 Publish. No terminal step required.
