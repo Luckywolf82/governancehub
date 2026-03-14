@@ -10,6 +10,40 @@ import { Copy, ExternalLink, Lock, CheckCircle2, XCircle, AlertTriangle, BookOpe
 const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main";
 const GH_BASE  = "https://github.com/Luckywolf82/governancehub/blob/main";
 
+// ── Canonical start artifacts (ordered by preference) ────────────────────────
+const CANONICAL_ARTIFACTS = [
+  {
+    key: "manifest",
+    label: "File Manifest",
+    role: "manifest",
+    path: "src/components/governance/REPO_FILE_MANIFEST.json",
+    rawUrl: `${RAW_BASE}/src/components/governance/REPO_FILE_MANIFEST.json`,
+    githubUrl: `${GH_BASE}/src/components/governance/REPO_FILE_MANIFEST.json`,
+    exists: false,
+    desc: "Complete indexed list of all 46 confirmed repo files.",
+  },
+  {
+    key: "bundle",
+    label: "Verification Bundle",
+    role: "verification bundle",
+    path: "src/components/governance/REPO_VERIFICATION_BUNDLE.json",
+    rawUrl: `${RAW_BASE}/src/components/governance/REPO_VERIFICATION_BUNDLE.json`,
+    githubUrl: `${GH_BASE}/src/components/governance/REPO_VERIFICATION_BUNDLE.json`,
+    exists: false,
+    desc: "Compact priority-first start pack for ChatGPT verification.",
+  },
+  {
+    key: "rtf",
+    label: "Read This First",
+    role: "read-this-first",
+    path: "src/components/governance/READ_THIS_FIRST.json",
+    rawUrl: `${RAW_BASE}/src/components/governance/READ_THIS_FIRST.json`,
+    githubUrl: `${GH_BASE}/src/components/governance/READ_THIS_FIRST.json`,
+    exists: false,
+    desc: "Ordered verification flows for governance, routing, admin, and project structure.",
+  },
+];
+
 // ── Artifact registry ─────────────────────────────────────────────────────────
 // These are the generated verification artifacts. exists=true once created in repo.
 const ARTIFACTS = [
