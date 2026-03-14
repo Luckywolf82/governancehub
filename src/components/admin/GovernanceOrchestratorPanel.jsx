@@ -119,12 +119,15 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [actualChangeSummary, setActualChangeSummary] = useState("");
 
   // ── GitHub Issue Create state ──────────────────────────────────────────────
-  // Use active repo if available, otherwise fall back to manual input
-  const [ghOwner, setGhOwner] = useState(activeRepo?.owner || "");
-  const [ghRepo, setGhRepo] = useState(activeRepo?.repo || "");
+  const [ghOwner, setGhOwner] = useState("");
+  const [ghRepo, setGhRepo] = useState("");
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
   const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
+
+  // Effective repo source: prioritize activeRepo if available, else use manual input
+  const effectiveOwner = activeRepo ? activeRepo.owner : ghOwner;
+  const effectiveRepo = activeRepo ? activeRepo.repo : ghRepo;
 
   // ── GitHub Issue Status Check state ────────────────────────────────────────
   const [issueStatus, setIssueStatus] = useState(null); // null | {found: false} | {found: true, number, url, title, state}
