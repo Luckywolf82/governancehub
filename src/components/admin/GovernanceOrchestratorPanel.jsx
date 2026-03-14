@@ -72,18 +72,21 @@ export default function GovernanceOrchestratorPanel() {
 
   const baseAudit = AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? null;
 
-  // Merge audit index data with manual enrichment
-  const audit = useMemo(() => {
-    if (!baseAudit) return null;
+  // Merge audit index data with manual enrichment; track which fields came from enrichment
+  const { audit, enrichedFields } = useMemo(() => {
+    if (!baseAudit) return { audit: null, enrichedFields: [] };
     const merged = { ...baseAudit };
+    const used = [];
     REQUIRED_FIELDS.forEach((f) => {
       const raw = enrichment[f] ?? "";
       if (!merged[f] && raw.trim()) {
         merged[f] = f === "affectedFiles" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw.trim();
+        used.push(f);
       }
     });
-    return merged;
+    return { audit: merged, enrichedFields: used };
   }, [baseAudit, enrichment]);
+  const hasManualData = enrichedFields.length > 0;
 
   const missing = audit ? missingFields(audit) : [];
   const isReady = audit && missing.length === 0;
