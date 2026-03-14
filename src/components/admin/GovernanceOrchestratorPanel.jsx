@@ -919,31 +919,49 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 </div>
               )}
 
-              {/* Repo input + trigger — hidden after success */}
+              {/* Active Repo Info or Manual Input */}
               {!createState?.success && (
                 <>
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <label className="text-xs text-slate-400 block mb-0.5">GitHub owner</label>
-                      <input
-                        type="text"
-                        value={ghOwner}
-                        onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
-                        placeholder="e.g. my-org"
-                        className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
-                      />
+                  {activeRepo ? (
+                    <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
+                      <Github className="w-3.5 h-3.5 shrink-0" />
+                      <div className="flex-1">
+                        <span className="font-medium">Bruker aktivt repo:</span>
+                        <span className="font-mono ml-1">{activeRepo.owner}/{activeRepo.repo}</span>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <label className="text-xs text-slate-400 block mb-0.5">Repository</label>
-                      <input
-                        type="text"
-                        value={ghRepo}
-                        onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
-                        placeholder="e.g. governance-hub"
-                        className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
-                      />
+                  ) : (
+                    <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800 mb-2">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <span>Ingen aktivt repo valgt — bruker manuell repo-input</span>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Manual repo inputs — only shown when no active repo */}
+                  {!activeRepo && (
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <label className="text-xs text-slate-400 block mb-0.5">GitHub owner</label>
+                        <input
+                          type="text"
+                          value={ghOwner}
+                          onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                          placeholder="e.g. my-org"
+                          className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-xs text-slate-400 block mb-0.5">Repository</label>
+                        <input
+                          type="text"
+                          value={ghRepo}
+                          onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                          placeholder="e.g. governance-hub"
+                          className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Pre-send review — hidden if duplicate detected */}
                   {!createState?.error && showCreateConfirm && ghOwner.trim() && ghRepo.trim() && githubIssue && (
