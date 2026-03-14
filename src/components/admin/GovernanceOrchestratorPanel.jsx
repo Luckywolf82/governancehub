@@ -876,17 +876,22 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
                   {/* Primary create trigger */}
                   {!showCreateConfirm && (
-                    <button
-                      onClick={() => { setShowCreateConfirm(true); setCreateState(null); }}
-                      disabled={!ghOwner.trim() || !ghRepo.trim() || !githubIssue}
-                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:border-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <Github className="w-3.5 h-3.5" />
-                      Opprett GitHub issue
-                    </button>
-                  )}
-                  {!githubIssue && (
-                    <p className="text-xs text-amber-600 italic flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Issue body ikke tilgjengelig — fyll inn påkrevde audit-felt først.</p>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => { setShowCreateConfirm(true); setCreateState(null); }}
+                        disabled={!canOpenCreateConfirm}
+                        className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:border-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Github className="w-3.5 h-3.5" />
+                        Opprett GitHub issue
+                      </button>
+                      {!githubIssue && (
+                        <p className="text-xs text-amber-600 italic flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Issue body ikke tilgjengelig — fyll inn påkrevde audit-felt først.</p>
+                      )}
+                      {requiresAnalysisConfirm && !analysisConfirmed && githubIssue && (
+                        <p className="text-xs text-blue-600 italic flex items-center gap-1"><BookOpen className="w-3 h-3" />Kryss av bekreftelsen over for å aktivere oppretting.</p>
+                      )}
+                    </div>
                   )}
                 </>
               )}
