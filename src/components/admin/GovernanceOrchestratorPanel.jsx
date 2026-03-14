@@ -279,24 +279,29 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const issuePrep = useMemo(() => {
     if (!audit) return null;
 
-    // Title: cleaner, operational format
+    // Title: prefix deterministically from readiness + category
     const categoryTag = audit.category ? `[${audit.category}]` : "";
     const baseTitle = audit.title ?? "Untitled audit";
-    const issueTitle = `${categoryTag} ${baseTitle}`.trim();
+    const issueTitle =
+      readiness === "remediation-first" ? `[Remediation]${categoryTag} ${baseTitle}`.trim() :
+      readiness === "analysis-first"    ? `[Planning]${categoryTag} ${baseTitle}`.trim() :
+      `${categoryTag} ${baseTitle}`.trim();
 
-    // Labels: 2–4 based on category + state
-    const labels = [];
-    if (audit.category) labels.push(audit.category.toLowerCase());
-    labels.push("audit");
-    if (audit.status === "orphaned") labels.push("remediation");
-    if (audit.preliminary) labels.push("preliminary");
-    if (audit.status === "verified" && !audit.preliminary) labels.push("verified");
+    // Labels: deterministic from readiness
+    const labelsSet = new Set();
+    if (audit.category) labelsSet.add(audit.category.toLowerCase());
+    labelsSet.add("audit");
+    if (readiness === "remediation-first") labelsSet.add("remediation");
+    if (readiness === "analysis-first") { labelsSet.add("needs-verification"); labelsSet.add("planning"); }
+    if (audit.preliminary) labelsSet.add("preliminary");
+    if (readiness === "execution-ready") labelsSet.add("verified");
+    const labels = Array.from(labelsSet);
 
     // Readiness → GitHub signal
     const githubSignal =
-      readiness === "execution-ready" ? "Ready for GitHub" :
+      readiness === "execution-ready"   ? "Ready for GitHub" :
       readiness === "remediation-first" ? "Ready — remediation-focused" :
-      "Draft only — review before issue creation";
+      "Planning/analysis — requires acknowledgement";
 
     // Provenance
     const source = isInjected ? "Audit Runner" : "AUDIT_INDEX";
