@@ -109,6 +109,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [selectedId, setSelectedId] = useState("");
   const [enrichment, setEnrichment] = useState({});
   const [showOutputs, setShowOutputs] = useState(false);
+  const [showLogAssistant, setShowLogAssistant] = useState(false);
+  const [confirmedFiles, setConfirmedFiles] = useState("");
 
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
