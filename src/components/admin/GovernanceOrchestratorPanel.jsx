@@ -461,9 +461,17 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             <div className="flex items-start justify-between gap-2 bg-indigo-50 border border-indigo-200 rounded px-3 py-2">
               <div className="flex items-start gap-2 text-xs text-indigo-800">
                 <FlaskConical className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                <div>
+                <div className="space-y-1">
                   <p className="font-semibold">Audit Runner result</p>
                   <p className="text-indigo-600">Injisert fra Audit Runner — ikke hentet fra AUDIT_INDEX. Kilde: <span className="font-mono">{injectedAudit.evidenceSource ?? "ukjent"}</span></p>
+                  {injectedAudit.auditTargetMode && (
+                    <p className="text-indigo-700 font-medium">
+                      Audit-kontekst: {injectedAudit.auditTargetMode === "active-repo" 
+                        ? `Aktivt repo${injectedAudit.auditTargetRepoFullName ? ` (${injectedAudit.auditTargetRepoFullName})` : ""}`
+                        : "GovernanceHub canonical"
+                      }
+                    </p>
+                  )}
                 </div>
               </div>
               <button
