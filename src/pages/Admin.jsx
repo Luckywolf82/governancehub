@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, FileText, Activity, Lock } from "lucide-react";
 import RepoRawAccessPanel from "@/components/admin/RepoRawAccessPanel";
+import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
