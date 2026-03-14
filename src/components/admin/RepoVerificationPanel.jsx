@@ -2,57 +2,18 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Copy, ExternalLink, Lock, CheckCircle2, XCircle, AlertTriangle, BookOpen, Link2 } from "lucide-react";
+import { CHATGPT_REPO_INDEX } from "@/components/governance/CHATGPT_REPO_INDEX";
 
-// ── Inline verification data ──────────────────────────────────────────────────
-// Source: derived from REPO_FILE_MANIFEST + PRIORITY_REPO_FILES (2026-03-14)
-// Re-derive by running: node tools/generateRepoManifest.js
-
-const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main";
-const GH_BASE  = "https://github.com/Luckywolf82/governancehub/blob/main";
-
-// ── Canonical start artifacts (ordered by preference) ────────────────────────
-const CANONICAL_ARTIFACTS = [
-  {
-    key: "manifest",
-    label: "File Manifest",
-    role: "manifest",
-    path: "src/components/governance/REPO_FILE_MANIFEST.json",
-    rawUrl: `${RAW_BASE}/src/components/governance/REPO_FILE_MANIFEST.json`,
-    githubUrl: `${GH_BASE}/src/components/governance/REPO_FILE_MANIFEST.json`,
-    exists: false,
-    desc: "Complete indexed list of all 46 confirmed repo files.",
-  },
-  {
-    key: "bundle",
-    label: "Verification Bundle",
-    role: "verification bundle",
-    path: "src/components/governance/REPO_VERIFICATION_BUNDLE.json",
-    rawUrl: `${RAW_BASE}/src/components/governance/REPO_VERIFICATION_BUNDLE.json`,
-    githubUrl: `${GH_BASE}/src/components/governance/REPO_VERIFICATION_BUNDLE.json`,
-    exists: false,
-    desc: "Compact priority-first start pack for ChatGPT verification.",
-  },
-  {
-    key: "rtf",
-    label: "Read This First",
-    role: "read-this-first",
-    path: "src/components/governance/READ_THIS_FIRST.json",
-    rawUrl: `${RAW_BASE}/src/components/governance/READ_THIS_FIRST.json`,
-    githubUrl: `${GH_BASE}/src/components/governance/READ_THIS_FIRST.json`,
-    exists: false,
-    desc: "Ordered verification flows for governance, routing, admin, and project structure.",
-  },
-];
-
-// ── Artifact registry ─────────────────────────────────────────────────────────
-// These are the generated verification artifacts. exists=true once created in repo.
-const ARTIFACTS = [
-  { label: "File Manifest",         path: "src/components/governance/REPO_FILE_MANIFEST.json",       exists: false, note: "Full file index (46 files)" },
-  { label: "Priority Registry",     path: "src/components/governance/PRIORITY_REPO_FILES.json",      exists: false, note: "15 priority files with labels" },
-  { label: "Verification Bundle",   path: "src/components/governance/REPO_VERIFICATION_BUNDLE.json", exists: false, note: "Compact ChatGPT start pack" },
-  { label: "Read This First",       path: "src/components/governance/READ_THIS_FIRST.json",           exists: false, note: "Ordered verification flows" },
-  { label: "Raw Access Guide",      path: "src/components/governance/REPO_RAW_ACCESS_GUIDE.jsx",     exists: true,  note: "Usage guide for raw access" },
-];
+// ── Canonical single artifact — lives as a committed source file ──────────────
+// Published to GitHub via Base44 Publish. No terminal step required.
+const CANONICAL = {
+  label:     "CHATGPT_REPO_INDEX.js",
+  path:      "src/components/governance/CHATGPT_REPO_INDEX.js",
+  rawUrl:    CHATGPT_REPO_INDEX.canonicalRawUrl,
+  githubUrl: CHATGPT_REPO_INDEX.canonicalGithubUrl,
+  exists:    true,
+  desc:      "Canonical repo index — manifest, priority files, verification flows, locked files.",
+};
 
 // ── Verification bundle (inline) ──────────────────────────────────────────────
 const VERIFICATION_BUNDLE = {
