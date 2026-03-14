@@ -240,7 +240,7 @@ export default function RepoRawAccessPanel() {
       {activeRepo && (
         <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke aktivt valgt repo. Aktivt repo er valgt ({activeRepo.owner}/{activeRepo.repo}), men filene nedenfor er statiske GovernanceHub-referanser.</span>
+          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke innholdet fra aktivt valgt repo ({activeRepo.owner}/{activeRepo.repo}). Filene nedenfor er statiske GovernanceHub-referanser og endres ikke basert på valgt repo.</span>
         </div>
       )}
       <Card>
@@ -249,7 +249,7 @@ export default function RepoRawAccessPanel() {
             <div>
               <CardTitle className="text-base text-slate-800">Repository Raw Access</CardTitle>
               <p className="text-xs text-slate-400 mt-0.5">
-                {allFiles.length} files indexed (GovernanceHub canonical) · Generated {MANIFEST._meta?.generatedAt}
+                Kanonisk referanseinnhold · {allFiles.length} filer indeksert · Generert {MANIFEST._meta?.generatedAt}
               </p>
             </div>
 
