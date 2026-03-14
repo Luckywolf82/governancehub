@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp, X, FlaskConical, ShieldCheck, Wrench, BookOpen, Tag, Send } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp, X, FlaskConical, ShieldCheck, Wrench, BookOpen, Tag, Send, Github, ExternalLink, RotateCcw } from "lucide-react";
 import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
 import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { generateCopilotTask } from "@/components/governance/TaskGenerator";
+import { base44 } from "@/api/base44Client";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
