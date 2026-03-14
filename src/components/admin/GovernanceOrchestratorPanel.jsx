@@ -131,6 +131,12 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     });
   }, []);
 
+  useEffect(() => {
+    if (!isInjected && !selectedId && orderedEntries[0]?.id) {
+      setSelectedId(orderedEntries[0].id);
+    }
+  }, [isInjected, selectedId, orderedEntries]);
+
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
   const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
