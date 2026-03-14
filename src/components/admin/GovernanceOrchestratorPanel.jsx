@@ -224,7 +224,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     // Debounce by 500ms to avoid excessive API calls
     const timeoutId = setTimeout(checkStatus, 500);
     return () => clearTimeout(timeoutId);
-  }, [audit, effectiveOwner, effectiveRepo];
+  }, [audit, effectiveOwner, effectiveRepo]);
 
   // Auto-check GitHub PR status when audit or repo selection changes
   useEffect(() => {
