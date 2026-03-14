@@ -267,56 +267,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // ── Issue Dispatch Prep ────────────────────────────────────────────────────
 
   const issuePrep = useMemo(() => {
-    if (!audit) return null;
-
-    // Title: prefix deterministically from readiness + category
-    const categoryTag = audit.category ? `[${audit.category}]` : "";
-    const baseTitle = audit.title ?? "Untitled audit";
-    const issueTitle =
-      readiness === "remediation-first" ? `[Remediation]${categoryTag} ${baseTitle}`.trim() :
-      readiness === "analysis-first"    ? `[Planning]${categoryTag} ${baseTitle}`.trim() :
-      `${categoryTag} ${baseTitle}`.trim();
-
-    // Labels: deterministic from readiness
-    const labelsSet = new Set();
-    if (audit.category) labelsSet.add(audit.category.toLowerCase());
-    labelsSet.add("audit");
-    if (readiness === "remediation-first") labelsSet.add("remediation");
-    if (readiness === "analysis-first") { labelsSet.add("needs-verification"); labelsSet.add("planning"); }
-    if (audit.preliminary) labelsSet.add("preliminary");
-    if (readiness === "execution-ready") labelsSet.add("verified");
-    const labels = Array.from(labelsSet);
-
-    // Readiness → GitHub signal
-    const githubSignal =
-      readiness === "execution-ready"   ? "Ready for GitHub" :
-      readiness === "remediation-first" ? "Ready — remediation-focused" :
-      "Planning/analysis — requires acknowledgement";
-
-    // Provenance
-    const source = isInjected ? "Audit Runner" : "AUDIT_INDEX";
-    const evidenceSrc = audit.evidenceSource ?? "unknown";
-    const enrichmentNote = hasManualData ? `Manual enrichment applied (${enrichedFields.join(", ")})` : null;
-
-    // Full package text for copy
-    const fullPackage = [
-      `ISSUE DISPATCH PACKAGE`,
-      ``,
-      `Title: ${issueTitle}`,
-      `Labels: ${labels.join(", ")}`,
-      `Priority/Readiness: ${readiness ?? "unknown"} — ${githubSignal}`,
-      ``,
-      `PROVENANCE`,
-      `Source: ${source}`,
-      `Audit ID: ${audit.id}`,
-      `Evidence: ${evidenceSrc}`,
-      enrichmentNote ? `Enrichment: ${enrichmentNote}` : null,
-      ``,
-      `ISSUE BODY`,
-      githubIssue ?? "(incomplete — fill required fields)",
-    ].filter((l) => l !== null).join("\n").trim();
-
-    return { issueTitle, labels, githubSignal, source, evidenceSrc, enrichmentNote, fullPackage };
+    return buildIssuePrep(audit, readiness, isInjected, hasManualData, enrichedFields, githubIssue);
   }, [audit, readiness, isInjected, hasManualData, enrichedFields, githubIssue]);
 
   // ── Execution Log Draft ────────────────────────────────────────────────────
