@@ -29,24 +29,27 @@ export default function AppLayout({ children }) {
             <select
               value={activeRepo?.id || ""}
               onChange={(e) => {
-                const repo = repos.find((r) => r.id === e.target.value);
-                if (repo) selectRepo(repo);
+                if (e.target.value === "") {
+                  clearActiveRepo();
+                } else {
+                  const repo = repos.find((r) => r.id === e.target.value);
+                  if (repo) selectRepo(repo);
+                }
               }}
-              className="text-xs font-medium text-slate-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer"
+              disabled={repos.length === 0}
+              className="text-xs font-medium text-slate-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <option value="">Velg repo</option>
-              {repos.length === 0 && <option disabled>Ingen aktive repo</option>}
-              {repos.map((repo) => (
-                <option key={repo.id} value={repo.id}>
-                  {repo.owner}/{repo.repo}
-                </option>
-              ))}
+              {repos.length === 0 ? (
+                <option disabled value="">Ingen aktive repo</option>
+              ) : (
+                repos.map((repo) => (
+                  <option key={repo.id} value={repo.id}>
+                    {repo.owner}/{repo.repo}
+                  </option>
+                ))
+              )}
             </select>
-            {activeRepo && (
-              <span className="text-xs text-slate-500 font-mono">
-                {activeRepo.owner}/{activeRepo.repo}
-              </span>
-            )}
           </div>
 
           <nav className="flex items-center gap-1">
