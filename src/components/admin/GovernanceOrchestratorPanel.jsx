@@ -12,18 +12,7 @@ import { getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDr
 
 const REQUIRED_FIELDS = ["problem", "impact", "affectedFiles", "requiredChange", "constraints", "acceptanceCriteria"];
 
-// ── Readiness model ────────────────────────────────────────────────────────
-// Derived from audit.status + audit.preliminary — no new canonical fields needed.
-//   "execution-ready"    → verified + preliminary: false
-//   "remediation-first"  → orphaned
-//   "analysis-first"     → planned OR preliminary: true (any status)
 
-function getReadiness(audit) {
-  if (!audit) return null;
-  if (audit.status === "orphaned") return "remediation-first";
-  if (audit.status === "verified" && audit.preliminary === false) return "execution-ready";
-  return "analysis-first";
-}
 
 const READINESS_CONFIG = {
   "execution-ready": {
