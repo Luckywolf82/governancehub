@@ -15,83 +15,15 @@ const CANONICAL = {
   desc:      "Canonical repo index — manifest, priority files, verification flows, locked files.",
 };
 
-// ── Verification bundle (inline) ──────────────────────────────────────────────
+// ── Data sourced from canonical index file ────────────────────────────────────
 const VERIFICATION_BUNDLE = {
-  generatedAt: "2026-03-14",
-  repository: "https://github.com/Luckywolf82/governancehub",
-  branch: "main",
-  totalFilesIndexed: 46,
-  missingCriticalFiles: [],
-
-  priorityFiles: [
-    { path: "src/components/governance/LockedFiles.jsx",           label: "Locked File Registry",    rawUrl: `${RAW_BASE}/src/components/governance/LockedFiles.jsx`,           githubUrl: `${GH_BASE}/src/components/governance/LockedFiles.jsx`,           exists: true, category: "governance", priority: "critical", lockedFile: true },
-    { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", label: "AI Project Instructions", rawUrl: `${RAW_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`, githubUrl: `${GH_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`, exists: true, category: "governance", priority: "critical", lockedFile: true },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",     label: "Phase Execution Log",     rawUrl: `${RAW_BASE}/src/components/governance/PhaseExecutionLog.jsx`,     githubUrl: `${GH_BASE}/src/components/governance/PhaseExecutionLog.jsx`,     exists: true, category: "governance", priority: "critical", lockedFile: false },
-    { path: "src/components/governance/AI_STATE.jsx",              label: "AI State",                rawUrl: `${RAW_BASE}/src/components/governance/AI_STATE.jsx`,              githubUrl: `${GH_BASE}/src/components/governance/AI_STATE.jsx`,              exists: true, category: "governance", priority: "critical", lockedFile: false },
-    { path: "src/components/governance/NextSafeStep.jsx",          label: "Next Safe Step",          rawUrl: `${RAW_BASE}/src/components/governance/NextSafeStep.jsx`,          githubUrl: `${GH_BASE}/src/components/governance/NextSafeStep.jsx`,          exists: true, category: "governance", priority: "critical", lockedFile: false },
-    { path: "src/App.jsx",                                         label: "App Router",              rawUrl: `${RAW_BASE}/src/App.jsx`,                                         githubUrl: `${GH_BASE}/src/App.jsx`,                                         exists: true, category: "bootstrap", priority: "critical", lockedFile: false },
-  ],
-
-  lockedFiles: [
-    { path: "src/components/governance/LockedFiles.jsx",           label: "Locked File Registry",    rawUrl: `${RAW_BASE}/src/components/governance/LockedFiles.jsx`,           githubUrl: `${GH_BASE}/src/components/governance/LockedFiles.jsx` },
-    { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", label: "AI Project Instructions", rawUrl: `${RAW_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`, githubUrl: `${GH_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx` },
-  ],
-
-  governanceFiles: [
-    { path: "src/components/governance/AI_STATE.jsx",              label: "AI State",              rawUrl: `${RAW_BASE}/src/components/governance/AI_STATE.jsx` },
-    { path: "src/components/governance/NextSafeStep.jsx",          label: "Next Safe Step",        rawUrl: `${RAW_BASE}/src/components/governance/NextSafeStep.jsx` },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",     label: "Phase Execution Log",   rawUrl: `${RAW_BASE}/src/components/governance/PhaseExecutionLog.jsx` },
-    { path: "src/components/governance/LastVerifiedState.jsx",     label: "Last Verified State",   rawUrl: `${RAW_BASE}/src/components/governance/LastVerifiedState.jsx` },
-    { path: "src/components/governance/TaskGenerator.js",          label: "Task Generator",        rawUrl: `${RAW_BASE}/src/components/governance/TaskGenerator.js` },
-  ],
-
-  adminFiles: [
-    { path: "src/pages/Admin.jsx",               label: "Admin Page",      rawUrl: `${RAW_BASE}/src/pages/Admin.jsx` },
-    { path: "src/components/AppLayout.jsx",      label: "App Layout",      rawUrl: `${RAW_BASE}/src/components/AppLayout.jsx` },
-  ],
-
-  routingFiles: [
-    { path: "src/App.jsx",           label: "App Router",     rawUrl: `${RAW_BASE}/src/App.jsx` },
-    { path: "src/pages.config.js",   label: "Pages Config",   rawUrl: `${RAW_BASE}/src/pages.config.js` },
-  ],
-
-  bootstrapFiles: [
-    { path: "src/main.jsx",     label: "Entry Point",  rawUrl: `${RAW_BASE}/src/main.jsx` },
-    { path: "package.json",     label: "package.json", rawUrl: `${RAW_BASE}/package.json` },
-    { path: "vite.config.js",   label: "Vite Config",  rawUrl: `${RAW_BASE}/vite.config.js` },
-  ],
+  generatedAt:        CHATGPT_REPO_INDEX.generatedAt,
+  totalFilesIndexed:  CHATGPT_REPO_INDEX.verificationBundleMeta.totalFilesIndexed,
+  missingCriticalFiles: CHATGPT_REPO_INDEX.verificationBundleMeta.missingCriticalFiles,
+  priorityFiles:      CHATGPT_REPO_INDEX.priorityFiles,
 };
 
-// ── Read-this-first flows ─────────────────────────────────────────────────────
-const READ_THIS_FIRST = {
-  governanceVerification: [
-    { step: 1, label: "Locked File Registry",    path: "src/components/governance/LockedFiles.jsx",           reason: "Always read first — defines what cannot change.", rawUrl: `${RAW_BASE}/src/components/governance/LockedFiles.jsx`,           githubUrl: `${GH_BASE}/src/components/governance/LockedFiles.jsx`,           exists: true },
-    { step: 2, label: "AI Project Instructions", path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", reason: "Canonical governance rules for AI agents.",       rawUrl: `${RAW_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`, githubUrl: `${GH_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`, exists: true },
-    { step: 3, label: "Phase Execution Log",     path: "src/components/governance/PhaseExecutionLog.jsx",     reason: "Full change history. Must read before proposing.",  rawUrl: `${RAW_BASE}/src/components/governance/PhaseExecutionLog.jsx`,     githubUrl: `${GH_BASE}/src/components/governance/PhaseExecutionLog.jsx`,     exists: true },
-    { step: 4, label: "AI State",                path: "src/components/governance/AI_STATE.jsx",              reason: "Current project phase and verification status.",    rawUrl: `${RAW_BASE}/src/components/governance/AI_STATE.jsx`,              githubUrl: `${GH_BASE}/src/components/governance/AI_STATE.jsx`,              exists: true },
-    { step: 5, label: "Next Safe Step",          path: "src/components/governance/NextSafeStep.jsx",          reason: "Approved next action. Do not bypass.",             rawUrl: `${RAW_BASE}/src/components/governance/NextSafeStep.jsx`,          githubUrl: `${GH_BASE}/src/components/governance/NextSafeStep.jsx`,          exists: true },
-    { step: 6, label: "Audit Index",             path: "src/components/audits/AUDIT_INDEX.jsx",               reason: "All audit records.",                               rawUrl: `${RAW_BASE}/src/components/audits/AUDIT_INDEX.jsx`,               githubUrl: `${GH_BASE}/src/components/audits/AUDIT_INDEX.jsx`,               exists: true },
-    { step: 7, label: "Audit System Guide",      path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx",        reason: "Audit naming standards and conventions.",          rawUrl: `${RAW_BASE}/src/components/audits/AUDIT_SYSTEM_GUIDE.jsx`,        githubUrl: `${GH_BASE}/src/components/audits/AUDIT_SYSTEM_GUIDE.jsx`,        exists: true },
-    { step: 8, label: "Project Registry",        path: "src/components/projects/PROJECT_REGISTRY.jsx",        reason: "All active and planned projects.",                 rawUrl: `${RAW_BASE}/src/components/projects/PROJECT_REGISTRY.jsx`,        githubUrl: `${GH_BASE}/src/components/projects/PROJECT_REGISTRY.jsx`,        exists: true },
-  ],
-  routingVerification: [
-    { step: 1, label: "App Router",    path: "src/App.jsx",           reason: "All routes are defined here.",                        rawUrl: `${RAW_BASE}/src/App.jsx`,           githubUrl: `${GH_BASE}/src/App.jsx`,           exists: true },
-    { step: 2, label: "Pages Config",  path: "src/pages.config.js",   reason: "Legacy page map — verify against App.jsx routes.",    rawUrl: `${RAW_BASE}/src/pages.config.js`,   githubUrl: `${GH_BASE}/src/pages.config.js`,   exists: true },
-    { step: 3, label: "App Layout",    path: "src/components/AppLayout.jsx", reason: "Nav items — must match App.jsx route paths.", rawUrl: `${RAW_BASE}/src/components/AppLayout.jsx`, githubUrl: `${GH_BASE}/src/components/AppLayout.jsx`, exists: true },
-    { step: 4, label: "Home Page",     path: "src/pages/Home.jsx",    reason: "Verify default route target exists.",                 rawUrl: `${RAW_BASE}/src/pages/Home.jsx`,    githubUrl: `${GH_BASE}/src/pages/Home.jsx`,    exists: true },
-  ],
-  adminVerification: [
-    { step: 1, label: "Admin Page",        path: "src/pages/Admin.jsx",             reason: "Primary admin entry point.",                          rawUrl: `${RAW_BASE}/src/pages/Admin.jsx`,             githubUrl: `${GH_BASE}/src/pages/Admin.jsx`,             exists: true },
-    { step: 2, label: "Repo Access Panel", path: "src/components/admin/RepoRawAccessPanel.jsx", reason: "File index and raw URL browser.", rawUrl: `${RAW_BASE}/src/components/admin/RepoRawAccessPanel.jsx`, githubUrl: `${GH_BASE}/src/components/admin/RepoRawAccessPanel.jsx`, exists: true },
-    { step: 3, label: "App Layout",        path: "src/components/AppLayout.jsx",    reason: "Verify admin nav item is present.",                   rawUrl: `${RAW_BASE}/src/components/AppLayout.jsx`,    githubUrl: `${GH_BASE}/src/components/AppLayout.jsx`,    exists: true },
-  ],
-  projectStructureVerification: [
-    { step: 1, label: "Project Registry",   path: "src/components/projects/PROJECT_REGISTRY.jsx", reason: "Source of truth for all projects.",       rawUrl: `${RAW_BASE}/src/components/projects/PROJECT_REGISTRY.jsx`, githubUrl: `${GH_BASE}/src/components/projects/PROJECT_REGISTRY.jsx`, exists: true },
-    { step: 2, label: "Projects Page",      path: "src/pages/Projects.jsx",                        reason: "Verify it reads from PROJECT_REGISTRY.",  rawUrl: `${RAW_BASE}/src/pages/Projects.jsx`,                        githubUrl: `${GH_BASE}/src/pages/Projects.jsx`,                        exists: true },
-    { step: 3, label: "Audit Index",        path: "src/components/audits/AUDIT_INDEX.jsx",         reason: "Source of truth for all audit records.",  rawUrl: `${RAW_BASE}/src/components/audits/AUDIT_INDEX.jsx`,         githubUrl: `${GH_BASE}/src/components/audits/AUDIT_INDEX.jsx`,         exists: true },
-    { step: 4, label: "Audits Page",        path: "src/pages/Audits.jsx",                          reason: "Verify it reads from AUDIT_INDEX.",       rawUrl: `${RAW_BASE}/src/pages/Audits.jsx`,                          githubUrl: `${GH_BASE}/src/pages/Audits.jsx`,                          exists: true },
-  ],
-};
+const READ_THIS_FIRST = CHATGPT_REPO_INDEX.readThisFirst;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
