@@ -121,10 +121,10 @@ export default function RepoVerificationPanel() {
   return (
     <div className="space-y-4">
 
-      {!activeRepo && (
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
+      {activeRepo && (
+        <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span>Ingen aktivt repo valgt. Velg et repo fra Aktivt repo-selektøren i topptitlelinjen for å se verifikasjonsstatus.</span>
+          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke aktivt valgt repo. Aktivt repo er valgt ({activeRepo.owner}/{activeRepo.repo}), men verifikasjonsstatus nedenfor er statisk GovernanceHub-referans.</span>
         </div>
       )}
 
@@ -189,17 +189,11 @@ export default function RepoVerificationPanel() {
         <CardHeader className="pb-2">
           <CardTitle className="text-base text-slate-800">Canonical Index Status</CardTitle>
           <p className="text-xs text-slate-400">
-            {bundle.generatedAt} · {bundle.totalFilesIndexed} files indexed ·{" "}
+            {bundle.generatedAt} · {bundle.totalFilesIndexed} files indexed (GovernanceHub canonical) ·{" "}
             {missingCount === 0
               ? <span className="text-green-600 font-medium">no critical files missing</span>
               : <span className="text-red-600 font-medium">{missingCount} critical file{missingCount !== 1 ? "s" : ""} missing</span>}
           </p>
-          {activeRepo && (
-            <div className="flex items-center gap-2 mt-1 text-xs text-slate-600 bg-blue-50 border border-blue-200 rounded px-2 py-1 w-fit">
-              <Github className="w-3 h-3" />
-              <span>Bruker aktivt repo: <span className="font-mono font-semibold">{activeRepo.owner}/{activeRepo.repo}</span></span>
-            </div>
-          )}
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
