@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 export default function AppLayout({ children }) {
   const { pathname } = useLocation();
-  const { activeRepo, repos, selectRepo } = useActiveRepo();
+  const { activeRepo, repos, selectRepo, clearActiveRepo } = useActiveRepo();
 
   return (
     <div className="min-h-screen flex flex-col">
