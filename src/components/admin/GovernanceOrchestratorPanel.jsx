@@ -466,6 +466,14 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
           {showOutputs && (
             <CardContent className="pt-0 space-y-4">
+              {readinessConfig?.outputNote && (
+                <div className={`flex items-start gap-1.5 text-xs border rounded px-2 py-1.5 ${readinessConfig.bg} ${readinessConfig.text}`}>
+                  {readiness === "remediation-first"
+                    ? <Wrench className="w-3 h-3 mt-0.5 shrink-0" />
+                    : <BookOpen className="w-3 h-3 mt-0.5 shrink-0" />}
+                  <span>{readinessConfig.outputNote}</span>
+                </div>
+              )}
               {hasManualData && (
                 <div className="flex items-start gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
                   <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
