@@ -1,6 +1,6 @@
 export const NEXT_SAFE_STEP = {
-  title: 'Run baseline repository audit',
-  reason: 'Project needs a verified starting point before implementation.',
-  scope: 'Governance, routing, entities, functions, locked files',
-  blockedBy: 'Repo not yet verified',
+  title: 'Governance Source-of-Truth Alignment',
+  reason: 'Reconcile governance registry truth before enabling automated audit and task workflows.',
+  scope: 'LockedFiles, AI_STATE, NextSafeStep, PhaseExecutionLog',
+  blockedBy: 'None — baseline audit complete',
 };

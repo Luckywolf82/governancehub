@@ -1,7 +1,7 @@
 export const AI_STATE = {
-  projectName: 'New Base44 App',
-  phase: 'Bootstrap',
-  status: 'Needs verification',
-  lastVerified: 'YYYY-MM-DD',
-  currentFocus: 'Replace placeholders with project-specific truth',
+  projectName: 'GovernanceHub',
+  phase: 'Governance Initialization',
+  status: 'Operationalizing Governance',
+  lastVerified: '2026-03-14',
+  currentFocus: 'Reconcile governance registry truth before enabling automated audit and task workflows',
 };
