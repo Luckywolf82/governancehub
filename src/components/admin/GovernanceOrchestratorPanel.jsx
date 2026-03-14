@@ -146,6 +146,31 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // If an injected audit is present, use it directly — do not merge with AUDIT_INDEX
   const isInjected = !!injectedAudit;
 
+  const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
+
+  // Merge audit index data with manual enrichment; track which fields came from enrichment
+  const { audit, enrichedFields } = useMemo(() => {
+    if (!baseAudit) return { audit: null, enrichedFields: [] };
+    // For injected audits, skip enrichment merge — fields are already populated by Audit Runner
+    if (isInjected) return { audit: baseAudit, enrichedFields: [] };
+    const merged = { ...baseAudit };
+    const used = [];
+    REQUIRED_FIELDS.forEach((f) => {
+      const raw = enrichment[f] ?? "";
+      if (!merged[f] && raw.trim()) {
+        merged[f] = f === "affectedFiles" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw.trim();
+        used.push(f);
+      }
+    });
+    return { audit: merged, enrichedFields: used };
+  }, [baseAudit, enrichment]);
+  const hasManualData = enrichedFields.length > 0;
+
+  const missing = audit ? missingFields(audit) : [];
+  const isReady = audit && missing.length === 0;
+  const readiness = getReadiness(audit);
+  const readinessConfig = readiness ? READINESS_CONFIG[readiness] : null;
+
   useEffect(() => {
     if (!isInjected && !selectedId && orderedEntries[0]?.id) {
       setSelectedId(orderedEntries[0].id);
@@ -224,31 +249,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     // Debounce by 500ms to avoid excessive API calls
     const timeoutId = setTimeout(checkPrStatus, 500);
     return () => clearTimeout(timeoutId);
-  }, [audit, ghOwner, ghRepo]);
-  const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
-
-  // Merge audit index data with manual enrichment; track which fields came from enrichment
-  const { audit, enrichedFields } = useMemo(() => {
-    if (!baseAudit) return { audit: null, enrichedFields: [] };
-    // For injected audits, skip enrichment merge — fields are already populated by Audit Runner
-    if (isInjected) return { audit: baseAudit, enrichedFields: [] };
-    const merged = { ...baseAudit };
-    const used = [];
-    REQUIRED_FIELDS.forEach((f) => {
-      const raw = enrichment[f] ?? "";
-      if (!merged[f] && raw.trim()) {
-        merged[f] = f === "affectedFiles" ? raw.split("\n").map((s) => s.trim()).filter(Boolean) : raw.trim();
-        used.push(f);
-      }
-    });
-    return { audit: merged, enrichedFields: used };
-  }, [baseAudit, enrichment]);
-  const hasManualData = enrichedFields.length > 0;
-
-  const missing = audit ? missingFields(audit) : [];
-  const isReady = audit && missing.length === 0;
-  const readiness = getReadiness(audit);
-  const readinessConfig = readiness ? READINESS_CONFIG[readiness] : null;
+  }, [audit, ghOwner, ghRepo];
 
   function handleEnrich(name, val) {
     setEnrichment((prev) => ({ ...prev, [name]: val }));
