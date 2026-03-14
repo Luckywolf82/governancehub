@@ -1,29 +1,31 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 /**
- * createGithubIssue
+ * getGithubRepoContents
  * 
- * Create a GitHub issue for a registered and enabled repository.
- * Enforces capability-based access control via Repository registry.
+ * Fetch file/directory contents from a registered GitHub repository.
+ * Foundation for governance file inspection and repo verification.
  * 
  * Payload:
  * {
  *   owner: string,
  *   repo: string,
- *   title: string,
- *   body: string,
- *   labels?: string[],
- *   auditId?: string,
- *   readiness?: string,
- *   source?: string
+ *   path?: string (default: root, e.g., "README.md" or "src/components")
  * }
  * 
  * Returns:
  * {
  *   success: true,
- *   issue_number,
- *   issue_url,
- *   title
+ *   contents: [
+ *     {
+ *       name,
+ *       path,
+ *       type (file|dir),
+ *       size,
+ *       sha,
+ *       download_url
+ *     }
+ *   ]
  * }
  */
 
@@ -64,26 +66,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { owner, repo, title, body, labels = [], auditId, readiness, source } = payload;
+    const { owner, repo, path = '' } = payload;
 
-    // Validate required fields
+    // Validate
     if (!owner || typeof owner !== 'string' || owner.trim() === '') {
       return Response.json({ error: 'owner must be a non-empty string' }, { status: 400 });
     }
     if (!repo || typeof repo !== 'string' || repo.trim() === '') {
       return Response.json({ error: 'repo must be a non-empty string' }, { status: 400 });
     }
-    if (!title || typeof title !== 'string' || title.trim() === '') {
-      return Response.json({ error: 'title must be a non-empty string' }, { status: 400 });
-    }
-    if (!body || typeof body !== 'string' || body.trim() === '') {
-      return Response.json({ error: 'body must be a non-empty string' }, { status: 400 });
-    }
-
-    // Normalize labels: trim whitespace, remove duplicates, skip empty values
-    const normalizedLabels = Array.isArray(labels)
-      ? [...new Set(labels.map((l) => String(l).trim()).filter(Boolean))]
-      : [];
 
     const repoKey = `${owner}/${repo}`;
 
@@ -98,16 +89,16 @@ Deno.serve(async (req) => {
         repositoryFullName: repoKey,
         repositoryId: null,
         actorUserId: user.id,
-        actionType: 'github.issue.create',
+        actionType: 'github.contents.read',
         status: 'failure',
-        requestJson: { owner, repo, title: title.substring(0, 50) },
+        requestJson: { owner, repo, path },
         responseJson: { reason: 'repository_not_registered' },
         githubUrl: null,
-        errorMessage: 'Repository not found in GovernanceHub registry',
+        errorMessage: 'Repository not found in registry',
       });
 
       return Response.json(
-        { error: 'Repository not registered', message: 'Use registerGithubRepo first' },
+        { error: 'Repository not registered' },
         { status: 403 }
       );
     }
@@ -120,9 +111,9 @@ Deno.serve(async (req) => {
         repositoryFullName: repoKey,
         repositoryId: repository.id,
         actorUserId: user.id,
-        actionType: 'github.issue.create',
+        actionType: 'github.contents.read',
         status: 'failure',
-        requestJson: { owner, repo, title: title.substring(0, 50) },
+        requestJson: { owner, repo, path },
         responseJson: { reason: 'repository_disabled' },
         githubUrl: null,
         errorMessage: 'Repository is disabled',
@@ -134,95 +125,90 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check capability: issue:create
+    // Check capability: contents:read
     const capabilities = repository.capabilitiesJson || {};
-    if (!capabilities['issue:create']) {
+    if (!capabilities['contents:read']) {
       await base44.asServiceRole.entities.RepoActionLog.create({
         repositoryFullName: repoKey,
         repositoryId: repository.id,
         actorUserId: user.id,
-        actionType: 'github.issue.create',
+        actionType: 'github.contents.read',
         status: 'failure',
-        requestJson: { owner, repo, title: title.substring(0, 50) },
+        requestJson: { owner, repo, path },
         responseJson: { reason: 'capability_denied' },
         githubUrl: null,
-        errorMessage: 'issue:create capability not enabled',
+        errorMessage: 'contents:read capability not enabled',
       });
 
       return Response.json(
-        { error: 'issue:create capability not enabled for this repository' },
+        { error: 'contents:read capability not enabled' },
         { status: 403 }
       );
     }
 
-    // Build issue body with provenance footer
-    const provenanceFooter = [
-      '',
-      '---',
-      `*GovernanceHub Issue Dispatch · Audit: \`${auditId ?? 'unknown'}\` · Source: ${source ?? 'unknown'} · Readiness: ${readiness ?? 'unknown'}*`,
-    ].join('\n');
-
-    const issueBody = body + provenanceFooter;
-
-    // Create issue via GitHub REST API
-    const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
-      body: JSON.stringify({ title, body: issueBody, labels: normalizedLabels }),
-    });
+    // Fetch from GitHub
+    const pathParam = path ? `/${path.trim()}` : '';
+    const ghRes = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents${pathParam}`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+      }
+    );
 
     const ghData = await ghRes.json();
 
     if (!ghRes.ok) {
-      let errorMsg = ghData.message ?? 'GitHub API error';
-      if (ghData.errors && Array.isArray(ghData.errors)) {
-        const labelErrors = ghData.errors.filter((e) => e.field === 'labels');
-        if (labelErrors.length > 0) {
-          errorMsg += ' (invalid labels; ensure they exist on the repository)';
-        }
-      }
-
       await base44.asServiceRole.entities.RepoActionLog.create({
         repositoryFullName: repoKey,
         repositoryId: repository.id,
         actorUserId: user.id,
-        actionType: 'github.issue.create',
+        actionType: 'github.contents.read',
         status: 'failure',
-        requestJson: { owner, repo, title: title.substring(0, 50), labelCount: normalizedLabels.length },
-        responseJson: { status: ghRes.status, message: errorMsg },
+        requestJson: { owner, repo, path },
+        responseJson: { status: ghRes.status, message: ghData.message },
         githubUrl: null,
-        errorMessage: errorMsg,
+        errorMessage: ghData.message ?? 'Failed to fetch contents',
       });
 
       return Response.json({
         error: 'github_api_error',
-        message: errorMsg,
+        message: ghData.message ?? 'Failed to fetch contents',
       }, { status: ghRes.status });
     }
+
+    // Normalize response: array or single object
+    const items = Array.isArray(ghData) ? ghData : [ghData];
+
+    const normalized = items.map((item) => ({
+      name: item.name,
+      path: item.path,
+      type: item.type,
+      size: item.size,
+      sha: item.sha,
+      download_url: item.download_url,
+    }));
 
     // Log success
     await base44.asServiceRole.entities.RepoActionLog.create({
       repositoryFullName: repoKey,
       repositoryId: repository.id,
       actorUserId: user.id,
-      actionType: 'github.issue.create',
+      actionType: 'github.contents.read',
       status: 'success',
-      requestJson: { owner, repo, title: title.substring(0, 50), labelCount: normalizedLabels.length },
-      responseJson: { issueNumber: ghData.number, issueUrl: ghData.html_url },
-      githubUrl: ghData.html_url,
+      requestJson: { owner, repo, path },
+      responseJson: { itemCount: normalized.length },
+      githubUrl: `https://github.com/${owner}/${repo}/tree/main/${path}`,
       errorMessage: null,
     });
 
     return Response.json({
       success: true,
-      issue_number: ghData.number,
-      issue_url: ghData.html_url,
-      title: ghData.title,
+      contents: normalized,
     });
 
   } catch (error) {
