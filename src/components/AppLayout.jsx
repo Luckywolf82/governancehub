@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, FolderKanban, ClipboardList, Home, Shield } from "lucide-react";
+import { LayoutDashboard, FolderKanban, ClipboardList, Home, Shield, GitBranch } from "lucide-react";
+import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/Home", icon: Home },
@@ -10,6 +11,7 @@ const NAV_ITEMS = [
 
 export default function AppLayout({ children }) {
   const { pathname } = useLocation();
+  const { activeRepo, repos, selectRepo } = useActiveRepo();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -20,6 +22,33 @@ export default function AppLayout({ children }) {
             <LayoutDashboard className="w-5 h-5 text-slate-700" />
             GovernanceHub
           </Link>
+          
+          {/* Global Active Repo Selector */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md">
+            <GitBranch className="w-4 h-4 text-slate-500" />
+            <select
+              value={activeRepo?.id || ""}
+              onChange={(e) => {
+                const repo = repos.find((r) => r.id === e.target.value);
+                if (repo) selectRepo(repo);
+              }}
+              className="text-xs font-medium text-slate-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer"
+            >
+              <option value="">Velg repo</option>
+              {repos.length === 0 && <option disabled>Ingen aktive repo</option>}
+              {repos.map((repo) => (
+                <option key={repo.id} value={repo.id}>
+                  {repo.owner}/{repo.repo}
+                </option>
+              ))}
+            </select>
+            {activeRepo && (
+              <span className="text-xs text-slate-500 font-mono">
+                {activeRepo.owner}/{activeRepo.repo}
+              </span>
+            )}
+          </div>
+
           <nav className="flex items-center gap-1">
             {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
               const active = pathname === href || (href !== "/Home" && pathname.startsWith(href));
