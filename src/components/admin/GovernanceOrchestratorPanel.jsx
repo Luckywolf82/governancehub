@@ -395,12 +395,12 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const canSubmitCreate = canOpenCreateConfirm && createState !== "loading";
 
   async function handleCreateIssue() {
-    if (!issuePrep || !githubIssue || !ghOwner.trim() || !ghRepo.trim()) return;
+    if (!issuePrep || !githubIssue || !effectiveOwner.trim() || !effectiveRepo.trim()) return;
     setCreateState("loading");
     try {
       const res = await base44.functions.invoke("createGithubIssue", {
-        owner: ghOwner.trim(),
-        repo: ghRepo.trim(),
+        owner: effectiveOwner.trim(),
+        repo: effectiveRepo.trim(),
         title: issuePrep.issueTitle,
         body: githubIssue,
         labels: issuePrep.labels,
