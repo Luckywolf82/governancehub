@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Copy, CheckCheck, AlertTriangle, CheckCircle2, HelpCircle, Play, ChevronDown, ChevronUp, ArrowRightCircle, Github } from "lucide-react";
@@ -327,12 +327,21 @@ function formatAuditAsGithubIssue(obj) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function AuditRunnerPanel({ onUseInOrchestrator }) {
+  const { activeRepo } = useActiveRepo();
   const [hasRun, setHasRun] = useState(false);
   const [checks, setChecks] = useState([]);
   const [manualEvidence, setManualEvidence] = useState({ phaseLog: "", appJsx: "" });
   const [showEvidence, setShowEvidence] = useState(false);
   const [showOutput, setShowOutput] = useState(false);
   const [runId] = useState(() => `run-${Date.now().toString(36)}`);
+  const [targetMode, setTargetMode] = useState(() => activeRepo ? "active-repo" : "canonical");
+
+  // Fallback to canonical mode if active repo is removed while active-repo mode is selected
+  useEffect(() => {
+    if (targetMode === "active-repo" && !activeRepo) {
+      setTargetMode("canonical");
+    }
+  }, [activeRepo, targetMode]);
 
   function handleRun() {
     const result = runChecks(manualEvidence);
@@ -343,8 +352,9 @@ export default function AuditRunnerPanel({ onUseInOrchestrator }) {
 
   const auditObject = useMemo(() => {
     if (!hasRun) return null;
-    return buildAuditObject(checks, runId);
-  }, [checks, hasRun, runId]);
+    const repoFullName = targetMode === "active-repo" && activeRepo ? `${activeRepo.owner}/${activeRepo.repo}` : null;
+    return buildAuditObject(checks, runId, targetMode, repoFullName);
+  }, [checks, hasRun, runId, targetMode, activeRepo]);
 
   const auditText = useMemo(() => auditObject ? formatAuditAsText(auditObject) : null, [auditObject]);
   const githubIssueText = useMemo(() => auditObject ? formatAuditAsGithubIssue(auditObject) : null, [auditObject]);
