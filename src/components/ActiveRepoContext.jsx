@@ -17,10 +17,6 @@ export function ActiveRepoProvider({ children }) {
           isEnabled: true,
         });
         setRepos(result || []);
-        // Auto-select first repo if available
-        if (result && result.length > 0 && !activeRepo) {
-          setActiveRepo(result[0]);
-        }
       } catch (err) {
         console.warn("Failed to load repositories:", err);
         setRepos([]);
