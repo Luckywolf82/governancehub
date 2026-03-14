@@ -164,6 +164,49 @@ Deno.serve(async (req) => {
 
     const issueBody = body + provenanceFooter;
 
+    // Prevent duplicate issues: search for existing issue with same auditId in this repo
+    if (auditId && auditId !== 'unknown') {
+      const searchRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?state=open&per_page=100`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+      });
+
+      if (searchRes.ok) {
+        const existingIssues = await searchRes.json();
+        const auditMarker = `Audit: \`${auditId}\``;
+
+        for (const issue of existingIssues) {
+          if (issue.body && issue.body.includes(auditMarker)) {
+            // Found existing issue for this audit
+            await base44.asServiceRole.entities.RepoActionLog.create({
+              repositoryFullName: repoKey,
+              repositoryId: repository.id,
+              actorUserId: user.id,
+              actionType: 'github.issue.create',
+              status: 'failure',
+              requestJson: { owner, repo, title: title.substring(0, 50), auditId },
+              responseJson: { reason: 'issue_already_exists', existingIssueNumber: issue.number },
+              githubUrl: issue.html_url,
+              errorMessage: `Issue #${issue.number} already exists for audit ${auditId}`,
+            });
+
+            return Response.json({
+              success: false,
+              error: 'issue_already_exists',
+              message: 'An issue already exists for this audit in this repository.',
+              existing_issue_number: issue.number,
+              existing_issue_url: issue.html_url,
+              existing_issue_title: issue.title,
+            }, { status: 409 });
+          }
+        }
+      }
+    }
+
     // Create issue via GitHub REST API
     const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
       method: 'POST',
