@@ -820,7 +820,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       <input
                         type="text"
                         value={ghRepo}
-                        onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); }}
+                        onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
                         placeholder="e.g. governance-hub"
                         className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
                       />
