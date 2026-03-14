@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, ExternalLink, Lock, CheckCircle2, XCircle, AlertTriangle, BookOpen } from "lucide-react";
+import { Copy, ExternalLink, Lock, CheckCircle2, XCircle, AlertTriangle, BookOpen, Link2 } from "lucide-react";
 
 // ── Inline verification data ──────────────────────────────────────────────────
 // Source: derived from REPO_FILE_MANIFEST + PRIORITY_REPO_FILES (2026-03-14)
