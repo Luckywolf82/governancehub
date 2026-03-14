@@ -110,6 +110,7 @@ function EnrichField({ label, name, value, onChange, isArray }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function GovernanceOrchestratorPanel({ injectedAudit = null, onClearInjected }) {
+  const { activeRepo } = useActiveRepo();
   const [selectedId, setSelectedId] = useState(() => getBestDefaultAudit(AUDIT_INDEX.entries));
   const [enrichment, setEnrichment] = useState({});
   const [showOutputs, setShowOutputs] = useState(false);
@@ -118,8 +119,9 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [actualChangeSummary, setActualChangeSummary] = useState("");
 
   // ── GitHub Issue Create state ──────────────────────────────────────────────
-  const [ghOwner, setGhOwner] = useState("");
-  const [ghRepo, setGhRepo] = useState("");
+  // Use active repo if available, otherwise fall back to manual input
+  const [ghOwner, setGhOwner] = useState(activeRepo?.owner || "");
+  const [ghRepo, setGhRepo] = useState(activeRepo?.repo || "");
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
   const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
