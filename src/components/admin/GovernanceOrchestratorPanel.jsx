@@ -795,7 +795,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       {verificationChecklist && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-slate-700">5. Verifikasjons-sjekkliste</CardTitle>
+            <CardTitle className="text-sm text-slate-700">6. Verifikasjons-sjekkliste</CardTitle>
             <p className="text-xs text-slate-400">Etter implementering — gå gjennom punkt for punkt</p>
           </CardHeader>
           <CardContent className="pt-0">
