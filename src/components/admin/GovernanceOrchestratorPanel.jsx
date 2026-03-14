@@ -17,12 +17,13 @@ function missingFields(audit) {
   });
 }
 
+// Exact path match only — no substring/includes matching
 function isLockedPath(path) {
-  return LOCKED_FILES.files.some((lf) => lf.path === path || path?.includes(lf.path));
+  return LOCKED_FILES.files.some((lf) => lf.path === path);
 }
 
 function lockedRuleFor(path) {
-  return LOCKED_FILES.files.find((lf) => lf.path === path || path?.includes(lf.path))?.rule;
+  return LOCKED_FILES.files.find((lf) => lf.path === path)?.rule;
 }
 
 // ── CopyBtn ─────────────────────────────────────────────────────────────────
@@ -99,11 +100,12 @@ export default function GovernanceOrchestratorPanel() {
     const lockedInvolved = affectedFiles.filter(isLockedPath);
     return {
       title: `${audit.title} — Implementation`,
-      why: `This audit (${audit.id}) is the highest-priority pending item. Completing it advances the governance loop one verified step.`,
+      why: `This recommendation is based on the selected audit (${audit.id}). No priority ranking has been computed — verify independently before acting.`,
       scope: audit.category,
       affectedFiles,
       constraints: audit.constraints ?? "Follow locked file policy. One structural change only.",
-      acceptanceCriteria: audit.acceptanceCriteria ?? "All affected files updated. GitHub visibility confirmed. Execution log entry written.",
+      acceptanceCriteria: audit.acceptanceCriteria ?? null,
+      acceptanceCriteriaMissing: !audit.acceptanceCriteria,
       lockedWarning: lockedInvolved.length > 0
         ? lockedInvolved.map((p) => `${p} — ${lockedRuleFor(p)}`).join("\n")
         : null,
