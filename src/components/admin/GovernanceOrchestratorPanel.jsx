@@ -967,10 +967,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                   )}
 
                   {/* Pre-send review — hidden if duplicate detected */}
-                  {!createState?.error && showCreateConfirm && ghOwner.trim() && ghRepo.trim() && githubIssue && (
+                  {!createState?.error && showCreateConfirm && effectiveOwner.trim() && effectiveRepo.trim() && githubIssue && (
                     <div className="border border-slate-200 rounded bg-slate-50 p-3 space-y-2 text-xs">
                       <p className="font-semibold text-slate-700">Bekreft før oppretting</p>
-                      <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{ghOwner.trim()}/{ghRepo.trim()}</span></p>
+                      <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{effectiveOwner.trim()}/{effectiveRepo.trim()}</span></p>
                       <p><span className="text-slate-400">Tittel:</span> <span className="font-medium text-slate-800">{issuePrep.issueTitle}</span></p>
                       <p><span className="text-slate-400">Labels:</span> {issuePrep.labels.join(", ")}</p>
                       <p>
