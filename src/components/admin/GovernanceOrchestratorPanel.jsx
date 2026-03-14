@@ -123,6 +123,11 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
   const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
 
+  // ── GitHub Issue Status Check state ────────────────────────────────────────
+  const [issueStatus, setIssueStatus] = useState(null); // null | {found: false} | {found: true, number, url, title, state}
+  const [checkingIssueStatus, setCheckingIssueStatus] = useState(false);
+  const abortControllerRef = useRef(null);
+
   const orderedEntries = useMemo(() => {
     const rank = { verified: 0, orphaned: 1, planned: 2 };
     return [...AUDIT_INDEX.entries].sort((a, b) => {
