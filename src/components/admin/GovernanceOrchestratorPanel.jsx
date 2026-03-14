@@ -343,8 +343,8 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             </div>
           )}
 
-          {/* Readiness banner — shown for all non-injected audits */}
-          {audit && !isInjected && readinessConfig && (() => {
+          {/* Readiness banner — shown for all audits, injected or registry */}
+          {audit && readinessConfig && (() => {
             const Icon = readinessConfig.icon;
             return (
               <div className={`flex items-start gap-2 border rounded px-3 py-2 ${readinessConfig.bg}`}>
@@ -352,11 +352,19 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 <div className={`text-xs ${readinessConfig.text}`}>
                   <span className="font-semibold">{readinessConfig.label}</span>
                   {" — "}
-                  {readinessConfig.message}
-                  {audit.preliminary && audit.preliminaryNote && (
+                  {isInjected
+                    ? readiness === "execution-ready"
+                      ? "Audit Runner result med verified status og preliminary: false — behandles som execution-ready, men verifiser uavhengig."
+                      : readiness === "remediation-first"
+                      ? "Audit Runner result indikerer orphaned status — outputs er remediation-orienterte, ikke normal implementering."
+                      : "Audit Runner result er preliminary eller unexecuted scope — outputs er planning-orienterte, ikke implementeringsklar."
+                    : readinessConfig.message
+                  }
+                  {!isInjected && audit.preliminary && audit.preliminaryNote && (
                     <p className="mt-1 opacity-80">{audit.preliminaryNote}</p>
                   )}
-                  {audit.evidenceSource && (
+                  {/* evidenceSource shown here for registry audits; injected audits already show it in provenance banner above */}
+                  {!isInjected && audit.evidenceSource && (
                     <p className="mt-1 font-mono opacity-70">Evidence source: {audit.evidenceSource}</p>
                   )}
                 </div>
