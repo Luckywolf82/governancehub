@@ -6,6 +6,7 @@ import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
 import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { generateCopilotTask } from "@/components/governance/TaskGenerator";
 import { base44 } from "@/api/base44Client";
+import { getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDraft } from "./orchestratorEngine";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
