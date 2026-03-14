@@ -296,6 +296,14 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             </div>
           )}
 
+          {/* Show preliminary warning if the entry is marked as such */}
+          {audit && !isInjected && audit.preliminary && (
+            <div className="flex items-start gap-1.5 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
+              <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+              <span><strong>Preliminary audit:</strong> {audit.preliminaryNote ?? "Some fields are scope definitions only — not verified evidence."}</span>
+            </div>
+          )}
+
           {/* Enrichment area — only for AUDIT_INDEX audits, not injected */}
           {audit && !isInjected && missing.length > 0 && (
             <div className="border border-amber-200 rounded p-3 bg-amber-50/50">
