@@ -153,6 +153,42 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       setShowOutputs(true);
     }
   }, [audit, readiness]);
+
+  // Auto-check GitHub issue status when audit or repo selection changes
+  useEffect(() => {
+    if (!audit || !ghOwner.trim() || !ghRepo.trim()) {
+      setIssueStatus(null);
+      return;
+    }
+
+    // Cancel previous request if still in progress
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const checkStatus = async () => {
+      setCheckingIssueStatus(true);
+      try {
+        const res = await base44.functions.invoke('getGithubIssueForAudit', {
+          owner: ghOwner.trim(),
+          repo: ghRepo.trim(),
+          auditId: audit.id,
+        });
+        if (res.data) {
+          setIssueStatus(res.data);
+        }
+      } catch (err) {
+        // Silent fail — status check is non-critical
+        setIssueStatus(null);
+      } finally {
+        setCheckingIssueStatus(false);
+      }
+    };
+
+    // Debounce by 500ms to avoid excessive API calls
+    const timeoutId = setTimeout(checkStatus, 500);
+    return () => clearTimeout(timeoutId);
+  }, [audit, ghOwner, ghRepo]);
   const baseAudit = isInjected ? injectedAudit : (AUDIT_INDEX.entries.find((e) => e.id === selectedId) ?? orderedEntries[0] ?? null);
 
   // Merge audit index data with manual enrichment; track which fields came from enrichment
