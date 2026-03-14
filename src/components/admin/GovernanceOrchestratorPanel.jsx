@@ -755,7 +755,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             </div>
 
             {/* ── GitHub Issue Status Check ── */}
-            {(ghOwner.trim() || ghRepo.trim()) && (
+            {(effectiveOwner.trim() || effectiveRepo.trim()) && (
               <div className="bg-slate-50 border border-slate-200 rounded px-3 py-2">
                 <p className="text-xs font-medium text-slate-600 mb-1.5 flex items-center gap-1">
                   <Github className="w-3 h-3" />
