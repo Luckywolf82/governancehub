@@ -237,10 +237,10 @@ export default function RepoRawAccessPanel() {
 
   return (
     <div className="space-y-4">
-      {!activeRepo && (
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
+      {activeRepo && (
+        <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span>Ingen aktivt repo valgt. Velg et repo fra Aktivt repo-selektøren i topptitlelinjen for å se filinnhold.</span>
+          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke aktivt valgt repo. Aktivt repo er valgt ({activeRepo.owner}/{activeRepo.repo}), men filene nedenfor er statiske GovernanceHub-referanser.</span>
         </div>
       )}
       <Card>
@@ -249,25 +249,10 @@ export default function RepoRawAccessPanel() {
             <div>
               <CardTitle className="text-base text-slate-800">Repository Raw Access</CardTitle>
               <p className="text-xs text-slate-400 mt-0.5">
-                {allFiles.length} files indexed · Generated {MANIFEST._meta?.generatedAt}
+                {allFiles.length} files indexed (GovernanceHub canonical) · Generated {MANIFEST._meta?.generatedAt}
               </p>
-              {activeRepo && (
-                <div className="flex items-center gap-2 mt-1 text-xs text-slate-600 bg-blue-50 border border-blue-200 rounded px-2 py-1 w-fit">
-                  <Github className="w-3 h-3" />
-                  <span>Bruker aktivt repo: <span className="font-mono font-semibold">{activeRepo.owner}/{activeRepo.repo}</span></span>
-                </div>
-              )}
             </div>
-            {activeRepo && (
-              <a
-                href={`https://github.com/${activeRepo.owner}/${activeRepo.repo}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1"
-              >
-                <ExternalLink className="w-3 h-3" /> GitHub
-              </a>
-            )}
+
           </div>
 
           {/* Tabs */}
