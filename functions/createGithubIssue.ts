@@ -9,7 +9,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
  *   repo        {string} — GitHub repo name
  *   title       {string} — Issue title
  *   body        {string} — Issue body (markdown)
- *   labels      {string[]} — Label names (optional; will be created if missing)
+ *   labels      {string[]} — Existing GitHub label names (optional)
  *   auditId     {string} — Provenance: source audit ID
  *   readiness   {string} — Provenance: readiness tier
  *   source      {string} — Provenance: AUDIT_INDEX or Audit Runner
@@ -46,6 +46,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing required fields: owner, repo, title, body' }, { status: 400 });
     }
 
+    // Normalize labels: trim whitespace, remove duplicates, skip empty values
+    const normalizedLabels = Array.isArray(labels)
+      ? [...new Set(labels.map((l) => String(l).trim()).filter(Boolean))]
+      : [];
+
     // Append provenance footer to body
     const provenanceFooter = [
       '',
@@ -64,7 +69,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
         'X-GitHub-Api-Version': '2022-11-28',
       },
-      body: JSON.stringify({ title, body: issueBody, labels }),
+      body: JSON.stringify({ title, body: issueBody, labels: normalizedLabels }),
     });
 
     const ghData = await ghRes.json();
