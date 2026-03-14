@@ -3,8 +3,10 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Edit2, Save, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 export default function RepositoryManagerPanel() {
+  const { refreshRepos } = useActiveRepo();
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
@@ -94,6 +96,8 @@ export default function RepositoryManagerPanel() {
       // Reload repos
       const result = await base44.entities.Repository.list();
       setRepos(result || []);
+      // Refresh active repo context so header selector updates
+      await refreshRepos();
     } catch (err) {
       setError(`Failed to create repository: ${err.message}`);
     }
@@ -117,6 +121,8 @@ export default function RepositoryManagerPanel() {
       // Reload repos
       const result = await base44.entities.Repository.list();
       setRepos(result || []);
+      // Refresh active repo context so header selector updates and validates current selection
+      await refreshRepos();
     } catch (err) {
       setError(`Failed to update repository: ${err.message}`);
     }
