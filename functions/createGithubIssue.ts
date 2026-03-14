@@ -51,6 +51,21 @@ Deno.serve(async (req) => {
       ? [...new Set(labels.map((l) => String(l).trim()).filter(Boolean))]
       : [];
 
+    // GovernanceHub phase A: restrict issue creation to approved owner repositories.
+    // This allowlist is intentionally designed to expand in phase B as multi-user support is added.
+    const ALLOWED_REPOS = [
+      'Luckywolf82/governancehub',
+      'Luckywolf82/tankradar',
+    ];
+
+    const repoKey = `${owner}/${repo}`;
+    if (!ALLOWED_REPOS.includes(repoKey)) {
+      return Response.json(
+        { error: 'Repository not allowed for issue creation' },
+        { status: 403 }
+      );
+    }
+
     // Append provenance footer to body
     const provenanceFooter = [
       '',
