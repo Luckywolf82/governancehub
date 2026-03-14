@@ -428,7 +428,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 </div>
               </div>
               <button
-                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setShowLogAssistant(false); }}
+                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); }}
                 className="shrink-0 text-indigo-400 hover:text-indigo-700 transition-colors"
                 title="Fjern injisert audit og gå tilbake til AUDIT_INDEX"
               >
@@ -438,7 +438,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
           ) : (
             <select
               value={selectedId}
-              onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setShowLogAssistant(false); }}
+              onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); }}
               className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
             >
               <option value="">— Velg en audit fra indeksen —</option>
