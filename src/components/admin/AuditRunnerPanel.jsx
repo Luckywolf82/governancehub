@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, CheckCircle2, HelpCircle, Play, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, CheckCircle2, HelpCircle, Play, ChevronDown, ChevronUp, ArrowRightCircle } from "lucide-react";
 import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { AI_PROJECT_INSTRUCTIONS } from "@/components/governance/AI_PROJECT_INSTRUCTIONS";
 import { AI_STATE } from "@/components/governance/AI_STATE";
@@ -321,7 +321,7 @@ function formatAuditAsGithubIssue(obj) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function AuditRunnerPanel() {
+export default function AuditRunnerPanel({ onUseInOrchestrator }) {
   const [hasRun, setHasRun] = useState(false);
   const [checks, setChecks] = useState([]);
   const [manualEvidence, setManualEvidence] = useState({ phaseLog: "", appJsx: "" });
@@ -480,6 +480,15 @@ export default function AuditRunnerPanel() {
               )}
 
               <div className="flex flex-wrap gap-2">
+                {onUseInOrchestrator && (
+                  <button
+                    onClick={() => onUseInOrchestrator(auditObject)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border bg-slate-800 text-white border-slate-800 hover:bg-slate-700 transition-colors"
+                  >
+                    <ArrowRightCircle className="w-3.5 h-3.5" />
+                    Bruk i Orchestrator
+                  </button>
+                )}
                 <CopyBtn value={auditText} label="Kopier som tekst (Orchestrator)" />
                 <CopyBtn value={githubIssueText} label="Kopier GitHub Issue" />
                 <CopyBtn value={auditJson} label="Kopier JSON" />
