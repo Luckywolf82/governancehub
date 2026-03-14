@@ -107,7 +107,9 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     const lockedInvolved = affectedFiles.filter(isLockedPath);
     return {
       title: `${audit.title} — Implementation`,
-      why: `This recommendation is based on the selected audit (${audit.id}). No priority ranking has been computed — verify independently before acting.`,
+      why: isInjected
+        ? `This recommendation is based on an Audit Runner generated result (${audit.id}). Evidence source: ${audit.evidenceSource ?? "unknown"}. Verify independently before acting.`
+        : `This recommendation is based on the selected audit (${audit.id}). No priority ranking has been computed — verify independently before acting.`,
       scope: audit.category,
       affectedFiles,
       constraints: audit.constraints ?? "Follow locked file policy. One structural change only.",
