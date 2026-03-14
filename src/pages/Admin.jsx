@@ -77,6 +77,8 @@ export default function Admin() {
           ))}
         </div>
 
+        <RepoRawAccessPanel />
+
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Systeminformasjon</CardTitle>
