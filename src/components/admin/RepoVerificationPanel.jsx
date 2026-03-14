@@ -142,44 +142,26 @@ export default function RepoVerificationPanel() {
         </CardContent>
       </Card>
 
-      {/* ── Artifact Status ── */}
+      {/* ── Index Status ── */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-slate-800">Verification Artifacts</CardTitle>
+          <CardTitle className="text-base text-slate-800">Canonical Index Status</CardTitle>
           <p className="text-xs text-slate-400">
-            Generated {bundle.generatedAt} · {bundle.totalFilesIndexed} files indexed ·{" "}
+            {bundle.generatedAt} · {bundle.totalFilesIndexed} files indexed ·{" "}
             {missingCount === 0
               ? <span className="text-green-600 font-medium">no critical files missing</span>
               : <span className="text-red-600 font-medium">{missingCount} critical file{missingCount !== 1 ? "s" : ""} missing</span>}
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {ARTIFACTS.map((a) => (
-              <div key={a.path} className={`flex items-start gap-2 rounded-lg border p-3 ${a.exists ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"}`}>
-                {a.exists
-                  ? <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-                  : <XCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />}
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-slate-800">{a.label}</p>
-                  <p className="text-xs text-slate-500">{a.note}</p>
-                  {!a.exists && (
-                    <p className="text-xs text-amber-600 mt-0.5">Not yet in repo · run generator</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {!ARTIFACTS.every((a) => a.exists) && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <AlertTriangle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-slate-600">
-                Some artifacts are not yet committed to the repo.
-                Run <code className="bg-slate-200 px-1 rounded">node tools/generateRepoManifest.js</code> locally, commit, and push to sync.
-              </p>
+          <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
+            <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-slate-800">{CANONICAL.label}</p>
+              <p className="text-xs text-slate-500 font-mono truncate">{CANONICAL.path}</p>
+              <p className="text-xs text-green-700 mt-0.5">{CANONICAL.desc}</p>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 
