@@ -708,7 +708,90 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
         </Card>
       )}
 
-      {/* ── SECTION 5: Verification Checklist ── */}
+      {/* ── SECTION 5: Execution Log Assistant ── */}
+      {logDraft && (
+        <Card>
+          <CardHeader className="pb-2 cursor-pointer" onClick={() => setShowLogAssistant((v) => !v)}>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm text-slate-700">5. Execution Log Assistant</CardTitle>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-amber-600 font-medium bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">Utkast — ikke auto-skrevet</span>
+                {showLogAssistant ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+              </div>
+            </div>
+          </CardHeader>
+
+          {showLogAssistant && (
+            <CardContent className="pt-0 space-y-3">
+
+              {/* Draft-only framing */}
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
+                <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold">Utkast — verifiser før du legger inn</p>
+                  <p className="opacity-80">Ikke legg til i PhaseExecutionLog.jsx før implementeringen er verifisert og GitHub-synlighet er bekreftet.</p>
+                </div>
+              </div>
+
+              {/* Locked file warning */}
+              {logDraft.lockedInvolved.length > 0 && (
+                <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-800">
+                  <Lock className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-semibold">Låste filer involvert</p>
+                    <ul className="mt-0.5 space-y-0.5">
+                      {logDraft.lockedInvolved.map((p) => (
+                        <li key={p} className="font-mono">{p} — {lockedRuleFor(p)}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-1 opacity-80">Bekreft at disse filene ikke ble endret utenom tillatte operasjoner.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Expected vs confirmed files */}
+              <div>
+                <p className="text-xs font-medium text-slate-600 mb-1">Bekreft endrede filer</p>
+                <p className="text-xs text-slate-400 mb-1">Forventede filer fra audit (forhåndsutfylt). Overskriv med faktisk endrede filer.</p>
+                <textarea
+                  rows={Math.max(2, logDraft.expectedFiles.length + 1)}
+                  value={confirmedFiles}
+                  onChange={(e) => setConfirmedFiles(e.target.value)}
+                  placeholder={logDraft.expectedFiles.length > 0
+                    ? logDraft.expectedFiles.join("\n")
+                    : "Skriv inn endrede filer, én per linje"}
+                  className="w-full text-xs font-mono border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400 resize-none"
+                />
+                {confirmedFiles.trim()
+                  ? <p className="text-xs text-green-600 mt-0.5 flex items-center gap-1"><CheckCheck className="w-3 h-3" />Bekreftet filsett vil bli brukt i utkastet.</p>
+                  : <p className="text-xs text-slate-400 mt-0.5">La stå tomt for å bruke forventede filer fra audit.</p>
+                }
+              </div>
+
+              {/* Provenance row */}
+              <div className="text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded px-2 py-1.5 space-y-0.5">
+                <p><span className="font-medium text-slate-600">Kilde:</span> {isInjected ? "Audit Runner" : "AUDIT_INDEX"} · <span className="font-mono">{audit.id}</span></p>
+                <p><span className="font-medium text-slate-600">Evidence:</span> {audit.evidenceSource ?? "unknown"} · <span className="font-medium">Readiness:</span> {readiness ?? "unknown"}</p>
+              </div>
+
+              {/* Draft preview */}
+              <div>
+                <p className="text-xs font-medium text-slate-600 mb-1">Log-utkast</p>
+                <pre className="text-xs font-mono bg-slate-50 border border-slate-100 rounded p-2 whitespace-pre-wrap text-slate-700 max-h-48 overflow-y-auto">{logDraft.fullDraft}</pre>
+              </div>
+
+              {/* Copy actions */}
+              <div className="flex flex-wrap gap-2">
+                <CopyBtn value={logDraft.fullDraft}    label="Kopier fullt utkast" />
+                <CopyBtn value={logDraft.summaryOnly}  label="Kopier sammendrag" />
+                <CopyBtn value={logDraft.followUpNote} label="Kopier oppfølging" />
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
+
+      {/* ── SECTION 6: Verification Checklist ── */}
       {verificationChecklist && (
         <Card>
           <CardHeader className="pb-2">
