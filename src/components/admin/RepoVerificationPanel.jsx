@@ -124,7 +124,7 @@ export default function RepoVerificationPanel() {
       {activeRepo && (
         <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke aktivt valgt repo. Aktivt repo er valgt ({activeRepo.owner}/{activeRepo.repo}), men verifikasjonsstatus nedenfor er statisk GovernanceHub-referans.</span>
+          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke verifikasjonsstatus for aktivt valgt repo ({activeRepo.owner}/{activeRepo.repo}). Innholdet nedenfor er statisk og endres ikke basert på valgt repo.</span>
         </div>
       )}
 
@@ -189,7 +189,7 @@ export default function RepoVerificationPanel() {
         <CardHeader className="pb-2">
           <CardTitle className="text-base text-slate-800">Canonical Index Status</CardTitle>
           <p className="text-xs text-slate-400">
-            {bundle.generatedAt} · {bundle.totalFilesIndexed} files indexed (GovernanceHub canonical) ·{" "}
+            Kanonisk referanseinnhold · {bundle.totalFilesIndexed} filer indeksert ({bundle.generatedAt}) ·{" "}
             {missingCount === 0
               ? <span className="text-green-600 font-medium">no critical files missing</span>
               : <span className="text-red-600 font-medium">{missingCount} critical file{missingCount !== 1 ? "s" : ""} missing</span>}
