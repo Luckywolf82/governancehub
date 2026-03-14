@@ -360,6 +360,13 @@ export default function GovernanceOrchestratorPanel() {
 
           {showOutputs && (
             <CardContent className="pt-0 space-y-4">
+              {hasManualData && (
+                <div className="flex items-start gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+                  <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+                  <span>Disse outputs bruker manuelt oppgitte verdier for: <strong>{enrichedFields.join(", ")}</strong>. Verifiser at verdiene er korrekte før du bruker outputene.</span>
+                </div>
+              )}
+
               {/* Copy action bar */}
               <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded border border-slate-100">
                 <CopyBtn value={copilotTask}          label="Kopier Copilot Task" />
