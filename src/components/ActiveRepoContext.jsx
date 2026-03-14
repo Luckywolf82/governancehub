@@ -35,6 +35,24 @@ export function ActiveRepoProvider({ children }) {
     setActiveRepo(null);
   };
 
+  const refreshRepos = async () => {
+    try {
+      const result = await base44.entities.Repository.filter({
+        provider: "github",
+        isEnabled: true,
+      });
+      const updatedRepos = result || [];
+      setRepos(updatedRepos);
+      
+      // If current activeRepo is no longer in the refreshed list, clear it
+      if (activeRepo && !updatedRepos.find(r => r.id === activeRepo.id)) {
+        setActiveRepo(null);
+      }
+    } catch (err) {
+      console.warn("Failed to refresh repositories:", err);
+    }
+  };
+
   return (
     <ActiveRepoContext.Provider
       value={{
@@ -43,6 +61,7 @@ export function ActiveRepoProvider({ children }) {
         loading,
         selectRepo,
         clearActiveRepo,
+        refreshRepos,
       }}
     >
       {children}
