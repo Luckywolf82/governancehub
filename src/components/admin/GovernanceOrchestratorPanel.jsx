@@ -711,6 +711,53 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               <CopyBtn value={issuePrep.fullPackage}   label="Kopier full pakke" />
             </div>
 
+            {/* ── GitHub Issue Status Check ── */}
+            {(ghOwner.trim() || ghRepo.trim()) && (
+              <div className="bg-slate-50 border border-slate-200 rounded px-3 py-2">
+                <p className="text-xs font-medium text-slate-600 mb-1.5 flex items-center gap-1">
+                  <Github className="w-3 h-3" />
+                  GitHub Issue Status
+                </p>
+                {checkingIssueStatus && (
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <div className="w-2.5 h-2.5 rounded-full bg-slate-400 animate-pulse" />
+                    Checking...
+                  </div>
+                )}
+                {!checkingIssueStatus && issueStatus?.found && (
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="text-xs">
+                      <p className="font-semibold text-slate-800 mb-0.5">
+                        Issue #{issueStatus.number}
+                      </p>
+                      <p className="text-slate-600 mb-1">{issueStatus.title}</p>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                          issueStatus.state === 'open'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {issueStatus.state === 'open' ? 'OPEN' : 'CLOSED'}
+                        </span>
+                      </div>
+                    </div>
+                    <a
+                      href={issueStatus.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
+                      title="Open in GitHub"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+                {!checkingIssueStatus && !issueStatus?.found && (
+                  <p className="text-xs text-slate-500 italic">No GitHub issue exists for this audit.</p>
+                )}
+              </div>
+            )}
+
             {/* ── GitHub Issue Create flow ── */}
             <div className="border-t border-slate-100 pt-3 space-y-3">
 
