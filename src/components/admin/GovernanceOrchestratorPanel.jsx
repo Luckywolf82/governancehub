@@ -810,7 +810,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       <input
                         type="text"
                         value={ghOwner}
-                        onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); }}
+                        onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
                         placeholder="e.g. my-org"
                         className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
                       />
