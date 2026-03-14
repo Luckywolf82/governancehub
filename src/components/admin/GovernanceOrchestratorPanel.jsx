@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Copy, CheckCheck, AlertTriangle, Lock, ChevronDown, ChevronUp, X, FlaskConical, ShieldCheck, Wrench, BookOpen, Tag, Send, Github, ExternalLink, RotateCcw } from "lucide-react";
