@@ -268,6 +268,7 @@ export default function RepositoryManagerPanel() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-slate-700">Registrerte repositories ({repos.length})</CardTitle>
+          <p className="text-xs text-slate-500 mt-1">Kun repositories med <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-700">isEnabled: true</code> vises i «Aktivt repo»-velgeren i topptittelen.</p>
         </CardHeader>
         <CardContent className="pt-0">
           {repos.length === 0 ? (
