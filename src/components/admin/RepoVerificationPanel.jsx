@@ -98,6 +98,24 @@ export default function RepoVerificationPanel() {
     return true;
   });
 
+  // All raw URLs grouped by category for "copy all" buttons
+  const allCategoryUrls = {
+    governance:  CHATGPT_REPO_INDEX.governanceFiles.map((f) => f.rawUrl),
+    admin:       CHATGPT_REPO_INDEX.adminFiles.map((f) => f.rawUrl),
+    routing:     CHATGPT_REPO_INDEX.routingFiles.map((f) => f.rawUrl),
+    bootstrap:   CHATGPT_REPO_INDEX.bootstrapFiles.map((f) => f.rawUrl),
+    priority:    bundle.priorityFiles.map((f) => f.rawUrl),
+  };
+  const allRawUrls = [
+    ...new Set([
+      ...allCategoryUrls.priority,
+      ...allCategoryUrls.governance,
+      ...allCategoryUrls.admin,
+      ...allCategoryUrls.routing,
+      ...allCategoryUrls.bootstrap,
+    ])
+  ];
+
   return (
     <div className="space-y-4">
 
