@@ -128,7 +128,11 @@ export default function InstallReadinessCheck() {
     setChecking(false);
   }
 
-  const meta = READINESS[readiness] ?? READINESS.idle;
+  // Derive `repo_not_connected` when no repo is selected and no check has run yet.
+  // `idle` is reserved strictly for the untouched initial state before any evaluation.
+  const effectiveReadiness = (!activeRepo && readiness === "idle") ? "repo_not_connected" : readiness;
+
+  const meta = READINESS[effectiveReadiness] ?? READINESS.idle;
   const existCount  = results.filter((r) => r.exists).length;
   const missingCount = results.filter((r) => !r.exists && !r.error).length;
   const errorCount  = results.filter((r) => r.error).length;
