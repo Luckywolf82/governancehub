@@ -8,7 +8,7 @@
  * is shown or acted upon. No writes, no installs, no routing changes.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, AlertTriangle, XCircle, CheckCircle2, Circle, Loader2, RefreshCw } from "lucide-react";
