@@ -20,7 +20,7 @@
 //   prod-002  orphaned   / preliminary: true   — problem verified; blocked on prod-001 resolution
 //   gov-001   planned    / preliminary: true   — scope only; not executed
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
-//   gov-003   verified   / preliminary: false  — execution log schema drift identified; remediation steps defined
+//   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -175,7 +175,7 @@ export const AUDIT_INDEX = {
       projectSlug: "governancehub",
       preliminary: false,
       evidenceSource: "repo-derived",
-      summary: "Audited execution log schema across PhaseExecutionLog.jsx, AI_PROJECT_INSTRUCTIONS.jsx, and INSTALL_POLICY.jsx. Two of three PhaseExecutionLog entries are missing the required 'taskRequested' field. INSTALL_POLICY.loggingRules.schema diverges from the canonical requiredFields: omits 'task' and 'changedFiles', and adds 'filesCreated', 'filesModified', and 'commitRef'.",
+      summary: "Audited execution log schema across PhaseExecutionLog.jsx, AI_PROJECT_INSTRUCTIONS.jsx, and INSTALL_POLICY.jsx. Two of three PhaseExecutionLog entries (at time of audit) were missing the required 'taskRequested' field. INSTALL_POLICY.loggingRules.schema diverges from the canonical requiredFields: omits 'task' and 'changedFiles', and adds 'filesCreated', 'filesModified', and 'commitRef'. Six of eight canonical fields overlap. Recommended model: treat INSTALL_POLICY schema as an explicit extension of the canonical runtime schema (Option 3).",
       problem: "Entry 1 and Entry 3 in PhaseExecutionLog.jsx omit 'taskRequested', which is listed as a required field in AI_PROJECT_INSTRUCTIONS.executionLog.requiredFields. INSTALL_POLICY.loggingRules.schema defines a logging schema incompatible with the canonical required-field list: it substitutes 'changedFiles' with 'filesCreated'+'filesModified', drops 'task', and introduces 'commitRef'.",
       impact: "Incomplete log entries reduce traceability. INSTALL_POLICY's divergent schema means install-originated log entries would not pass canonical schema validation and would be missing required fields.",
       affectedFiles: [
