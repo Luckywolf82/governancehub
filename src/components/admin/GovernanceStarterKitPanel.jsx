@@ -223,12 +223,95 @@ function SectionCard({ title, children }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+// ── Install Preview hook ──────────────────────────────────────────────────────
+
+function useInstallPreview(activeRepo, manifest) {
+  const [preview, setPreview] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    if (!activeRepo || !manifest) {
+      setPreview(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function computePreview() {
+      setPreviewLoading(true);
+      const files = manifest.files ?? [];
+
+      // Canonical governance files (from readiness check) for already_exists classification
+      const canonicalPaths = [
+        "src/components/governance/AI_STATE.jsx",
+        "src/components/governance/PhaseExecutionLog.jsx",
+        "src/components/governance/LockedFiles.jsx",
+        "src/components/projects/PROJECT_REGISTRY.jsx",
+      ];
+
+      // Check each manifest file's target existence
+      const results = await Promise.all(
+        files.map(async (f) => {
+          const targetPath = `src/components/${f.path}`;
+          try {
+            const res = await base44.functions.invoke("getGithubRepoContents", {
+              owner: activeRepo.owner,
+              repo: activeRepo.repo,
+              path: targetPath,
+            });
+            // File exists
+            const isCanonical = canonicalPaths.includes(targetPath);
+            return {
+              path: f.path,
+              targetPath,
+              exists: res.data?.success === true,
+              isCanonical,
+              error: null,
+            };
+          } catch (e) {
+            return {
+              path: f.path,
+              targetPath,
+              exists: null,
+              isCanonical: canonicalPaths.includes(targetPath),
+              error: e.message ?? "request failed",
+            };
+          }
+        })
+      );
+
+      if (cancelled) return;
+
+      // Classify into groups
+      const will_create = results.filter((r) => r.exists === false);
+      const already_exists = results.filter((r) => r.exists === true && r.isCanonical);
+      const requires_manual_review = results.filter(
+        (r) => r.error !== null || (r.exists === true && !r.isCanonical)
+      );
+
+      setPreview({
+        will_create,
+        already_exists,
+        requires_manual_review,
+        total: files.length,
+      });
+      setPreviewLoading(false);
+    }
+
+    computePreview();
+    return () => { cancelled = true; };
+  }, [activeRepo, manifest]);
+
+  return { preview, previewLoading };
+}
+
 export default function GovernanceStarterKitPanel() {
   const { activeRepo } = useActiveRepo();
   const [buildIntent, setBuildIntent] = useState("scaffold");
   const [notes, setNotes] = useState("");
   const [installReadiness, setInstallReadiness] = useState("idle");
   const { manifest, loading: manifestLoading, error: manifestError } = useManifest();
+  const { preview, previewLoading } = useInstallPreview(activeRepo, manifest);
 
   const steps = FIRST_STEPS[buildIntent] ?? FIRST_STEPS["scaffold"];
 
