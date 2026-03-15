@@ -4,6 +4,7 @@ export const PHASE_EXECUTION_LOG = {
       id: 'Entry 1',
       date: 'YYYY-MM-DD',
       task: 'Bootstrap governance and admin framework',
+      taskRequested: 'Not recorded at time of entry. Inferred from task title.',
       changedFiles: [
         'src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx',
         'src/pages/AdminDashboard.jsx'
@@ -34,6 +35,7 @@ export const PHASE_EXECUTION_LOG = {
       id: 'Entry 3',
       date: '2026-03-15',
       task: 'Normalize locked-file definitions across governance files',
+      taskRequested: 'Not recorded at time of entry. Inferred from task title.',
       changedFiles: [
         'src/components/governance/LockedFiles.jsx',
         'src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx',
