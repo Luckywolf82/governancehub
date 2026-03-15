@@ -1,0 +1,53 @@
+{
+  "name": "GovernanceHub Starter Kit",
+  "version": "1.0.0",
+  "releaseDate": "2026-03-15",
+  "basePath": "starter-kit/src/components",
+  "files": [
+    {
+      "module": "governance",
+      "path": "governance/AI_PROJECT_INSTRUCTIONS.jsx",
+      "required": true
+    },
+    {
+      "module": "governance",
+      "path": "governance/AI_STATE.jsx",
+      "required": true
+    },
+    {
+      "module": "governance",
+      "path": "governance/LockedFiles.jsx",
+      "required": true
+    },
+    {
+      "module": "governance",
+      "path": "governance/NextSafeStep.jsx",
+      "required": true
+    },
+    {
+      "module": "governance",
+      "path": "governance/PhaseExecutionLog.jsx",
+      "required": true
+    },
+    {
+      "module": "governance",
+      "path": "governance/STARTER_KIT_VERSION.jsx",
+      "required": true
+    },
+    {
+      "module": "audits",
+      "path": "audits/AUDIT_INDEX.jsx",
+      "required": true
+    },
+    {
+      "module": "audits",
+      "path": "audits/AUDIT_SYSTEM_GUIDE.jsx",
+      "required": true
+    },
+    {
+      "module": "projects",
+      "path": "projects/PROJECT_REGISTRY.jsx",
+      "required": true
+    }
+  ]
+}
