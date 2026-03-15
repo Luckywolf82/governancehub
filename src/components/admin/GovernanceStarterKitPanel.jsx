@@ -227,6 +227,7 @@ export default function GovernanceStarterKitPanel() {
   const { activeRepo } = useActiveRepo();
   const [buildIntent, setBuildIntent] = useState("scaffold");
   const [notes, setNotes] = useState("");
+  const [installReadiness, setInstallReadiness] = useState("idle");
   const { manifest, loading: manifestLoading, error: manifestError } = useManifest();
 
   const steps = FIRST_STEPS[buildIntent] ?? FIRST_STEPS["scaffold"];
