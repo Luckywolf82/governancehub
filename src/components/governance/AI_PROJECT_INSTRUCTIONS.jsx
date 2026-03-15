@@ -97,6 +97,8 @@ export const AI_PROJECT_INSTRUCTIONS = {
   lockedFiles: [
     "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
     "src/components/governance/LockedFiles.jsx",
+    "src/components/governance/INSTALL_POLICY.jsx",
+    "src/components/governance/STARTER_KIT_VERSION.jsx",
     "src/components/governance/PhaseExecutionLog.jsx",
     "src/components/audits/AUDIT_INDEX.jsx",
     "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx"

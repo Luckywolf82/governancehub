@@ -9,6 +9,14 @@ export const LOCKED_FILES = {
       rule: 'Do not weaken locked-file rules silently.'
     },
     {
+      path: 'src/components/governance/INSTALL_POLICY.jsx',
+      rule: 'Update only when install policy changes with explicit justification.'
+    },
+    {
+      path: 'src/components/governance/STARTER_KIT_VERSION.jsx',
+      rule: 'Update only with explicit version bump.'
+    },
+    {
       path: 'src/components/governance/PhaseExecutionLog.jsx',
       rule: 'Append only. Do not rewrite or delete existing entries.'
     },
