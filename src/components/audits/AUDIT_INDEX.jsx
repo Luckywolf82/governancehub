@@ -22,7 +22,6 @@
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
-//   gov-005   verified   / preliminary: false  — scope compliance audit; implementation kept, Entry 8 scopeNote correction required
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
