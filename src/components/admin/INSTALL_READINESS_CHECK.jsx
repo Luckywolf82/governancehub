@@ -135,6 +135,11 @@ export default function InstallReadinessCheck({ onReadinessChange } = {}) {
   // `idle` is reserved strictly for the untouched initial state before any evaluation.
   const effectiveReadiness = (!activeRepo && readiness === "idle") ? "repo_not_connected" : readiness;
 
+  // Notify parent whenever the effective readiness state changes
+  useEffect(() => {
+    onReadinessChange?.(effectiveReadiness);
+  }, [effectiveReadiness]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const meta = READINESS[effectiveReadiness] ?? READINESS.idle;
   const existCount  = results.filter((r) => r.exists).length;
   const missingCount = results.filter((r) => !r.exists && !r.error).length;
