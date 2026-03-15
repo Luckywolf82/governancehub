@@ -7,7 +7,7 @@ import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { generateCopilotTask } from "@/components/governance/TaskGenerator";
 import { base44 } from "@/api/base44Client";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
-import { getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDraft } from "./orchestratorEngine";
+import { getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDraft, buildDispatchRecommendation } from "./orchestratorEngine";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -268,6 +268,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     return buildRecommendedStep(audit, isInjected, isLockedPath, lockedRuleFor);
   }, [audit, isInjected]);
 
+  const dispatchRecommendation = useMemo(() => {
+    return buildDispatchRecommendation(audit, readiness, isLockedPath);
+  }, [audit, readiness]);
+
   const copilotTask = useMemo(() => {
     if (!isReady) return null;
     return generateCopilotTask({
@@ -434,8 +438,9 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       `Constraints: ${recommendedStep.constraints}`,
       `Acceptance Criteria: ${recommendedStep.acceptanceCriteriaMissing ? "Missing — manual definition required before implementation" : recommendedStep.acceptanceCriteria}`,
       recommendedStep.lockedWarning ? `\nLocked File Caution:\n${recommendedStep.lockedWarning}` : "",
+      dispatchRecommendation ? `\nDISPATCH RECOMMENDATION\nTarget: ${dispatchRecommendation.dispatchTarget}\nReason: ${dispatchRecommendation.dispatchReason}` : "",
     ].filter(Boolean).join("\n");
-  }, [recommendedStep]);
+  }, [recommendedStep, dispatchRecommendation]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -619,6 +624,28 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               <div className="bg-red-50 border border-red-200 rounded p-2 text-red-700">
                 <p className="font-medium flex items-center gap-1 mb-1"><Lock className="w-3 h-3" /> Låste filer involvert:</p>
                 <pre className="whitespace-pre-wrap font-mono text-xs">{recommendedStep.lockedWarning}</pre>
+              </div>
+            )}
+
+            {/* Dispatch Recommendation */}
+            {dispatchRecommendation && (
+              <div className={`border rounded p-2 text-xs ${
+                dispatchRecommendation.dispatchTarget === "blocked"      ? "bg-red-50 border-red-200 text-red-800" :
+                dispatchRecommendation.dispatchTarget === "copilot_task" ? "bg-purple-50 border-purple-200 text-purple-800" :
+                dispatchRecommendation.dispatchTarget === "github_issue" ? "bg-blue-50 border-blue-200 text-blue-800" :
+                "bg-amber-50 border-amber-200 text-amber-800"
+              }`}>
+                <p className="font-semibold mb-0.5 flex items-center gap-1">
+                  <Send className="w-3 h-3 shrink-0" />
+                  Dispatch:{" "}
+                  <span className={`font-mono px-1.5 py-0.5 rounded text-xs ${
+                    dispatchRecommendation.dispatchTarget === "blocked"      ? "bg-red-200 text-red-900" :
+                    dispatchRecommendation.dispatchTarget === "copilot_task" ? "bg-purple-200 text-purple-900" :
+                    dispatchRecommendation.dispatchTarget === "github_issue" ? "bg-blue-200 text-blue-900" :
+                    "bg-amber-200 text-amber-900"
+                  }`}>{dispatchRecommendation.dispatchTarget}</span>
+                </p>
+                <p className="opacity-80">{dispatchRecommendation.dispatchReason}</p>
               </div>
             )}
           </CardContent>
