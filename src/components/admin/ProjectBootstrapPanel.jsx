@@ -182,10 +182,13 @@ function CopyBtn({ value, label = "Kopier" }) {
 
 export default function ProjectBootstrapPanel() {
   const { activeRepo } = useActiveRepo();
+  const queryClient   = useQueryClient();
   const [bootstrapMode, setBootstrapMode] = useState("create");
   const [buildIntent, setBuildIntent]     = useState("new-app");
   const [projectName, setProjectName]     = useState("");
   const [notes, setNotes]                 = useState("");
+  const [saving, setSaving]               = useState(false);
+  const [savedProject, setSavedProject]   = useState(null);
 
   const pkg = useMemo(() => {
     if (!activeRepo) return null;
@@ -195,6 +198,25 @@ export default function ProjectBootstrapPanel() {
 
   const needsName = bootstrapMode === "create";
   const canGenerate = activeRepo && (bootstrapMode === "link" || projectName.trim());
+
+  async function handleCreate() {
+    if (!activeRepo || !projectName.trim()) return;
+    setSaving(true);
+    const record = await base44.entities.Project.create({
+      name:         projectName.trim(),
+      projectSlug:  toSlug(projectName.trim()),
+      description:  notes.trim() || `Bootstrapped from ${activeRepo.owner}/${activeRepo.repo}`,
+      status:       "planned",
+      phase:        "Bootstrap",
+      owner:        activeRepo.owner,
+      repoFullName: activeRepo.fullName ?? `${activeRepo.owner}/${activeRepo.repo}`,
+      buildIntent,
+      notes:        notes.trim() || null,
+    });
+    setSavedProject(record);
+    setSaving(false);
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+  }
 
   return (
     <div className="space-y-4">
