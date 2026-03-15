@@ -21,6 +21,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("Govern");
   const [injectedAudit, setInjectedAudit] = useState(null);
+  const { activeRepo } = useActiveRepo();
 
   useEffect(() => {
     base44.auth.me().then(setUser).finally(() => setLoading(false));
