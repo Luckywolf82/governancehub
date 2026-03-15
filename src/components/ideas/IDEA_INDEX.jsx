@@ -15,6 +15,7 @@ export const IDEA_INDEX = {
     // ── Repo Onboarding ────────────────────────────────────────────────────────
     {
       ideaId: "repo-onboarding-flow",
+      ideaType: "capability",
       title: "Repo Onboarding Flow",
       description: "Guided step-by-step onboarding for registering a new repository into GovernanceHub, including capability detection and initial health check.",
       category: "repo-management",
@@ -28,6 +29,7 @@ export const IDEA_INDEX = {
     // ── Start Prompt Generator ─────────────────────────────────────────────────
     {
       ideaId: "start-prompt-generator",
+      ideaType: "capability",
       title: "Start Prompt Generator",
       description: "Generate a structured AI context-primer for any registered repo: reads repo manifest, capabilities, audit index, and produces a ready-to-paste AI prompt.",
       category: "ai-tooling",
@@ -41,6 +43,7 @@ export const IDEA_INDEX = {
     // ── Governance Starter Kit Export ─────────────────────────────────────────
     {
       ideaId: "governance-starter-kit-export",
+      ideaType: "capability",
       title: "Governance Starter Kit Export",
       description: "One-click export of the canonical GovernanceHub governance files (AUDIT_INDEX, AI_STATE, LOCKED_FILES, PhaseExecutionLog, etc.) as a versioned starter kit for new projects.",
       category: "governance",
@@ -54,6 +57,7 @@ export const IDEA_INDEX = {
     // ── Project Bootstrap Flow ─────────────────────────────────────────────────
     {
       ideaId: "project-bootstrap-flow",
+      ideaType: "capability",
       title: "Project Bootstrap Flow",
       description: "Guided flow to initialize a new project entry in GovernanceHub: create project record, link repo, set initial audit scope, generate bootstrap PhaseExecutionLog entry.",
       category: "project-management",
@@ -67,6 +71,7 @@ export const IDEA_INDEX = {
     // ── Issue / Task Channel Selector ─────────────────────────────────────────
     {
       ideaId: "issue-task-channel-selector",
+      ideaType: "workflow",
       title: "Issue / Task Channel Selector",
       description: "Allow users to select per-audit where the action lands: GitHub issue, Base44 prompt, Copilot task, manual clipboard. Currently implied — make it explicit and configurable.",
       category: "workflow",
@@ -80,6 +85,7 @@ export const IDEA_INDEX = {
     // ── Copilot Task Bridge ────────────────────────────────────────────────────
     {
       ideaId: "copilot-task-bridge",
+      ideaType: "integration",
       title: "Copilot Task Bridge",
       description: "Structured integration between GovernanceHub audits and GitHub Copilot task format — auto-generate copilot-ready task prompts from audit output.",
       category: "ai-tooling",
@@ -93,6 +99,7 @@ export const IDEA_INDEX = {
     // ── Repo Manifest System ───────────────────────────────────────────────────
     {
       ideaId: "repo-manifest-system",
+      ideaType: "architecture",
       title: "Repo Manifest System",
       description: "A machine-readable repo manifest file format (.governancehub.json) describing the repo structure, capabilities, governance files, and project links — living in each registered repo.",
       category: "repo-intelligence",
@@ -106,6 +113,7 @@ export const IDEA_INDEX = {
     // ── Repo Verification Bundles ─────────────────────────────────────────────
     {
       ideaId: "repo-verification-bundles",
+      ideaType: "governance",
       title: "Repo Verification Bundles",
       description: "Pre-packaged verification checklists specific to repo type (Base44 app, Node service, Python library, etc.) — loaded when a repo is registered and run on demand.",
       category: "repo-intelligence",
@@ -119,6 +127,7 @@ export const IDEA_INDEX = {
     // ── Project ↔ Repo Linking Model ──────────────────────────────────────────
     {
       ideaId: "project-repo-linking-model",
+      ideaType: "architecture",
       title: "Project ↔ Repo Linking Model",
       description: "Formal data model linking GovernanceHub projects to one or more repositories. Currently ad-hoc — needs explicit schema and UI.",
       category: "data-model",
@@ -132,6 +141,7 @@ export const IDEA_INDEX = {
     // ── Audit Scope Taxonomy ───────────────────────────────────────────────────
     {
       ideaId: "audit-scope-taxonomy",
+      ideaType: "architecture",
       title: "Audit Scope Taxonomy",
       description: "Formal classification system for audit types, scopes, and evidence sources — making audit categories explicit and machine-readable rather than emergent.",
       category: "governance",
@@ -145,6 +155,7 @@ export const IDEA_INDEX = {
     // ── Roadmap Generator ─────────────────────────────────────────────────────
     {
       ideaId: "roadmap-generator",
+      ideaType: "analytics",
       title: "Roadmap Generator",
       description: "Generate a structured roadmap from scored IDEA_INDEX entries — what we are building now. Make it re-runnable and exportable.",
       category: "product-intelligence",
@@ -158,6 +169,7 @@ export const IDEA_INDEX = {
     // ── Project Intelligence Engine ────────────────────────────────────────────
     {
       ideaId: "project-intelligence-engine",
+      ideaType: "platform",
       title: "Project Intelligence Engine",
       description: "Per-project health scoring, audit completion tracking, risk surface detection, and recommended next actions — surfaced in the Projects dashboard.",
       category: "product-intelligence",
@@ -171,6 +183,7 @@ export const IDEA_INDEX = {
     // ── Cross-Repo Dashboard ───────────────────────────────────────────────────
     {
       ideaId: "cross-repo-dashboard",
+      ideaType: "platform",
       title: "Cross-Repo Dashboard",
       description: "Unified view across all registered repos: open issues, audit status, last verified date, capability coverage — the 'control plane' for multi-repo governance.",
       category: "dashboard",
@@ -184,6 +197,7 @@ export const IDEA_INDEX = {
     // ── Repo-Aware Audit Runner ────────────────────────────────────────────────
     {
       ideaId: "repo-aware-audit-runner",
+      ideaType: "governance",
       title: "Repo-Aware Audit Runner",
       description: "The audit runner should be able to target a specific registered repo and run checks against live repo content, not just in-memory governance files.",
       category: "governance",
@@ -197,6 +211,7 @@ export const IDEA_INDEX = {
     // ── Audit Context Provenance ───────────────────────────────────────────────
     {
       ideaId: "audit-context-provenance",
+      ideaType: "governance",
       title: "Audit Context Provenance",
       description: "All audit runs and injected audits should carry explicit provenance: who ran it, which repo, which mode, what evidence sources were used.",
       category: "governance",
@@ -210,6 +225,7 @@ export const IDEA_INDEX = {
     // ── Builder Target Profiles ────────────────────────────────────────────────
     {
       ideaId: "builder-target-profiles",
+      ideaType: "integration",
       title: "Builder Target Profiles",
       description: "Define explicit builder personas (solo dev, team lead, agency, open source maintainer) and tailor GovernanceHub defaults to each profile.",
       category: "product-intelligence",
@@ -223,6 +239,7 @@ export const IDEA_INDEX = {
     // ── Repo Health Score ─────────────────────────────────────────────────────
     {
       ideaId: "repo-health-score",
+      ideaType: "analytics",
       title: "Repo Health Score",
       description: "A single composite score per repo reflecting governance coverage, audit freshness, capability completeness, and open issue count.",
       category: "repo-intelligence",
@@ -236,6 +253,7 @@ export const IDEA_INDEX = {
     // ── AI Governance Playbooks ────────────────────────────────────────────────
     {
       ideaId: "ai-governance-playbooks",
+      ideaType: "workflow",
       title: "AI Governance Playbooks",
       description: "Curated, structured playbooks for common governance scenarios (e.g. 'adding a new feature', 'fixing an audit finding', 'onboarding a new repo') — consumable by AI agents or human operators.",
       category: "governance",
@@ -249,6 +267,7 @@ export const IDEA_INDEX = {
     // ── Audit Scope Model ─────────────────────────────────────────────────────
     {
       ideaId: "audit-scope-model",
+      ideaType: "governance",
       title: "Audit Scope Model",
       description: "Introduce explicit audit scopes (repo, multi-repo, project, global) so audits can run consistently across different contexts.",
       category: "governance",
@@ -262,6 +281,7 @@ export const IDEA_INDEX = {
     // ── Multi-Repo Audit Runner ────────────────────────────────────────────────
     {
       ideaId: "multi-repo-audit-runner",
+      ideaType: "governance",
       title: "Multi-Repo Audit Runner",
       description: "Extend the audit runner so a single audit can run across multiple repositories to detect governance drift, architecture inconsistencies, and missing capabilities.",
       category: "governance",
@@ -275,6 +295,7 @@ export const IDEA_INDEX = {
     // ── Audit Definition Generator ────────────────────────────────────────────
     {
       ideaId: "audit-definition-generator",
+      ideaType: "integration",
       title: "Audit Definition Generator",
       description: "Allow users to generate new audit definitions using structured prompts (Copilot, GitHub issue, or Base44). Generated audits follow the governance audit schema and are stored as draft audits.",
       category: "ai-tooling",
