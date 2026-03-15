@@ -124,6 +124,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
   const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
+  const [dispatchActionFeedback, setDispatchActionFeedback] = useState(null);
 
   // Effective repo source: prioritize activeRepo if available, else use manual input
   const effectiveOwner = activeRepo ? activeRepo.owner : ghOwner;
@@ -271,6 +272,11 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const dispatchRecommendation = useMemo(() => {
     return buildDispatchRecommendation(audit, readiness, isLockedPath);
   }, [audit, readiness]);
+
+  // Reset dispatch action feedback whenever the recommendation changes (e.g. new audit selected)
+  useEffect(() => {
+    setDispatchActionFeedback(null);
+  }, [dispatchRecommendation]);
 
   const copilotTask = useMemo(() => {
     if (!isReady) return null;
@@ -629,13 +635,13 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
             {/* Dispatch Recommendation */}
             {dispatchRecommendation && (
-              <div className={`border rounded p-2 text-xs ${
+              <div className={`border rounded p-2 text-xs space-y-2 ${
                 dispatchRecommendation.dispatchTarget === "blocked"      ? "bg-red-50 border-red-200 text-red-800" :
                 dispatchRecommendation.dispatchTarget === "copilot_task" ? "bg-purple-50 border-purple-200 text-purple-800" :
                 dispatchRecommendation.dispatchTarget === "github_issue" ? "bg-blue-50 border-blue-200 text-blue-800" :
                 "bg-amber-50 border-amber-200 text-amber-800"
               }`}>
-                <p className="font-semibold mb-0.5 flex items-center gap-1">
+                <p className="font-semibold flex items-center gap-1">
                   <Send className="w-3 h-3 shrink-0" />
                   Dispatch:{" "}
                   <span className={`font-mono px-1.5 py-0.5 rounded text-xs ${
@@ -646,6 +652,53 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                   }`}>{dispatchRecommendation.dispatchTarget}</span>
                 </p>
                 <p className="opacity-80">{dispatchRecommendation.dispatchReason}</p>
+
+                {/* ── Dispatch Action Controls ── */}
+                {dispatchRecommendation.dispatchTarget === "copilot_task" && (
+                  <div>
+                    {dispatchActionFeedback ? (
+                      <p className="text-purple-700 italic">{dispatchActionFeedback}</p>
+                    ) : (
+                      <button
+                        onClick={() => setDispatchActionFeedback("Coming next — Copilot task dispatch is not yet wired. Use the outputs in Section 3 to create a task manually.")}
+                        className="inline-flex items-center gap-1.5 font-medium px-3 py-1.5 rounded border border-purple-400 text-purple-800 bg-purple-100 hover:bg-purple-200 transition-colors"
+                      >
+                        <Send className="w-3 h-3 shrink-0" />
+                        Create issue for Copilot
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {dispatchRecommendation.dispatchTarget === "github_issue" && (
+                  <div>
+                    {dispatchActionFeedback ? (
+                      <p className="text-blue-700 italic">{dispatchActionFeedback}</p>
+                    ) : (
+                      <button
+                        onClick={() => setDispatchActionFeedback("Coming next — use Section 4 (Issue Dispatch Prep) below to create a GitHub issue for this audit.")}
+                        className="inline-flex items-center gap-1.5 font-medium px-3 py-1.5 rounded border border-blue-400 text-blue-800 bg-blue-100 hover:bg-blue-200 transition-colors"
+                      >
+                        <Github className="w-3 h-3 shrink-0" />
+                        Create GitHub issue
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {dispatchRecommendation.dispatchTarget === "manual" && (
+                  <div className="flex items-start gap-1.5 bg-amber-100 border border-amber-300 rounded px-2 py-1.5 text-amber-900">
+                    <BookOpen className="w-3 h-3 mt-0.5 shrink-0" />
+                    <span>Keep in app / manual review</span>
+                  </div>
+                )}
+
+                {dispatchRecommendation.dispatchTarget === "blocked" && (
+                  <div className="flex items-start gap-1.5 bg-red-100 border border-red-400 rounded px-2 py-1.5 text-red-900 font-semibold">
+                    <Lock className="w-3 h-3 mt-0.5 shrink-0" />
+                    <span>Blocked — manual review required</span>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
