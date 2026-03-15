@@ -7,6 +7,7 @@ import RepoRawAccessPanel from "@/components/admin/RepoRawAccessPanel";
 import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
 import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestratorPanel";
 import AuditRunnerPanel from "@/components/admin/AuditRunnerPanel";
+import ExecutionLogPanel from "@/components/admin/ExecutionLogPanel";
 import RepositoryManagerPanel from "@/components/admin/RepositoryManagerPanel";
 import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePanel";
 import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPanel";
@@ -106,6 +107,9 @@ export default function Admin() {
             <AuditRunnerPanel onUseInOrchestrator={(obj) => { setInjectedAudit(obj); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             <div className="border-t border-slate-200 pt-4">
               <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
+              <ExecutionLogPanel />
             </div>
           </div>
         )}
