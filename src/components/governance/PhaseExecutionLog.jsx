@@ -6,7 +6,7 @@ export const PHASE_EXECUTION_LOG = {
       task: 'Bootstrap governance and admin framework',
       changedFiles: [
         'src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx',
-        'src/components/admin/AdminDashboard.jsx'
+        'src/pages/AdminDashboard.jsx'
       ],
       diffSummary: 'Initial project scaffolding',
       githubVisibility: 'Not yet verified',

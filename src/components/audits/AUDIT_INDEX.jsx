@@ -160,7 +160,7 @@ export const AUDIT_INDEX = {
       requiredChange: "Remove starter-kit-only file references from LockedFiles.jsx. Align all four files to describe the same canonical 5-file locked set.",
       constraints: "Modify only the four target files. Do not invent files that do not exist. Preserve export structure.",
       acceptanceCriteria: "All four files describe the same canonical locked-file set. No file references non-existent main-repo governance files.",
-      oneSafeNextStep: "Add PhaseExecutionLog entry and AUDIT_INDEX record to complete the governance documentation for this normalization change.",
+      oneSafeNextStep: "No further action required. Locked-file normalization is complete and documented in PhaseExecutionLog Entry 3 and this AUDIT_INDEX gov-002 record.",
     },
 
     {
