@@ -230,7 +230,9 @@ export default function ProjectBootstrapPanel() {
           </h2>
           <p className="text-xs text-slate-500">Generer bootstrap-pakke for nytt eller eksisterende prosjekt</p>
         </div>
-        <Badge className="bg-violet-100 text-violet-700 border border-violet-200 text-xs">Forhåndsvisning kun</Badge>
+        <Badge className={`text-xs border ${bootstrapMode === "create" ? "bg-violet-100 text-violet-700 border-violet-200" : "bg-slate-100 text-slate-500 border-slate-200"}`}>
+          {bootstrapMode === "create" ? "Kan persisteres" : "Forhåndsvisning kun"}
+        </Badge>
       </div>
 
       {/* Repo context */}
