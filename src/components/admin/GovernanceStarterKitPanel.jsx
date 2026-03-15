@@ -385,21 +385,60 @@ export default function GovernanceStarterKitPanel() {
       {/* Output sections — only when both repo and manifest are ready */}
       {activeRepo && manifest && (
         <>
-          {/* Install prompt — primary action */}
-          <Card className="border-emerald-200 bg-emerald-50">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <CardTitle className="text-sm text-emerald-800 flex items-center gap-1.5">
-                  <Download className="w-4 h-4" />
-                  Kopier install-prompt
-                </CardTitle>
-                <CopyBtn value={installPrompt} label="Kopier install-prompt" />
-              </div>
-              <p className="text-xs text-emerald-700 mt-1">
-                Instruksjoner for å installere starter-kit i <span className="font-mono font-medium">{activeRepo.owner}/{activeRepo.repo}</span> — lim inn i AI-editor eller Copilot.
-              </p>
-            </CardHeader>
-          </Card>
+          {/* ── Install Readiness Check ── */}
+          <InstallReadinessCheck onReadinessChange={setInstallReadiness} />
+
+          {/* ── Install prompt — gated by readiness ── */}
+          {(() => {
+            const isSafe = installReadiness === "safe_to_install";
+            const isIdle = installReadiness === "idle" || installReadiness === "checking";
+            const isBlocked = !isSafe && !isIdle;
+
+            // Per-state warning copy
+            const warnings = {
+              existing_governance_detected: "Eksisterende governance oppdaget — ikke installer blindt. Gjør en audit/merge-vurdering først.",
+              partial_governance_detected:  "Delvis governance oppdaget — audit/merge kreves før installasjon.",
+              verification_failed:          "Verifisering feilet — bekreft repo-tilgang før installasjon.",
+              repo_not_connected:           "Velg et aktivt repo og kjør readiness-sjekk før du installerer.",
+            };
+            const warningText = warnings[installReadiness];
+
+            return (
+              <Card className={`${isBlocked ? "border-amber-300 bg-amber-50" : isSafe ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50"}`}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <CardTitle className={`text-sm flex items-center gap-1.5 ${isBlocked ? "text-amber-800" : isSafe ? "text-emerald-800" : "text-slate-600"}`}>
+                      {isBlocked
+                        ? <XCircle className="w-4 h-4 text-amber-600" />
+                        : <Download className="w-4 h-4" />
+                      }
+                      Kopier install-prompt
+                    </CardTitle>
+                    <CopyBtn
+                      value={isBlocked ? null : installPrompt}
+                      label="Kopier install-prompt"
+                    />
+                  </div>
+                  {isSafe && (
+                    <p className="text-xs text-emerald-700 mt-1">
+                      Ingen eksisterende governance funnet — trygt å installere i <span className="font-mono font-medium">{activeRepo.owner}/{activeRepo.repo}</span>.
+                    </p>
+                  )}
+                  {isIdle && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      Kjør readiness-sjekk ovenfor for å aktivere install-prompt.
+                    </p>
+                  )}
+                  {isBlocked && warningText && (
+                    <p className="text-xs text-amber-800 mt-1 flex items-start gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-600" />
+                      {warningText}
+                    </p>
+                  )}
+                </CardHeader>
+              </Card>
+            );
+          })()}
 
           {/* Folders from manifest */}
           <SectionCard title={`Mappestruktur (${folders.length} mapper)`}>
