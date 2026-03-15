@@ -487,12 +487,12 @@ export default function GovernanceStarterKitPanel() {
                   </div>
                   {isSafe && (
                     <p className="text-xs text-emerald-700 mt-1">
-                      Ingen eksisterende governance funnet — trygt å installere i <span className="font-mono font-medium">{activeRepo.owner}/{activeRepo.repo}</span>.
+                      Starter kit er klar for installasjon i <span className="font-mono font-medium">{activeRepo.owner}/{activeRepo.repo}</span>.
                     </p>
                   )}
                   {isIdle && (
                     <p className="text-xs text-slate-500 mt-1">
-                      Kjør readiness-sjekk ovenfor for å aktivere install-prompt.
+                      Kjør readiness-sjekken ovenfor for å aktivere denne handlingen.
                     </p>
                   )}
                   {isBlocked && warningText && (
