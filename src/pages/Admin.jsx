@@ -138,7 +138,20 @@ export default function Admin() {
             </div>
             <div>
               <p className="text-xs text-slate-500 font-semibold mb-1">Generatorer</p>
-              <p className="text-xs text-slate-400 mb-4">Bruk disse for å forberede AI-arbeid og governance-struktur før implementering.</p>
+              <p className="text-xs text-slate-400 mb-3">Bruk disse for å forberede AI-arbeid og governance-struktur før implementering.</p>
+              {activeRepo ? (
+                <div className="flex items-center gap-2 text-xs bg-emerald-50 border border-emerald-200 rounded px-3 py-1.5 w-fit mb-4">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="font-medium text-emerald-800">Aktivt repo: {activeRepo.fullName}</span>
+                  <span className="text-emerald-600">· Brukes for prompt og starter kit</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs bg-amber-50 border border-amber-200 rounded px-3 py-1.5 w-fit mb-4">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                  <span className="font-medium text-amber-800">Ingen aktivt repo valgt</span>
+                  <span className="text-amber-600">· Velg repo i toppmenyen før du genererer prompt eller starter kit</span>
+                </div>
+              )}
               <StartPromptGeneratorPanel />
             </div>
             <div className="border-t border-slate-200 pt-4">
