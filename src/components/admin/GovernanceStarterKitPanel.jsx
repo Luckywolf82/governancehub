@@ -650,7 +650,7 @@ export default function GovernanceStarterKitPanel() {
                       Kopier install-prompt
                     </CardTitle>
                     <CopyBtn
-                      value={isBlocked ? null : installPrompt}
+                      value={isSafe ? installPrompt : null}
                       label="Kopier install-prompt"
                     />
                   </div>
