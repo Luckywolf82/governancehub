@@ -20,6 +20,7 @@
 //   prod-002  orphaned   / preliminary: true   — problem verified; blocked on prod-001 resolution
 //   gov-001   planned    / preliminary: true   — scope only; not executed
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
+//   gov-003   verified   / preliminary: false  — execution log schema drift identified; remediation steps defined
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -161,6 +162,32 @@ export const AUDIT_INDEX = {
       constraints: "Modify only the four target files. Do not invent files that do not exist. Preserve export structure.",
       acceptanceCriteria: "All four files describe the same canonical locked-file set. No file references non-existent main-repo governance files.",
       oneSafeNextStep: "No further action required. Locked-file normalization is complete and documented in PhaseExecutionLog Entry 3 and this AUDIT_INDEX gov-002 record.",
+    },
+
+    {
+      id: "gov-003",
+      title: "Execution Log Schema Consistency",
+      category: "Governance",
+      type: "Schema Drift Audit",
+      status: "verified",
+      date: "2026-03-15",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary: "Audited execution log schema across PhaseExecutionLog.jsx, AI_PROJECT_INSTRUCTIONS.jsx, and INSTALL_POLICY.jsx. Two of three PhaseExecutionLog entries are missing the required 'taskRequested' field. INSTALL_POLICY.loggingRules.schema diverges from the canonical requiredFields: omits 'task' and 'changedFiles', and adds 'filesCreated', 'filesModified', and 'commitRef'.",
+      problem: "Entry 1 and Entry 3 in PhaseExecutionLog.jsx omit 'taskRequested', which is listed as a required field in AI_PROJECT_INSTRUCTIONS.executionLog.requiredFields. INSTALL_POLICY.loggingRules.schema defines a logging schema incompatible with the canonical required-field list: it substitutes 'changedFiles' with 'filesCreated'+'filesModified', drops 'task', and introduces 'commitRef'.",
+      impact: "Incomplete log entries reduce traceability. INSTALL_POLICY's divergent schema means install-originated log entries would not pass canonical schema validation and would be missing required fields.",
+      affectedFiles: [
+        "src/components/governance/PhaseExecutionLog.jsx",
+        "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
+        "src/components/governance/INSTALL_POLICY.jsx",
+      ],
+      requiredChange: "Step 1: Add 'taskRequested' to PhaseExecutionLog Entry 1 and Entry 3. Step 2: Align INSTALL_POLICY.loggingRules.schema with the canonical required-field list or document install-specific extensions explicitly.",
+      constraints: "Both PhaseExecutionLog.jsx and INSTALL_POLICY.jsx are locked files. One structural change at a time. Append PhaseExecutionLog entry after each verified change.",
+      acceptanceCriteria: "All PhaseExecutionLog entries include every field in executionLog.requiredFields. INSTALL_POLICY schema is aligned with or explicitly extends the canonical required-field list.",
+      oneSafeNextStep: "Add 'taskRequested' to PhaseExecutionLog Entry 1 and Entry 3.",
+      dataFile: "src/components/audits/governance/execution-log-schema-audit-2026-03-15.jsx",
     },
 
     {
