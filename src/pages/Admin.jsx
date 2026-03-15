@@ -18,7 +18,7 @@ const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("Operations");
+  const [tab, setTab] = useState("Govern");
   const [injectedAudit, setInjectedAudit] = useState(null);
 
   useEffect(() => {
