@@ -87,5 +87,22 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'AUDIT_INDEX.jsx and PhaseExecutionLog.jsx modified as explicitly required by audit output rules. execution-log-schema-audit-2026-03-15.jsx updated with required output fields. No other locked files modified.',
     },
+    {
+      id: 'Entry 6',
+      date: '2026-03-15',
+      task: 'Align INSTALL_POLICY logging schema with canonical execution log schema (gov-003 remediation)',
+      taskRequested: 'Implement gov-003 audit recommendation: treat INSTALL_POLICY.loggingRules.schema as an extension of the canonical runtime execution log schema.',
+      changedFiles: [
+        'src/components/governance/INSTALL_POLICY.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'INSTALL_POLICY.jsx loggingRules.schema: added all eight canonical required fields (id, date, task, taskRequested, changedFiles, diffSummary, githubVisibility, lockedFileVerification). Previously missing canonical fields "task" and "changedFiles" are now explicitly present.',
+        'INSTALL_POLICY.jsx loggingRules.schema: preserved install-specific extension fields (filesCreated, filesModified, commitRef). Added inline comments documenting that filesCreated + filesModified are an install-context granular decomposition of changedFiles, and that commitRef is optional and only used when an actual commit SHA is known.',
+        'PhaseExecutionLog.jsx: appended Entry 6 for this gov-003 remediation execution.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'INSTALL_POLICY.jsx modified intentionally as the explicit target of this gov-003 remediation task. PhaseExecutionLog.jsx appended with this entry per governance logging rules. No other locked files modified.',
+    },
   ],
 };

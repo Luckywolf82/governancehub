@@ -138,16 +138,29 @@ export const INSTALL_POLICY = {
       "Never append PhaseExecutionLog entry until installation is fully verified.",
       "Do not create draft or speculative execution-log entries.",
     ],
+    // This schema is an explicit extension of the canonical runtime execution log schema
+    // defined in AI_PROJECT_INSTRUCTIONS.executionLog.requiredFields.
+    // All eight canonical required fields are included below.
+    // Install-specific extensions are annotated where they appear.
     schema: [
+      // ── Canonical required fields (from AI_PROJECT_INSTRUCTIONS.executionLog.requiredFields) ──
       "id: next integer after last entry in PhaseExecutionLog",
       "date: ISO date string (YYYY-MM-DD)",
+      "task: short label describing the install action (e.g. 'Install GovernanceHub Starter Kit')",
       "taskRequested: 'Install GovernanceHub Starter Kit'",
-      "filesCreated: list of target paths that were newly created",
-      "filesModified: list of target paths that were updated or merged",
+      // changedFiles is satisfied in the install context by the more granular
+      // filesCreated + filesModified fields defined below (install-context extension).
+      "changedFiles: combined list of all target paths created or modified during install",
       "diffSummary: 'Installed GovernanceHub Starter Kit v{version} from starter manifest.'",
-      "commitRef: null unless actual commit SHA is known",
       "githubVisibility: 'verified' only after target file existence is confirmed",
       "lockedFileVerification: 'confirmed unchanged' or exact description if locked files were touched",
+      // ── Install-context extensions (additions beyond the canonical minimum) ──
+      // filesCreated and filesModified are a granular decomposition of changedFiles,
+      // providing install-specific distinction between newly created and updated files.
+      "filesCreated: list of target paths that were newly created (install-context extension of changedFiles)",
+      "filesModified: list of target paths that were updated or merged (install-context extension of changedFiles)",
+      // commitRef is optional and only used when an actual commit SHA is known after a verified write.
+      "commitRef: null unless actual commit SHA is known",
     ],
   },
 
