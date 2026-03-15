@@ -309,6 +309,13 @@ export default function GovernanceStarterKitPanel() {
         </CardContent>
       </Card>
 
+      {/* No-repo blocked state */}
+      {!activeRepo && (
+        <div className="rounded border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-400 text-center">
+          Eksport og forhåndsvisning er ikke tilgjengelig — velg et aktivt repo først.
+        </div>
+      )}
+
       {/* Output sections */}
       {kit && (
         <>
@@ -354,7 +361,7 @@ export default function GovernanceStarterKitPanel() {
           <Card>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <CardTitle className="text-sm text-slate-700">Komplett export</CardTitle>
+                <CardTitle className="text-sm text-slate-700">Komplett eksport</CardTitle>
                 <div className="flex gap-2">
                   <CopyBtn value={kit.text} label="Kopier full pakke" />
                   <CopyBtn value={JSON.stringify({ repo: `${activeRepo.owner}/${activeRepo.repo}`, intent: buildIntent, notes, folders: kit.folders, governanceFiles: kit.govFiles.map(f => f.path), firstSteps: kit.steps }, null, 2)} label="Kopier JSON" />
