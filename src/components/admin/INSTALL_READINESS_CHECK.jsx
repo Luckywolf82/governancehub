@@ -85,7 +85,10 @@ function ReadinessIcon({ state }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function InstallReadinessCheck() {
+/**
+ * @param {function} [onReadinessChange] - optional callback fired whenever effectiveReadiness changes
+ */
+export default function InstallReadinessCheck({ onReadinessChange } = {}) {
   const { activeRepo } = useActiveRepo();
   const [results, setResults]       = useState([]);   // [{ path, label, exists, notFound, error }]
   const [readiness, setReadiness]   = useState("idle");
