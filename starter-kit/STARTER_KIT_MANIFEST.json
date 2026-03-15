@@ -35,6 +35,11 @@
       "required": true
     },
     {
+      "module": "governance",
+      "path": "governance/INSTALL_POLICY.jsx",
+      "required": true
+    },
+    {
       "module": "audits",
       "path": "audits/AUDIT_INDEX.jsx",
       "required": true
