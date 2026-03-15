@@ -95,11 +95,16 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Repo Tools */}
-        {tab === "Repo Tools" && (
+        {/* Tab: Setup */}
+        {tab === "Setup" && (
           <div className="space-y-6">
+            <div>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Setup</p>
+              <p className="text-sm text-slate-500">Registrer repo og opprett eller koble prosjekt</p>
+            </div>
             <RepositoryManagerPanel />
             <div className="border-t border-slate-200 pt-4">
+              <p className="text-xs text-slate-400 mb-3">Neste steg etter repo-oppsett: bootstrap eller koble prosjekt</p>
               <ProjectBootstrapPanel />
             </div>
             <div className="border-t border-slate-200 pt-4">
