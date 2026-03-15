@@ -388,6 +388,72 @@ export default function GovernanceStarterKitPanel() {
           {/* ── Install Readiness Check ── */}
           <InstallReadinessCheck onReadinessChange={setInstallReadiness} />
 
+          {/* ── Install Status Banner ── */}
+          {(() => {
+            const statusMap = {
+              safe_to_install: {
+                bg: "bg-emerald-100 border-emerald-300",
+                text: "text-emerald-800",
+                icon: <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />,
+                label: "Klar for installasjon",
+                message: "Ingen eksisterende governance funnet — trygt å installere starter kit.",
+              },
+              existing_governance_detected: {
+                bg: "bg-red-100 border-red-300",
+                text: "text-red-800",
+                icon: <XCircle className="w-4 h-4 text-red-600 shrink-0" />,
+                label: "Installasjon blokkert",
+                message: "Eksisterende governance funnet — installer ikke blindt. Gjør audit/merge først.",
+              },
+              partial_governance_detected: {
+                bg: "bg-amber-100 border-amber-300",
+                text: "text-amber-800",
+                icon: <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />,
+                label: "Audit/merge påkrevd",
+                message: "Delvis governance funnet — audit/merge kreves før installasjon.",
+              },
+              verification_failed: {
+                bg: "bg-red-100 border-red-300",
+                text: "text-red-800",
+                icon: <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />,
+                label: "Verifisering feilet",
+                message: "Repo-verifisering feilet — bekreft tilgang før installasjon.",
+              },
+              repo_not_connected: {
+                bg: "bg-slate-100 border-slate-300",
+                text: "text-slate-700",
+                icon: <AlertTriangle className="w-4 h-4 text-slate-600 shrink-0" />,
+                label: "Repo kreves",
+                message: "Velg et aktivt repo og kjør readiness-sjekk før installasjon.",
+              },
+              idle: {
+                bg: "bg-slate-100 border-slate-300",
+                text: "text-slate-600",
+                icon: <Circle className="w-4 h-4 text-slate-400 shrink-0" />,
+                label: "Sjekk ausstår",
+                message: "Kjør readiness-sjekk ovenfor for å godkjenne installasjon.",
+              },
+              checking: {
+                bg: "bg-blue-100 border-blue-300",
+                text: "text-blue-800",
+                icon: <Loader2 className="w-4 h-4 text-blue-600 shrink-0 animate-spin" />,
+                label: "Sjekker…",
+                message: "Sjekker repo for eksisterende governance-filer…",
+              },
+            };
+            const status = statusMap[installReadiness] || statusMap.idle;
+
+            return (
+              <div className={`border rounded px-4 py-3 flex items-start gap-3 ${status.bg}`}>
+                {status.icon}
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium ${status.text}`}>{status.label}</p>
+                  <p className={`text-xs mt-0.5 ${status.text} opacity-90`}>{status.message}</p>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* ── Install prompt — gated by readiness ── */}
           {(() => {
             const isSafe = installReadiness === "safe_to_install";
