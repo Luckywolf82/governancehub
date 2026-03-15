@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Github, Package, ChevronDown, ChevronUp, Loader2, Download, XCircle } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Github, Package, ChevronDown, ChevronUp, Loader2, Download, XCircle, ShieldCheck, Circle } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 import InstallReadinessCheck from "@/components/admin/INSTALL_READINESS_CHECK";
 
