@@ -336,6 +336,29 @@ export default function ProjectBootstrapPanel() {
             <p className="text-xs text-amber-600">Fyll inn prosjektnavn for å generere bootstrap-pakke.</p>
           )}
 
+          {/* Create button — only in create mode */}
+          {bootstrapMode === "create" && activeRepo && projectName.trim() && !savedProject && (
+            <button
+              onClick={handleCreate}
+              disabled={saving}
+              className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded bg-violet-600 text-white hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Rocket className="w-3.5 h-3.5" />}
+              {saving ? "Oppretter..." : "Opprett prosjekt"}
+            </button>
+          )}
+
+          {/* Success state */}
+          {savedProject && (
+            <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-800">
+              <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0 text-green-600" />
+              <span>
+                <span className="font-medium">Prosjekt opprettet.</span>{" "}
+                <span className="font-mono">{savedProject.name}</span> er nå lagret og vises på Projects-siden.
+              </span>
+            </div>
+          )}
+
         </CardContent>
       </Card>
 
