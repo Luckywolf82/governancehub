@@ -13,7 +13,7 @@ import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPa
 import GovernanceStarterKitPanel from "@/components/admin/GovernanceStarterKitPanel";
 import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
 
-const TABS = ["Operations", "Repo Tools", "Product", "System"];
+const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
 export default function Admin() {
   const [user, setUser] = useState(null);
