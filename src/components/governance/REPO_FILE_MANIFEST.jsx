@@ -493,12 +493,12 @@
       "exists": true
     },
     {
-      "path": "src/components/projects/PROJECT_REGISTRY.jsx",
-      "fileName": "PROJECT_REGISTRY.jsx",
+      "path": "src/components/projects/WORKSTREAM_REGISTRY.jsx",
+      "fileName": "WORKSTREAM_REGISTRY.jsx",
       "extension": "jsx",
       "folder": "src/components/projects",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/projects/PROJECT_REGISTRY.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/projects/PROJECT_REGISTRY.jsx",
+      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/projects/WORKSTREAM_REGISTRY.jsx",
+      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/projects/WORKSTREAM_REGISTRY.jsx",
       "category": "projects",
       "exists": true
     }

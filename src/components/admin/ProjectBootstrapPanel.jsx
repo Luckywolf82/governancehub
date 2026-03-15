@@ -31,7 +31,7 @@ function toSlug(str) {
 
 const NEXT_STEPS = {
   "new-app": [
-    "Register project in PROJECT_REGISTRY with generated id and metadata",
+    "Register project in WORKSTREAM_REGISTRY with generated id and metadata",
     "Verify repo is registered in Repository Manager and isEnabled=true",
     "Initialize governance foundation: AI_STATE, LockedFiles, AI_PROJECT_INSTRUCTIONS",
     "Create initial PhaseExecutionLog bootstrap entry",
@@ -40,7 +40,7 @@ const NEXT_STEPS = {
     "Set NextSafeStep to reflect first implementation target",
   ],
   "existing": [
-    "Locate matching entry in PROJECT_REGISTRY and verify metadata is current",
+    "Locate matching entry in WORKSTREAM_REGISTRY and verify metadata is current",
     "Link repo fullName reference to project entry",
     "Read AI_STATE — verify phase and status match actual project state",
     "Review PhaseExecutionLog for last verified entry",
@@ -48,7 +48,7 @@ const NEXT_STEPS = {
     "Update NextSafeStep based on audit findings",
   ],
   "new-capability": [
-    "Register capability as a new project entry or sub-scope in PROJECT_REGISTRY",
+    "Register capability as a new project entry or sub-scope in WORKSTREAM_REGISTRY",
     "Add audit entry in AUDIT_INDEX scoped to this capability",
     "Implement minimally — one file at a time",
     "Verify against acceptance criteria before marking done",
@@ -56,7 +56,7 @@ const NEXT_STEPS = {
     "Update NextSafeStep",
   ],
   "scaffold": [
-    "Register project in PROJECT_REGISTRY with status: planned",
+    "Register project in WORKSTREAM_REGISTRY with status: planned",
     "Create governance folder structure",
     "Initialize AI_STATE with project name and bootstrap phase",
     "Define LockedFiles registry",
@@ -65,7 +65,7 @@ const NEXT_STEPS = {
     "Build initial ROADMAP from scored data",
   ],
   "governance": [
-    "Locate or create project entry in PROJECT_REGISTRY",
+    "Locate or create project entry in WORKSTREAM_REGISTRY",
     "Run AuditRunner — get current governance snapshot",
     "Identify and remove placeholder values in governance files",
     "Verify LockedFiles matches AI_PROJECT_INSTRUCTIONS",
@@ -151,7 +151,7 @@ function buildBootstrapPackage({ repo, bootstrapMode, buildIntent, projectName, 
     ...(bootstrapMode === "create" ? { proposedEntry: registryEntry } : {
       linkInstruction: {
         repoFullName: repo.fullName ?? `${repo.owner}/${repo.repo}`,
-        action: "add repoFullName field to matching PROJECT_REGISTRY entry",
+        action: "add repoFullName field to matching WORKSTREAM_REGISTRY entry",
       }
     }),
     nextSteps: steps,
@@ -390,7 +390,7 @@ export default function ProjectBootstrapPanel() {
               {/* Proposed registry entry */}
               {pkg.registryEntry && (
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-slate-600">Foreslått PROJECT_REGISTRY-oppføring:</p>
+                  <p className="text-xs font-medium text-slate-600">Foreslått WORKSTREAM_REGISTRY-oppføring:</p>
                   <pre className="text-xs font-mono bg-slate-50 border border-slate-100 rounded p-3 whitespace-pre-wrap text-slate-700 leading-relaxed">
 {`{
   id:          "${pkg.registryEntry.id}",

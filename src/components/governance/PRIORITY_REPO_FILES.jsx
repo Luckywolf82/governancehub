@@ -86,12 +86,12 @@
       "exists": true
     },
     {
-      "path": "src/components/projects/PROJECT_REGISTRY.jsx",
-      "label": "Project Registry",
+      "path": "src/components/projects/WORKSTREAM_REGISTRY.jsx",
+      "label": "Workstream Registry",
       "priority": "high",
-      "whyItMatters": "Canonical registry of all GovernanceHub projects.",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/projects/PROJECT_REGISTRY.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/projects/PROJECT_REGISTRY.jsx",
+      "whyItMatters": "Canonical registry of all GovernanceHub internal workstreams.",
+      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/projects/WORKSTREAM_REGISTRY.jsx",
+      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/projects/WORKSTREAM_REGISTRY.jsx",
       "lockedFile": false,
       "exists": true
     },

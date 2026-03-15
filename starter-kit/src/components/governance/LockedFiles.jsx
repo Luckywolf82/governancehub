@@ -21,7 +21,7 @@ export const LockedFiles = {
     "src/components/governance/AI_STATE.jsx",
     "src/components/governance/NextSafeStep.jsx",
     "src/components/governance/PhaseExecutionLog.jsx",
-    "src/components/projects/PROJECT_REGISTRY.jsx"
+    "src/components/projects/WORKSTREAM_REGISTRY.jsx"
   ],
 
   informational: [

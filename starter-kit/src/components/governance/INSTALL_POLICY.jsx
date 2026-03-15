@@ -75,7 +75,7 @@ export const INSTALL_POLICY = {
       "src/components/governance/LockedFiles.jsx",
       "src/components/governance/PhaseExecutionLog.jsx",
       "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
-      "src/components/projects/PROJECT_REGISTRY.jsx",
+      "src/components/projects/WORKSTREAM_REGISTRY.jsx",
     ],
     approvalRequirement: [
       "If canonical locked governance files already exist in target repo, installation must not proceed blindly.",

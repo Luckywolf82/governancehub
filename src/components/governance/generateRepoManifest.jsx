@@ -159,7 +159,7 @@ function generatePriorityRepoFiles(manifest) {
     { path: "src/App.jsx",                                         priority: "critical", label: "App Bootstrap / Router",   why: "Main routing configuration." },
     { path: "src/components/audits/AUDIT_INDEX.jsx",              priority: "high",     label: "Audit Index",              why: "Canonical registry of all audit records." },
     { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx",       priority: "high",     label: "Audit System Guide",       why: "Standards for all audit artifacts." },
-    { path: "src/components/projects/PROJECT_REGISTRY.jsx",       priority: "high",     label: "Project Registry",         why: "Canonical registry of all projects." },
+    { path: "src/components/projects/WORKSTREAM_REGISTRY.jsx",    priority: "high",     label: "Workstream Registry",      why: "Canonical registry of all internal workstreams." },
     { path: "src/components/governance/LastVerifiedState.jsx",    priority: "high",     label: "Last Verified State",      why: "Last known verified repository state." },
     { path: "src/pages/Admin.jsx",                                 priority: "high",     label: "Admin Page",               why: "Primary admin interface." },
     { path: "src/components/AppLayout.jsx",                        priority: "high",     label: "App Layout",               why: "Global navigation shell." },

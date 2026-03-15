@@ -247,7 +247,7 @@ function useInstallPreview(activeRepo, manifest) {
         "src/components/governance/AI_STATE.jsx",
         "src/components/governance/PhaseExecutionLog.jsx",
         "src/components/governance/LockedFiles.jsx",
-        "src/components/projects/PROJECT_REGISTRY.jsx",
+        "src/components/projects/WORKSTREAM_REGISTRY.jsx",
       ];
 
       // Check each manifest file's target existence

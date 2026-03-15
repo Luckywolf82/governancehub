@@ -27,7 +27,7 @@ export const STARTER_KIT_VERSION = {
   ],
 
   projectModules: [
-    "PROJECT_REGISTRY"
+    "WORKSTREAM_REGISTRY"
   ],
 
   description: "Initial GovernanceHub starter governance baseline.",

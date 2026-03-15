@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { FolderKanban, ClipboardList, Shield, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AUDIT_INDEX } from "@/components/audits/AUDIT_INDEX";
-import { PROJECT_REGISTRY } from "@/components/projects/PROJECT_REGISTRY";
+import { WORKSTREAM_REGISTRY } from "@/components/projects/WORKSTREAM_REGISTRY";
 
 const FEATURES = [
   {
@@ -28,7 +28,7 @@ const FEATURES = [
   },
 ];
 
-const projects = PROJECT_REGISTRY.entries;
+const projects = WORKSTREAM_REGISTRY.entries;
 const audits = AUDIT_INDEX.entries;
 
 export default function Home() {
