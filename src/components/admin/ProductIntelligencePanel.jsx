@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ROADMAP } from "@/components/roadmap/ROADMAP";
 import { IDEA_INDEX } from "@/components/ideas/IDEA_INDEX";
 import { IDEA_PRIORITY_AUDIT } from "@/components/audits/product/idea-priority-audit";
 import { Lightbulb, ArrowRight } from "lucide-react";
+
+const IDEA_TYPES = ["Alle", "capability", "architecture", "workflow", "integration", "governance", "platform", "analytics"];
 
 const TIER_STYLES = {
   now:   "bg-green-100 text-green-800 border border-green-200",
@@ -27,6 +30,13 @@ function TierPill({ tier }) {
 export default function ProductIntelligencePanel() {
   const totalIdeas = IDEA_INDEX.ideas.length;
   const { lanes, recommendedBuildSequence } = ROADMAP;
+  const [activeType, setActiveType] = useState("Alle");
+
+  const filterByType = (items) =>
+    activeType === "Alle" ? items : items.filter((i) => i.ideaType === activeType);
+
+  const filteredNow = filterByType(lanes.now);
+  const filteredSequence = filterByType(recommendedBuildSequence);
 
   return (
     <div className="space-y-4">
@@ -44,6 +54,23 @@ export default function ProductIntelligencePanel() {
         <Badge className="bg-amber-100 text-amber-700 border border-amber-200 text-xs">Read-only</Badge>
       </div>
 
+      {/* ideaType filter */}
+      <div className="flex flex-wrap gap-1">
+        {IDEA_TYPES.map((type) => (
+          <button
+            key={type}
+            onClick={() => setActiveType(type)}
+            className={`text-xs px-2 py-0.5 rounded border transition-colors capitalize ${
+              activeType === type
+                ? "bg-slate-800 text-white border-slate-800"
+                : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+            }`}
+          >
+            {type}
+          </button>
+        ))}
+      </div>
+
       {/* Lane summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {["now", "next", "soon", "later"].map((tier) => (
@@ -55,7 +82,7 @@ export default function ProductIntelligencePanel() {
       </div>
 
       {/* Now lane */}
-      {lanes.now.length > 0 && (
+      {filteredNow.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-slate-700 flex items-center gap-2">
@@ -64,7 +91,7 @@ export default function ProductIntelligencePanel() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-1.5">
-            {lanes.now.map((idea) => (
+            {filteredNow.map((idea) => (
               <div key={idea.ideaId} className="flex items-start justify-between gap-2 text-xs py-1 border-b border-slate-50 last:border-0">
                 <div>
                   <span className="font-medium text-slate-800">{idea.title}</span>
@@ -83,7 +110,7 @@ export default function ProductIntelligencePanel() {
           <CardTitle className="text-sm text-slate-700">Recommended Build Sequence</CardTitle>
         </CardHeader>
         <CardContent className="pt-0 space-y-1">
-          {recommendedBuildSequence.map((item, idx) => (
+          {filteredSequence.map((item, idx) => (
             <div key={item.ideaId} className="flex items-center gap-2 text-xs py-0.5">
               <span className="text-slate-400 font-mono w-5 shrink-0 text-right">{idx + 1}.</span>
               <ArrowRight className="w-3 h-3 text-slate-300 shrink-0" />
