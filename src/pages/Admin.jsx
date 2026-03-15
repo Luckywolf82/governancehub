@@ -114,10 +114,18 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Product */}
-        {tab === "Product" && (
+        {/* Tab: Build Prep */}
+        {tab === "Build Prep" && (
           <div className="space-y-6">
-            <StartPromptGeneratorPanel />
+            <div>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Build Prep</p>
+              <p className="text-sm text-slate-500">Generer prompt og governance-startpakke før bygging</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-semibold mb-1">Generatorer</p>
+              <p className="text-xs text-slate-400 mb-4">Bruk disse for å forberede AI-arbeid og governance-struktur før implementering.</p>
+              <StartPromptGeneratorPanel />
+            </div>
             <div className="border-t border-slate-200 pt-4">
               <GovernanceStarterKitPanel />
             </div>
