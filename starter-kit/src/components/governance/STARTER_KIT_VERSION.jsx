@@ -1,26 +1,40 @@
 /**
  * STARTER KIT VERSION
  *
- * Used by GovernanceHub to detect governance version
+ * Defines the version of governance starter kit
  * installed in a repository.
  */
 
 export const STARTER_KIT_VERSION = {
-  version: "1.0.0",
   name: "GovernanceHub Starter Kit",
+
+  version: "1.0.0",
+
   releaseDate: "2026-03-15",
 
   description:
-    "Initial governance bootstrap package for AI-governed repositories.",
+    "Bootstrap governance package for AI-governed repositories.",
 
-  components: [
-    "AI_STATE",
-    "AI_PROJECT_INSTRUCTIONS",
-    "LockedFiles",
-    "NextSafeStep",
-    "PhaseExecutionLog",
-    "AUDIT_INDEX",
-    "AUDIT_SYSTEM_GUIDE",
-    "PROJECT_REGISTRY"
-  ]
+  compatibility: {
+    governanceHub: ">=1.0.0"
+  },
+
+  modules: {
+    governance: [
+      "AI_STATE",
+      "AI_PROJECT_INSTRUCTIONS",
+      "LockedFiles",
+      "NextSafeStep",
+      "PhaseExecutionLog"
+    ],
+
+    audits: [
+      "AUDIT_INDEX",
+      "AUDIT_SYSTEM_GUIDE"
+    ],
+
+    projects: [
+      "PROJECT_REGISTRY"
+    ]
+  }
 };
