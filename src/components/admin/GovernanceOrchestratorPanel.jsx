@@ -7,7 +7,7 @@ import { LOCKED_FILES } from "@/components/governance/LockedFiles";
 import { generateCopilotTask } from "@/components/governance/TaskGenerator";
 import { base44 } from "@/api/base44Client";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
-import { getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDraft, buildDispatchRecommendation } from "./orchestratorEngine";
+import { normalizeAuditShape, getReadiness, buildRecommendedStep, buildIssuePrep, buildExecutionLogDraft, buildDispatchRecommendation } from "./orchestratorEngine";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -159,9 +159,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // Merge audit index data with manual enrichment; track which fields came from enrichment
   const { audit, enrichedFields } = useMemo(() => {
     if (!baseAudit) return { audit: null, enrichedFields: [] };
+    const normalizedBase = normalizeAuditShape(baseAudit);
     // For injected audits, skip enrichment merge — fields are already populated by Audit Runner
-    if (isInjected) return { audit: baseAudit, enrichedFields: [] };
-    const merged = { ...baseAudit };
+    if (isInjected) return { audit: normalizedBase, enrichedFields: [] };
+    const merged = { ...normalizedBase };
     const used = [];
     REQUIRED_FIELDS.forEach((f) => {
       const raw = enrichment[f] ?? "";

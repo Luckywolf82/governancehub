@@ -4,6 +4,27 @@
  * No React dependencies. All functions accept parameters and return plain objects.
  */
 
+// ── Audit Shape Normalization ─────────────────────────────────────────────────
+// Accepts both canonical (meta/finding) and legacy (flat) audit shapes.
+// Canonical shape: { meta: {...}, finding: {...} }
+// Legacy shape:    flat object with all fields at the top level
+// Returns a flat object with all expected orchestrator fields.
+// Legacy audits are returned unchanged.
+
+export function normalizeAuditShape(audit) {
+  if (!audit) return audit;
+  if (audit.meta && audit.finding) {
+    // Spread order: meta fields first, finding fields second.
+    // Per canonical schema (AUDIT_SYSTEM_GUIDE), meta and finding have no
+    // overlapping keys, so no conflict is expected. finding wins if overlap occurs.
+    return {
+      ...audit.meta,
+      ...audit.finding,
+    };
+  }
+  return audit;
+}
+
 // ── Readiness Model ──────────────────────────────────────────────────────────
 // Derived from audit.status + audit.preliminary — no new canonical fields needed.
 //   "execution-ready"    → verified + preliminary: false
