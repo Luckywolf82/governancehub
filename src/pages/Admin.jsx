@@ -7,6 +7,7 @@ import RepoRawAccessPanel from "@/components/admin/RepoRawAccessPanel";
 import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
 import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestratorPanel";
 import AuditRunnerPanel from "@/components/admin/AuditRunnerPanel";
+import ExecutionLogPanel from "@/components/admin/ExecutionLogPanel";
 import RepositoryManagerPanel from "@/components/admin/RepositoryManagerPanel";
 import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePanel";
 import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPanel";
@@ -48,8 +49,6 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-5xl mx-auto space-y-4">
-
-        {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <Shield className="w-7 h-7 text-slate-700" />
@@ -65,7 +64,6 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Tab bar */}
         <div className="flex border-b border-slate-200">
           {TABS.map((t) => (
             <button
@@ -82,7 +80,6 @@ export default function Admin() {
           ))}
         </div>
 
-        {/* Tab: Govern */}
         {tab === "Govern" && (
           <div className="space-y-6">
             <div>
@@ -107,10 +104,12 @@ export default function Admin() {
             <div className="border-t border-slate-200 pt-4">
               <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
             </div>
+            <div className="border-t border-slate-200 pt-4">
+              <ExecutionLogPanel />
+            </div>
           </div>
         )}
 
-        {/* Tab: Setup */}
         {tab === "Setup" && (
           <div className="space-y-6">
             <div>
@@ -129,7 +128,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Build Prep */}
         {tab === "Build Prep" && (
           <div className="space-y-6">
             <div>
@@ -160,7 +158,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Strategy */}
         {tab === "Strategy" && (
           <div className="space-y-6">
             <div>
@@ -213,7 +210,6 @@ export default function Admin() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
