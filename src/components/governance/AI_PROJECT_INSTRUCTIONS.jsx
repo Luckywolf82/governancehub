@@ -76,6 +76,8 @@ AI AGENT RULES
 
 LOCKED FILES
 The following files are locked governance files and must not be modified without an explicit audit:
+- src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx
+- src/components/governance/LockedFiles.jsx
 - src/components/governance/PhaseExecutionLog.jsx
 - src/components/audits/AUDIT_INDEX.jsx
 - src/components/audits/AUDIT_SYSTEM_GUIDE.jsx

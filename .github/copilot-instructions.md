@@ -17,6 +17,7 @@ This repository is a governance-first multi-project control system.
 The following governance files are high-sensitivity files:
 
 - src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx
+- src/components/governance/LockedFiles.jsx
 - src/components/governance/PhaseExecutionLog.jsx
 - src/components/audits/AUDIT_INDEX.jsx
 - src/components/audits/AUDIT_SYSTEM_GUIDE.jsx
