@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Github, Package, ChevronDown, ChevronUp, Loader2, Download, XCircle, ShieldCheck, Circle } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Github, Package, ChevronDown, ChevronUp, Loader2, Download, XCircle, ShieldCheck, Circle, FileCheck, FileQuestion } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
+import { base44 } from "@/api/base44Client";
 import InstallReadinessCheck from "@/components/admin/INSTALL_READINESS_CHECK";
 
 // ── Shared vocabulary ──────────────────────────────────────────────────────────
