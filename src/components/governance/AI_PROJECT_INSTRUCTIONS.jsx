@@ -1,138 +1,141 @@
-export const AI_PROJECT_INSTRUCTIONS = `
-AI PROJECT INSTRUCTIONS — GOVERNANCEHUB MULTI-PROJECT GOVERNANCE
+export const AI_PROJECT_INSTRUCTIONS = {
+  projectName: "GovernanceHub",
 
-VERSION
-v2.0
+  repository: "Luckywolf82/governancehub",
 
----
+  governanceModel: "AI-assisted multi-project repository governance",
 
-SYSTEM STRUCTURE
-GovernanceHub is a multi-project governance control system.
-It manages audits, tasks, execution logs, and project references across multiple independent projects.
-Every audit, task, and execution log entry must reference a specific project.
-No governance action is project-agnostic.
+  version: "v2.0",
 
----
+  canonicalSources: [
+    "STARTER_KIT_MANIFEST",
+    "INSTALL_POLICY",
+    "STARTER_KIT_VERSION",
+    "AI_PROJECT_INSTRUCTIONS",
+    "AI_STATE",
+    "LockedFiles",
+    "PhaseExecutionLog",
+    "PROJECT_REGISTRY"
+  ],
 
-RULE: REPOSITORY VERIFICATION
-When the user requests repository verification, the AI agent must read the actual repository files directly.
-Reposnapshot is never a source of truth.
-Never answer from memory, cached summaries, reposnapshot, or prior chat context.
-Always read live repository files before reporting repository state.
+  repositoryVerificationRule: {
+    description:
+      "AI must verify repository files directly before making claims about repository state.",
+    rules: [
+      "Reposnapshot is never a source of truth.",
+      "AI must read the actual repository file before confirming repository state.",
+      "Cached memory or prior conversation context is not valid verification.",
+      "If repository state is uncertain, AI must re-read the relevant file."
+    ]
+  },
 
-MANUAL REPOSITORY VERIFICATION PROTOCOL
-If the AI cannot directly access the repository filesystem:
+  workflowPrinciples: [
+    "Always verify repository state before proposing changes.",
+    "Make one structural change at a time.",
+    "Do not overwrite governance files blindly.",
+    "All verified governance changes must be recorded in PhaseExecutionLog.",
+    "Prefer audit and review before structural modifications.",
+    "Use manifest, policy, and version files as canonical starter-kit references."
+  ],
 
-1. The AI must explicitly request the exact file needed for verification
-2. The user may provide the exact GitHub file URL
-3. The AI must base its verification strictly on the contents of that file
-4. The AI must not assume repository state without reading the active file
-5. Changed files must be confirmed visible in GitHub before any task is marked complete
+  safeOperations: [
+    "Reading repository files",
+    "Creating missing governance files",
+    "Updating audit documentation",
+    "Generating install previews",
+    "Running readiness checks",
+    "Producing non-destructive governance recommendations"
+  ],
 
-RULE: REPOSITORY QUESTIONS
-When the user asks about repository structure, file contents, or current state:
-- Do not infer from prior context
-- Read the actual files directly
-- Report only what was read, not what is assumed
+  restrictedOperations: [
+    "Overwriting canonical governance files without approval",
+    "Destructive repository operations",
+    "Modifying locked files without audit review",
+    "Logging unverified changes in PhaseExecutionLog",
+    "Installing governance when readiness is blocked",
+    "Assuming repository state without direct inspection"
+  ],
 
----
+  governanceFiles: [
+    "AI_PROJECT_INSTRUCTIONS",
+    "AI_STATE",
+    "LockedFiles",
+    "NextSafeStep",
+    "PhaseExecutionLog",
+    "INSTALL_POLICY",
+    "STARTER_KIT_VERSION",
+    "PROJECT_REGISTRY"
+  ],
 
-DATA INTEGRITY
-- GitHub is the sole source of truth for repository state
-- No cached, summarized, or inferred state may be treated as verified
-- Execution log entries must be written after each verified change
-- Locked files must be confirmed unmodified before and after each session
+  multiProjectGovernance: {
+    description: "GovernanceHub manages multiple projects.",
+    rules: [
+      "Every audit, task, and execution log entry must reference a specific project.",
+      "No governance action is project-agnostic.",
+      "Project identity must be confirmed at the start of every governance session.",
+      "Cross-project actions require explicit identification of each affected project.",
+      "Audits and tasks created without a project reference are invalid.",
+      "All audits, tasks, and execution logs must include projectId and projectSlug."
+    ]
+  },
 
----
+  auditSystem: {
+    canonicalFiles: [
+      "src/components/audits/AUDIT_INDEX.jsx",
+      "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx"
+    ],
+    rules: [
+      "All structural changes require an audit when system state is unclear.",
+      "Audit entries must identify: project, date, change description, affected files, and outcome.",
+      "Audit index must be updated when a new audit is created.",
+      "Modifying a locked file requires an audit.",
+      "Adding a new project to GovernanceHub requires an audit.",
+      "Cross-project dependencies being affected requires an audit."
+    ]
+  },
 
-MULTI-PROJECT GOVERNANCE
-- GovernanceHub manages multiple projects
-- Each project has its own audit trail, task list, and execution log scope
-- Project identity must be confirmed at the start of every governance session
-- Cross-project actions require explicit identification of each affected project
-- Audits and tasks created without a project reference are invalid
-All audits, tasks, and execution logs must include a project reference such as projectId and projectSlug.
----
+  lockedFiles: [
+    "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
+    "src/components/governance/LockedFiles.jsx",
+    "src/components/governance/PhaseExecutionLog.jsx",
+    "src/components/audits/AUDIT_INDEX.jsx",
+    "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx"
+  ],
 
-AUDIT SYSTEM
-- All structural changes require an audit when system state is unclear
-- Audit entries must identify: project, date, change description, affected files, and outcome
-- Audit index must be updated when a new audit is created
-- Refer to src/components/audits/AUDIT_INDEX.jsx for the canonical audit index
-- Refer to src/components/audits/AUDIT_SYSTEM_GUIDE.jsx for audit procedures
+  executionLog: {
+    file: "src/components/governance/PhaseExecutionLog.jsx",
+    requiredFields: [
+      "id",
+      "date",
+      "task",
+      "changedFiles",
+      "diffSummary",
+      "githubVisibility",
+      "lockedFileVerification"
+    ],
+    rule: "Add an entry after every verified change. GitHub visibility must be confirmed before setting githubVisibility to verified."
+  },
 
----
+  repositoryVisibilityProtocol: [
+    "Implement the change.",
+    "Confirm the file is saved and committed.",
+    "Confirm GitHub shows the updated file.",
+    "Record the confirmed state in the execution log.",
+    "Only then mark the task complete."
+  ],
 
-AI AGENT RULES
-- Propose exactly one safe next step at a time
-- Do not execute multiple structural changes in a single step
-- Read governance files before making any new proposal
-- Update the execution log after every verified change
-- Do not mark a task complete until GitHub visibility is confirmed
-- Never use reposnapshot as a source of truth
-- Never infer repository state from prior chat context
+  completionRule: {
+    conditions: [
+      "The change is visible in the GitHub repository.",
+      "The execution log entry is written and visible in GitHub.",
+      "Locked files are confirmed unmodified."
+    ]
+  },
 
----
+  developmentLoop: "verify → propose → implement → publish → verify",
 
-LOCKED FILES
-The following files are locked governance files and must not be modified without an explicit audit:
-- src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx
-- src/components/governance/LockedFiles.jsx
-- src/components/governance/PhaseExecutionLog.jsx
-- src/components/audits/AUDIT_INDEX.jsx
-- src/components/audits/AUDIT_SYSTEM_GUIDE.jsx
-
-Locked file verification must be confirmed at the start and end of each governance session.
-
----
-
-EXECUTION LOG
-After every verified change:
-- Add an entry to src/components/governance/PhaseExecutionLog.jsx
-- Record: id, date, task, changedFiles, diffSummary, githubVisibility, lockedFileVerification
-- GitHub visibility must be confirmed before setting githubVisibility to verified
-
----
-
-REPOSITORY VISIBILITY PROTOCOL
-1. Implement the change
-2. Confirm the file is saved and committed
-3. Confirm GitHub shows the updated file
-4. Record the confirmed state in the execution log
-5. Only then mark the task complete
-
----
-
-REPOSITORY COMPLETION RULE
-A task is complete only when:
-- The change is visible in the GitHub repository
-- The execution log entry is written and visible in GitHub
-- Locked files are confirmed unmodified
-
----
-
-DEVELOPMENT LOOP
-verify → propose → implement → publish → verify
-
-Each iteration of the loop must:
-- Begin with reading actual repository files
-- Propose exactly one safe next step
-- Implement only the approved step
-- Confirm GitHub visibility after publish
-- Verify locked files remain unmodified
-
----
-
-AUDIT REQUIREMENT
-Structural changes require an audit entry when:
-- System state is unclear or unverified
-- A locked file is being modified
-- A new project is being added to GovernanceHub
-- Cross-project dependencies are affected
-
----
-
-VERSION HISTORY
-v1.0 — Initial Base44 template
-v2.0 — Upgraded to GovernanceHub multi-project governance specification
-`;
+  versionHistory: [
+    "v1.0 — Initial Base44 template",
+    "v2.0 — Upgraded to GovernanceHub multi-project governance specification"
+  ]
+};
