@@ -1,8 +1,8 @@
-/**
- * STARTER KIT VERSION
+/*
+ * STARTER_KIT_VERSION
  *
- * Defines the version of governance starter kit
- * installed in a repository.
+ * Canonical version definition for GovernanceHub Starter Kit.
+ * Used to track installed governance baseline inside target repositories.
  */
 
 export const STARTER_KIT_VERSION = {
@@ -12,29 +12,32 @@ export const STARTER_KIT_VERSION = {
 
   releaseDate: "2026-03-15",
 
-  description:
-    "Bootstrap governance package for AI-governed repositories.",
+  governanceModules: [
+    "AI_PROJECT_INSTRUCTIONS",
+    "INSTALL_POLICY",
+    "AI_STATE",
+    "LockedFiles",
+    "NextSafeStep",
+    "PhaseExecutionLog"
+  ],
 
-  compatibility: {
-    governanceHub: ">=1.0.0"
-  },
+  auditModules: [
+    "AUDIT_INDEX",
+    "AUDIT_SYSTEM_GUIDE"
+  ],
 
-  modules: {
-    governance: [
-      "AI_STATE",
-      "AI_PROJECT_INSTRUCTIONS",
-      "LockedFiles",
-      "NextSafeStep",
-      "PhaseExecutionLog"
-    ],
+  projectModules: [
+    "PROJECT_REGISTRY"
+  ],
 
-    audits: [
-      "AUDIT_INDEX",
-      "AUDIT_SYSTEM_GUIDE"
-    ],
+  description: "Initial GovernanceHub starter governance baseline.",
 
-    projects: [
-      "PROJECT_REGISTRY"
-    ]
-  }
+  installedVia: "manual-starter-kit-install",
+
+  notes: [
+    "Starter kit provides minimal governance framework for AI-assisted repositories.",
+    "INSTALL_POLICY defines installer constraints and safety rules.",
+    "AI_STATE stores runtime AI governance state.",
+    "PhaseExecutionLog records governance changes and operations."
+  ]
 };
