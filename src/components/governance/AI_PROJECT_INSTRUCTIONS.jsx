@@ -5,7 +5,7 @@ export const AI_PROJECT_INSTRUCTIONS = {
 
   governanceModel: "AI-assisted multi-project repository governance",
 
-  version: "v2.0",
+  version: "v2.1",
 
   canonicalSources: [
     "STARTER_KIT_MANIFEST",
@@ -15,7 +15,7 @@ export const AI_PROJECT_INSTRUCTIONS = {
     "AI_STATE",
     "LockedFiles",
     "PhaseExecutionLog",
-    "PROJECT_REGISTRY"
+    "WORKSTREAM_REGISTRY"
   ],
 
   repositoryVerificationRule: {
@@ -64,7 +64,7 @@ export const AI_PROJECT_INSTRUCTIONS = {
     "PhaseExecutionLog",
     "INSTALL_POLICY",
     "STARTER_KIT_VERSION",
-    "PROJECT_REGISTRY"
+    "WORKSTREAM_REGISTRY"
   ],
 
   multiProjectGovernance: {
@@ -139,6 +139,7 @@ export const AI_PROJECT_INSTRUCTIONS = {
 
   versionHistory: [
     "v1.0 — Initial Base44 template",
-    "v2.0 — Upgraded to GovernanceHub multi-project governance specification"
+    "v2.0 — Upgraded to GovernanceHub multi-project governance specification",
+    "v2.1 — Updated canonicalSources and governanceFiles to use WORKSTREAM_REGISTRY following component-layer rename from PROJECT_REGISTRY"
   ]
 };
