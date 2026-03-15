@@ -110,6 +110,7 @@ export const AI_PROJECT_INSTRUCTIONS = {
       "id",
       "date",
       "task",
+      "taskRequested",
       "changedFiles",
       "diffSummary",
       "githubVisibility",
