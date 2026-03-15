@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Github, Package, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Github, Package, ChevronDown, ChevronUp, Loader2, Download } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 
-// ── Shared vocabulary (aligned with StartPromptGeneratorPanel) ─────────────────
+// ── Shared vocabulary ──────────────────────────────────────────────────────────
 
 const BUILD_INTENTS = [
   { value: "new-app",        label: "Ny app" },
@@ -14,89 +14,7 @@ const BUILD_INTENTS = [
   { value: "governance",     label: "Governance-opprydding" },
 ];
 
-// ── Starter kit data ───────────────────────────────────────────────────────────
-
-const FOLDER_STRUCTURE = {
-  "new-app": [
-    "src/pages/",
-    "src/components/",
-    "src/components/governance/",
-    "src/components/audits/",
-    "src/components/admin/",
-    "src/components/projects/",
-    "src/components/roadmap/",
-    "src/components/ideas/",
-    "entities/",
-    "functions/",
-  ],
-  "existing": [
-    "src/components/governance/",
-    "src/components/audits/",
-    "src/components/admin/",
-    "src/components/roadmap/",
-    "src/components/ideas/",
-  ],
-  "new-capability": [
-    "src/components/<capability-name>/",
-    "src/components/audits/",
-    "src/components/governance/",
-  ],
-  "scaffold": [
-    "src/components/governance/",
-    "src/components/audits/",
-    "src/components/admin/",
-    "src/components/roadmap/",
-    "src/components/ideas/",
-    "src/components/projects/",
-  ],
-  "governance": [
-    "src/components/governance/",
-    "src/components/audits/",
-  ],
-};
-
-const GOVERNANCE_FILES = {
-  "new-app": [
-    { path: "src/components/governance/AI_STATE.jsx",               desc: "Current project state — phase, status, lastVerified" },
-    { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", desc: "Governance rules and agent operating instructions" },
-    { path: "src/components/governance/LockedFiles.jsx",             desc: "Locked file registry with per-file modification rules" },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",       desc: "Verified change history — append-only" },
-    { path: "src/components/governance/NextSafeStep.jsx",            desc: "Current recommended next action" },
-    { path: "src/components/audits/AUDIT_INDEX.jsx",                 desc: "Central audit registry" },
-    { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx",          desc: "Audit lifecycle and evidence rules" },
-    { path: "src/components/roadmap/ROADMAP.jsx",                    desc: "Derived roadmap from scored ideas" },
-    { path: "src/components/ideas/IDEA_INDEX.jsx",                   desc: "Idea bank for capability prioritization" },
-  ],
-  "existing": [
-    { path: "src/components/governance/AI_STATE.jsx",               desc: "Verify and update project state" },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",       desc: "Append new verified entry after changes" },
-    { path: "src/components/governance/NextSafeStep.jsx",            desc: "Update to reflect current recommended step" },
-    { path: "src/components/audits/AUDIT_INDEX.jsx",                 desc: "Enrich or add audit entries as needed" },
-  ],
-  "new-capability": [
-    { path: "src/components/audits/AUDIT_INDEX.jsx",                 desc: "Add audit entry for new capability scope" },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",       desc: "Append entry after capability is verified" },
-    { path: "src/components/governance/AI_STATE.jsx",                desc: "Update phase/status after implementation" },
-  ],
-  "scaffold": [
-    { path: "src/components/governance/AI_STATE.jsx",               desc: "Initialize with project name and phase" },
-    { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", desc: "Set governance operating rules" },
-    { path: "src/components/governance/LockedFiles.jsx",             desc: "Define locked files before work begins" },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",       desc: "Create initial bootstrap entry" },
-    { path: "src/components/governance/NextSafeStep.jsx",            desc: "Define first safe step" },
-    { path: "src/components/audits/AUDIT_INDEX.jsx",                 desc: "Seed with initial audit scope" },
-    { path: "src/components/roadmap/ROADMAP.jsx",                    desc: "Build initial roadmap from idea index" },
-    { path: "src/components/ideas/IDEA_INDEX.jsx",                   desc: "Seed with initial idea bank" },
-  ],
-  "governance": [
-    { path: "src/components/governance/AI_STATE.jsx",               desc: "Verify all values — remove placeholders" },
-    { path: "src/components/governance/LockedFiles.jsx",             desc: "Verify locked file list is complete and consistent" },
-    { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", desc: "Verify instructions match LockedFiles registry" },
-    { path: "src/components/governance/PhaseExecutionLog.jsx",       desc: "Verify last entry reflects actual state" },
-    { path: "src/components/audits/AUDIT_INDEX.jsx",                 desc: "Verify all entries are complete — no placeholder fields" },
-  ],
-};
-
+// These are workflow steps, not file lists — kept as-is (not in manifest)
 const FIRST_STEPS = {
   "new-app": [
     "1. Verify repo is registered in GovernanceHub Repository Manager",
@@ -154,53 +72,105 @@ const GOVERNANCE_RULES = [
   "Verify the repository before and after structural work.",
 ];
 
-// ── Kit builder ────────────────────────────────────────────────────────────────
+const MANIFEST_URL =
+  "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/starter-kit/STARTER_KIT_MANIFEST.json";
 
-function buildStarterKit({ repo, buildIntent, notes }) {
-  const intentLabel = BUILD_INTENTS.find((b) => b.value === buildIntent)?.label ?? buildIntent;
-  const folders = FOLDER_STRUCTURE[buildIntent] ?? FOLDER_STRUCTURE["scaffold"];
-  const govFiles = GOVERNANCE_FILES[buildIntent] ?? GOVERNANCE_FILES["scaffold"];
-  const steps = FIRST_STEPS[buildIntent] ?? FIRST_STEPS["scaffold"];
+const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/";
+
+// ── Manifest hook ──────────────────────────────────────────────────────────────
+
+function useManifest() {
+  const [manifest, setManifest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch(MANIFEST_URL)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => { if (!cancelled) { setManifest(data); setLoading(false); } })
+      .catch((e) => { if (!cancelled) { setError(e.message); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, []);
+
+  return { manifest, loading, error };
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+function buildRawUrl(manifest, filePath) {
+  return `${RAW_BASE}${manifest.basePath}/${filePath}`;
+}
+
+function groupByModule(files) {
+  return files.reduce((acc, f) => {
+    (acc[f.module] ??= []).push(f);
+    return acc;
+  }, {});
+}
+
+function uniqueFolders(manifest) {
+  const modules = [...new Set((manifest.files ?? []).map((f) => f.module))];
+  return modules.map((m) => `src/components/${m}/`);
+}
+
+// ── Install prompt builder ─────────────────────────────────────────────────────
+
+function buildInstallPrompt({ repo, manifest }) {
+  const branch = repo.defaultBranch ?? "main";
   const date = new Date().toISOString().slice(0, 10);
+  const folders = uniqueFolders(manifest);
+  const fileLines = (manifest.files ?? []).map(
+    (f) => `  - ${f.path}  →  src/components/${f.path}\n    Raw: ${buildRawUrl(manifest, f.path)}`
+  );
 
-  const lines = [
-    `# GovernanceHub Starter Kit`,
+  return [
+    `# GovernanceHub Starter Kit — Install Prompt`,
     ``,
-    `**Repository:** \`${repo.owner}/${repo.repo}\` (${repo.provider ?? "github"}, branch: \`${repo.defaultBranch ?? "main"}\`)`,
-    `**Intent:** ${intentLabel}`,
-    `**Generated:** ${date}`,
-    notes?.trim() ? `**Mål:** ${notes.trim()}` : null,
-    ``,
-    `---`,
-    ``,
-    `## Anbefalt mappestruktur`,
-    ...folders.map((f) => `- \`${f}\``),
+    `**Target repo:** \`${repo.owner}/${repo.repo}\` (branch: \`${branch}\`)`,
+    `**Manifest version:** ${manifest.version} (${manifest.releaseDate})`,
+    `**Total files:** ${manifest.files?.length ?? 0}`,
     ``,
     `---`,
     ``,
-    `## Governance-filer som bør finnes`,
-    ...govFiles.map((f) => `- \`${f.path}\`\n  → ${f.desc}`),
+    `## Instructions`,
+    ``,
+    `1. **Read the target repository structure first.**`,
+    `   List all files currently under \`src/components/\` before making any changes.`,
+    ``,
+    `2. **Create missing folders** under \`src/components/\` if they do not already exist:`,
+    ...folders.map((f) => `   - \`${f}\``),
+    ``,
+    `3. **Copy each file** from the starter kit into the matching relative target path:`,
+    ...fileLines,
+    ``,
+    `4. **Preserve existing files** — only replace files that contain placeholder values`,
+    `   (e.g. \`null\`, \`"TODO"\`, \`"PLACEHOLDER"\`, or empty export stubs).`,
+    `   Do not overwrite files that contain real project-specific content.`,
+    ``,
+    `5. **Verify installed files** after copying — confirm each file exists at its target path`,
+    `   and contains non-placeholder content.`,
+    ``,
+    `6. **Only after installation is fully confirmed**, append a verified bootstrap entry`,
+    `   to \`PhaseExecutionLog\` with:`,
+    `   - date: ${date}`,
+    `   - action: "Starter kit installed"`,
+    `   - version: ${manifest.version}`,
+    `   - files: ${manifest.files?.length ?? 0} files installed`,
+    `   - status: verified`,
     ``,
     `---`,
     ``,
-    `## Anbefalte første steg`,
-    ...steps.map((s) => s),
-    ``,
-    `---`,
-    ``,
-    `## Governance-regler (følges alltid)`,
+    `## Governance rules (always apply)`,
     ...GOVERNANCE_RULES.map((r) => `- ${r}`),
     ``,
     `---`,
-    ``,
-    `## Repo-capabilities`,
-    ...Object.entries(repo.capabilitiesJson ?? {}).map(([cap, enabled]) => `- ${enabled ? "✓" : "✗"} \`${cap}\``),
-    ``,
-    `---`,
-    `*Generert av GovernanceHub Starter Kit Generator — ${date}*`,
-  ].filter((l) => l !== null).join("\n");
-
-  return { text: lines, folders, govFiles, steps };
+    `*Generated by GovernanceHub Starter Kit — ${date}*`,
+  ].join("\n");
 }
 
 // ── CopyBtn ────────────────────────────────────────────────────────────────────
@@ -244,25 +214,107 @@ export default function GovernanceStarterKitPanel() {
   const { activeRepo } = useActiveRepo();
   const [buildIntent, setBuildIntent] = useState("scaffold");
   const [notes, setNotes] = useState("");
+  const { manifest, loading: manifestLoading, error: manifestError } = useManifest();
 
-  const kit = useMemo(() => {
-    if (!activeRepo) return null;
-    return buildStarterKit({ repo: activeRepo, buildIntent, notes });
-  }, [activeRepo, buildIntent, notes]);
+  const steps = FIRST_STEPS[buildIntent] ?? FIRST_STEPS["scaffold"];
+
+  const grouped = useMemo(
+    () => (manifest ? groupByModule(manifest.files ?? []) : {}),
+    [manifest]
+  );
+
+  const folders = useMemo(
+    () => (manifest ? uniqueFolders(manifest) : []),
+    [manifest]
+  );
+
+  const installPrompt = useMemo(() => {
+    if (!activeRepo || !manifest) return null;
+    return buildInstallPrompt({ repo: activeRepo, manifest });
+  }, [activeRepo, manifest]);
+
+  // Legacy full-text export (markdown summary without file content)
+  const exportText = useMemo(() => {
+    if (!activeRepo || !manifest) return null;
+    const intentLabel = BUILD_INTENTS.find((b) => b.value === buildIntent)?.label ?? buildIntent;
+    const date = new Date().toISOString().slice(0, 10);
+    return [
+      `# GovernanceHub Starter Kit`,
+      ``,
+      `**Repository:** \`${activeRepo.owner}/${activeRepo.repo}\` (${activeRepo.provider ?? "github"}, branch: \`${activeRepo.defaultBranch ?? "main"}\`)`,
+      `**Intent:** ${intentLabel}`,
+      `**Manifest version:** ${manifest.version} (${manifest.releaseDate})`,
+      `**Files:** ${manifest.files?.length ?? 0}`,
+      notes?.trim() ? `**Mål:** ${notes.trim()}` : null,
+      ``,
+      `---`,
+      ``,
+      `## Mappestruktur fra manifest`,
+      ...folders.map((f) => `- \`${f}\``),
+      ``,
+      `---`,
+      ``,
+      `## Starter kit-filer (${manifest.files?.length ?? 0} filer)`,
+      ...Object.entries(grouped).flatMap(([mod, files]) => [
+        ``,
+        `### ${mod}`,
+        ...files.map((f) => `- \`src/components/${f.path}\`\n  Raw: ${buildRawUrl(manifest, f.path)}`),
+      ]),
+      ``,
+      `---`,
+      ``,
+      `## Anbefalte første steg`,
+      ...steps,
+      ``,
+      `---`,
+      ``,
+      `## Governance-regler`,
+      ...GOVERNANCE_RULES.map((r) => `- ${r}`),
+      ``,
+      `---`,
+      `*Generert av GovernanceHub Starter Kit Generator — ${date}*`,
+    ].filter((l) => l !== null).join("\n");
+  }, [activeRepo, manifest, buildIntent, notes, folders, grouped, steps]);
 
   return (
     <div className="space-y-4">
 
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-base font-semibold text-slate-800 flex items-center gap-2">
             <Package className="w-4 h-4 text-emerald-600" />
             Governance Starter Kit
           </h2>
-          <p className="text-xs text-slate-500">Generer eksporterbar governance-pakke for valgt repository</p>
+          <p className="text-xs text-slate-500">Manifest-drevet — filer hentes fra STARTER_KIT_MANIFEST.json</p>
         </div>
         <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Generering kun</Badge>
       </div>
+
+      {/* Manifest status */}
+      {manifestLoading && (
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs text-slate-500">
+          <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+          Laster manifest…
+        </div>
+      )}
+      {manifestError && (
+        <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-700">
+          <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          Kunne ikke laste manifest: {manifestError}
+        </div>
+      )}
+      {manifest && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs text-slate-600">
+          <span><span className="font-medium text-slate-700">Manifest:</span> v{manifest.version}</span>
+          <span className="text-slate-400">·</span>
+          <span>{manifest.releaseDate}</span>
+          <span className="text-slate-400">·</span>
+          <span>{manifest.files?.length ?? 0} filer</span>
+          <span className="text-slate-400">·</span>
+          <span className="font-mono text-slate-500">{manifest.basePath}</span>
+        </div>
+      )}
 
       {/* Repo context */}
       {activeRepo ? (
@@ -309,43 +361,75 @@ export default function GovernanceStarterKitPanel() {
         </CardContent>
       </Card>
 
-      {/* No-repo blocked state */}
-      {!activeRepo && (
+      {/* Blocked state */}
+      {(!activeRepo || !manifest) && !manifestLoading && (
         <div className="rounded border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-400 text-center">
-          Eksport og forhåndsvisning er ikke tilgjengelig — velg et aktivt repo først.
+          {!manifest ? "Manifest ikke tilgjengelig." : "Velg et aktivt repo for å generere eksport."}
         </div>
       )}
 
-      {/* Output sections */}
-      {kit && (
+      {/* Output sections — only when both repo and manifest are ready */}
+      {activeRepo && manifest && (
         <>
-          <SectionCard title="Anbefalt mappestruktur">
+          {/* Install prompt — primary action */}
+          <Card className="border-emerald-200 bg-emerald-50">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <CardTitle className="text-sm text-emerald-800 flex items-center gap-1.5">
+                  <Download className="w-4 h-4" />
+                  Kopier install-prompt
+                </CardTitle>
+                <CopyBtn value={installPrompt} label="Kopier install-prompt" />
+              </div>
+              <p className="text-xs text-emerald-700 mt-1">
+                Instruksjoner for å installere starter-kit i <span className="font-mono font-medium">{activeRepo.owner}/{activeRepo.repo}</span> — lim inn i AI-editor eller Copilot.
+              </p>
+            </CardHeader>
+          </Card>
+
+          {/* Folders from manifest */}
+          <SectionCard title={`Mappestruktur (${folders.length} mapper)`}>
             <ul className="space-y-1">
-              {kit.folders.map((f) => (
+              {folders.map((f) => (
                 <li key={f} className="text-xs font-mono text-slate-700 bg-slate-50 border border-slate-100 rounded px-2 py-1">{f}</li>
               ))}
             </ul>
           </SectionCard>
 
-          <SectionCard title="Governance-filer som bør finnes">
-            <ul className="space-y-2">
-              {kit.govFiles.map((f) => (
-                <li key={f.path} className="text-xs">
-                  <span className="font-mono text-slate-800">{f.path}</span>
-                  <span className="block text-slate-500 mt-0.5 ml-1">→ {f.desc}</span>
-                </li>
-              ))}
-            </ul>
-          </SectionCard>
+          {/* Files grouped by module — from manifest */}
+          {Object.entries(grouped).map(([mod, files]) => (
+            <SectionCard key={mod} title={`${mod} (${files.length} filer)`}>
+              <ul className="space-y-2">
+                {files.map((f) => (
+                  <li key={f.path} className="text-xs">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-mono text-slate-800">src/components/{f.path}</span>
+                      {f.required && <Badge variant="outline" className="text-[10px] shrink-0">required</Badge>}
+                    </div>
+                    <a
+                      href={buildRawUrl(manifest, f.path)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-slate-400 hover:text-slate-600 mt-0.5 ml-1 truncate"
+                    >
+                      {buildRawUrl(manifest, f.path)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </SectionCard>
+          ))}
 
+          {/* First steps (workflow, not file-driven) */}
           <SectionCard title="Anbefalte første steg">
             <ol className="space-y-1">
-              {kit.steps.map((s, i) => (
+              {steps.map((s, i) => (
                 <li key={i} className="text-xs text-slate-700">{s}</li>
               ))}
             </ol>
           </SectionCard>
 
+          {/* Governance rules */}
           <SectionCard title="Governance-regler">
             <ul className="space-y-1">
               {GOVERNANCE_RULES.map((r, i) => (
@@ -363,14 +447,29 @@ export default function GovernanceStarterKitPanel() {
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <CardTitle className="text-sm text-slate-700">Komplett eksport</CardTitle>
                 <div className="flex gap-2">
-                  <CopyBtn value={kit.text} label="Kopier full pakke" />
-                  <CopyBtn value={JSON.stringify({ repo: `${activeRepo.owner}/${activeRepo.repo}`, intent: buildIntent, notes, folders: kit.folders, governanceFiles: kit.govFiles.map(f => f.path), firstSteps: kit.steps }, null, 2)} label="Kopier JSON" />
+                  <CopyBtn value={exportText} label="Kopier full pakke" />
+                  <CopyBtn
+                    value={JSON.stringify({
+                      repo: `${activeRepo.owner}/${activeRepo.repo}`,
+                      intent: buildIntent,
+                      notes,
+                      manifestVersion: manifest.version,
+                      basePath: manifest.basePath,
+                      files: (manifest.files ?? []).map((f) => ({
+                        path: `src/components/${f.path}`,
+                        rawUrl: buildRawUrl(manifest, f.path),
+                        module: f.module,
+                        required: f.required,
+                      })),
+                    }, null, 2)}
+                    label="Kopier JSON"
+                  />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
               <pre className="text-xs font-mono bg-slate-50 border border-slate-100 rounded p-3 whitespace-pre-wrap text-slate-700 max-h-72 overflow-y-auto leading-relaxed">
-                {kit.text}
+                {exportText}
               </pre>
             </CardContent>
           </Card>
