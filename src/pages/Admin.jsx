@@ -9,6 +9,7 @@ import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestrat
 import AuditRunnerPanel from "@/components/admin/AuditRunnerPanel";
 import RepositoryManagerPanel from "@/components/admin/RepositoryManagerPanel";
 import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePanel";
+import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPanel";
 
 const TABS = ["Operations", "Repo Tools", "Product", "System"];
 
