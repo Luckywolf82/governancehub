@@ -11,6 +11,7 @@ import RepositoryManagerPanel from "@/components/admin/RepositoryManagerPanel";
 import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePanel";
 import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPanel";
 import GovernanceStarterKitPanel from "@/components/admin/GovernanceStarterKitPanel";
+import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
 
 const TABS = ["Operations", "Repo Tools", "Product", "System"];
 
