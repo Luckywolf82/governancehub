@@ -80,9 +80,14 @@ export default function Admin() {
           ))}
         </div>
 
-        {/* Tab: Operations */}
-        {tab === "Operations" && (
+        {/* Tab: Govern */}
+        {tab === "Govern" && (
           <div className="space-y-6">
+            <div>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Govern</p>
+              <p className="text-sm text-slate-500 mb-1">Kjør audit, send til Orchestrator, opprett issue og verifiser</p>
+              <p className="text-xs text-slate-400 bg-slate-100 rounded px-3 py-1.5 inline-block">Kjør audit → Bruk i Orchestrator → Opprett issue → Verifiser</p>
+            </div>
             <AuditRunnerPanel onUseInOrchestrator={(obj) => { setInjectedAudit(obj); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             <div className="border-t border-slate-200 pt-4">
               <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
