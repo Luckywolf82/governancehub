@@ -99,8 +99,11 @@ export default function Admin() {
 
         {/* Tab: Product */}
         {tab === "Product" && (
-          <div className="space-y-4">
-            <ProductIntelligencePanel />
+          <div className="space-y-6">
+            <StartPromptGeneratorPanel />
+            <div className="border-t border-slate-200 pt-4">
+              <ProductIntelligencePanel />
+            </div>
           </div>
         )}
 
