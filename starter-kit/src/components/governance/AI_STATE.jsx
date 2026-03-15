@@ -5,15 +5,15 @@
  */
 
 export const AI_STATE = {
-  projectId: "example-project",
-  projectSlug: "example-project",
+  projectId: null,
+  projectSlug: null,
 
-  projectName: "Example Project",
+  projectName: null,
 
   repo: {
-    owner: "repo-owner",
-    name: "repo-name",
-    fullName: "repo-owner/repo-name"
+    owner: null,
+    name: null,
+    fullName: null
   },
 
   phase: "bootstrap",
