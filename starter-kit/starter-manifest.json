@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "basePath": "starter-kit/src/components",
+  "files": [
+    {
+      "path": "governance/AI_PROJECT_INSTRUCTIONS.jsx"
+    },
+    {
+      "path": "governance/AI_STATE.jsx"
+    },
+    {
+      "path": "governance/LockedFiles.jsx"
+    },
+    {
+      "path": "governance/NextSafeStep.jsx"
+    },
+    {
+      "path": "governance/PhaseExecutionLog.jsx"
+    },
+    {
+      "path": "audits/AUDIT_INDEX.jsx"
+    },
+    {
+      "path": "audits/AUDIT_SYSTEM_GUIDE.jsx"
+    },
+    {
+      "path": "projects/PROJECT_REGISTRY.jsx"
+    }
+  ]
+}
