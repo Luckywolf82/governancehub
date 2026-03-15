@@ -96,6 +96,70 @@ export function buildIssuePrep(audit, readiness, isInjected, hasManualData, enri
   return { issueTitle, labels, githubSignal, source, evidenceSrc, enrichmentNote, fullPackage };
 }
 
+// ── Dispatch Recommendation Builder ─────────────────────────────────────────
+// Determines how the safe next step should be handled.
+//   "blocked"       → locked files are involved
+//   "copilot_task"  → execution-ready, one safe step, no locked files, few files, clear acceptance criteria
+//   "github_issue"  → valid engineering task but not safe for direct copilot dispatch
+//   "manual"        → analysis/strategy/non-code tasks, or missing required fields
+
+export function buildDispatchRecommendation(audit, readiness, isLockedPath) {
+  if (!audit) return null;
+
+  const affectedFiles = Array.isArray(audit.affectedFiles) ? audit.affectedFiles : [];
+  const lockedInvolved = affectedFiles.filter(isLockedPath);
+  const hasLockedFiles = lockedInvolved.length > 0;
+  const hasClearAcceptanceCriteria = !!(audit.acceptanceCriteria && audit.acceptanceCriteria.trim());
+  const hasOneSafeNextStep = !!(audit.oneSafeNextStep && audit.oneSafeNextStep.trim());
+  const fewFiles = affectedFiles.length <= 5;
+  const hasRequiredEngineFields = !!(audit.problem && audit.requiredChange && audit.acceptanceCriteria);
+
+  // Rule: blocked if locked files are involved
+  if (hasLockedFiles) {
+    return {
+      dispatchTarget: "blocked",
+      dispatchReason: `Locked files are involved (${lockedInvolved.join(", ")}). Manual review and explicit unlock required before dispatch.`,
+    };
+  }
+
+  // Rule: manual for analysis/strategy/non-code tasks or missing required fields
+  if (readiness === "analysis-first" || !hasRequiredEngineFields) {
+    return {
+      dispatchTarget: "manual",
+      dispatchReason: readiness === "analysis-first"
+        ? "Analysis-first audit — preliminary scope or unexecuted plan. Requires human analysis and verification before dispatch."
+        : "Missing required engineering fields (problem, requiredChange, or acceptanceCriteria). Manual enrichment required before dispatch.",
+    };
+  }
+
+  // Rule: copilot_task if execution-ready, one safe step, few files, clear acceptance criteria
+  if (
+    readiness === "execution-ready" &&
+    hasOneSafeNextStep &&
+    fewFiles &&
+    hasClearAcceptanceCriteria
+  ) {
+    return {
+      dispatchTarget: "copilot_task",
+      dispatchReason: `Execution-ready with one safe next step, ${affectedFiles.length} affected file${affectedFiles.length === 1 ? "" : "s"}, clear acceptance criteria, and no locked files. Safe for direct Copilot dispatch.`,
+    };
+  }
+
+  // Rule: github_issue for valid engineering tasks not safe for direct copilot dispatch
+  const reasons = [];
+  if (readiness === "remediation-first") reasons.push("remediation-first audit");
+  if (!hasOneSafeNextStep) reasons.push("no oneSafeNextStep defined");
+  if (!fewFiles) reasons.push(`${affectedFiles.length} affected files (exceeds threshold for direct dispatch)`);
+  if (!hasClearAcceptanceCriteria) reasons.push("acceptance criteria missing");
+
+  return {
+    dispatchTarget: "github_issue",
+    // reasons may be empty only if readiness is null/unknown (getReadiness returned null);
+    // the defensive fallback ensures a useful message in that edge case.
+    dispatchReason: `Valid engineering task but not safe for direct Copilot dispatch: ${reasons.length > 0 ? reasons.join("; ") : "recommend human review before automation"}.`,
+  };
+}
+
 // ── Execution Log Draft Builder ──────────────────────────────────────────────
 
 export function buildExecutionLogDraft(
