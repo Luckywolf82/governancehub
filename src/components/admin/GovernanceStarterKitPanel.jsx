@@ -538,6 +538,91 @@ export default function GovernanceStarterKitPanel() {
             );
           })()}
 
+          {/* ── Install Preview (dry-run) ── */}
+          {previewLoading && (
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded px-4 py-3 text-xs text-slate-500">
+              <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+              Analyserer installasjonsforutsetninger…
+            </div>
+          )}
+          {!previewLoading && preview && (
+            <Card className="border-slate-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-slate-700 flex items-center gap-1.5">
+                  <FileCheck className="w-4 h-4 text-slate-600" />
+                  Installasjon Preview (dry-run)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-2">
+                {/* Summary row */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                  <span className="flex items-center gap-1.5">
+                    <span className="font-medium text-emerald-700">{preview.will_create.length}</span>
+                    <span className="text-slate-500">vil bli opprettet</span>
+                  </span>
+                  <span className="text-slate-300">·</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="font-medium text-red-700">{preview.already_exists.length}</span>
+                    <span className="text-slate-500">eksisterer allerede</span>
+                  </span>
+                  {preview.requires_manual_review.length > 0 && (
+                    <>
+                      <span className="text-slate-300">·</span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="font-medium text-amber-700">{preview.requires_manual_review.length}</span>
+                        <span className="text-slate-500">krever gjennomgang</span>
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Expandable sections */}
+                {preview.will_create.length > 0 && (
+                  <details className="pt-1 border-t border-slate-100">
+                    <summary className="cursor-pointer text-xs font-medium text-emerald-700 hover:text-emerald-800">
+                      ▶ Vil bli opprettet ({preview.will_create.length})
+                    </summary>
+                    <ul className="space-y-1 mt-2 pl-2">
+                      {preview.will_create.map((f) => (
+                        <li key={f.path} className="text-xs font-mono text-slate-600">src/components/{f.path}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+
+                {preview.already_exists.length > 0 && (
+                  <details className="pt-1 border-t border-slate-100">
+                    <summary className="cursor-pointer text-xs font-medium text-red-700 hover:text-red-800">
+                      ▶ Eksisterer allerede ({preview.already_exists.length})
+                    </summary>
+                    <ul className="space-y-1 mt-2 pl-2">
+                      {preview.already_exists.map((f) => (
+                        <li key={f.path} className="text-xs font-mono text-slate-600">src/components/{f.path}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+
+                {preview.requires_manual_review.length > 0 && (
+                  <details className="pt-1 border-t border-slate-100">
+                    <summary className="cursor-pointer text-xs font-medium text-amber-700 hover:text-amber-800">
+                      ▶ Krever gjennomgang ({preview.requires_manual_review.length})
+                    </summary>
+                    <ul className="space-y-1 mt-2 pl-2">
+                      {preview.requires_manual_review.map((f) => (
+                        <li key={f.path} className="flex items-center gap-1.5">
+                          <FileQuestion className="w-3 h-3 text-amber-600 shrink-0" />
+                          <span className="font-mono text-slate-600">src/components/{f.path}</span>
+                          {f.error && <span className="text-xs text-amber-600">({f.error})</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* ── Install prompt — gated by readiness ── */}
           {(() => {
             const isSafe = installReadiness === "safe_to_install";
