@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, CheckCheck, AlertTriangle, Github, Rocket, Info } from "lucide-react";
+import { Copy, CheckCheck, AlertTriangle, Github, Rocket, Info, CheckCircle2, Loader2 } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 // ── Vocabulary (aligned with StartPromptGeneratorPanel / GovernanceStarterKitPanel) ──
 
