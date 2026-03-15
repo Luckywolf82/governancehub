@@ -10,12 +10,13 @@ export const LockedFiles = {
 
   description: "Defines governance files that are protected from automatic modification.",
 
-  hardLocked: [
-    "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
-    "src/components/governance/INSTALL_POLICY.jsx",
-    "src/components/governance/STARTER_KIT_VERSION.jsx"
-  ],
-
+ hardLocked: [
+  "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
+  "src/components/governance/LockedFiles.jsx",
+  "src/components/governance/INSTALL_POLICY.jsx",
+  "src/components/governance/STARTER_KIT_VERSION.jsx"
+], 
+  
   reviewLocked: [
     "src/components/governance/AI_STATE.jsx",
     "src/components/governance/NextSafeStep.jsx",
