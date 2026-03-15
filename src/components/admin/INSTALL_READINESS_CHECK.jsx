@@ -177,7 +177,7 @@ export default function InstallReadinessCheck() {
 
       <CardContent className="pt-0 space-y-1">
         {/* No repo selected */}
-        {!activeRepo && readiness === "idle" && (
+        {effectiveReadiness === "repo_not_connected" && results.length === 0 && (
           <p className="text-xs text-slate-400 text-center py-2">
             Velg et aktivt repo for å kjøre readiness-sjekk.
           </p>
