@@ -49,7 +49,6 @@ function EntryRow({ entry }) {
   const status = deriveVisibilityStatus(entry.githubVisibility);
   const isUnverified = status === "unverified";
 
-  // Build GitHub compare URL for the entry if possible
   const repoBase = "https://github.com/Luckywolf82/governancehub";
 
   return (
@@ -76,8 +75,6 @@ function EntryRow({ entry }) {
 
       {expanded && (
         <div className="px-4 pb-4 space-y-3 border-t border-slate-100 pt-3">
-
-          {/* Task requested */}
           {entry.taskRequested && (
             <div>
               <p className="text-xs font-semibold text-slate-600 mb-0.5">Task requested</p>
@@ -85,7 +82,6 @@ function EntryRow({ entry }) {
             </div>
           )}
 
-          {/* Changed files */}
           {entry.changedFiles && entry.changedFiles.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-slate-600 mb-1">Changed files</p>
@@ -107,7 +103,6 @@ function EntryRow({ entry }) {
             </div>
           )}
 
-          {/* Diff summary */}
           {entry.diffSummary && (
             <div>
               <p className="text-xs font-semibold text-slate-600 mb-1">Diff summary</p>
@@ -124,7 +119,6 @@ function EntryRow({ entry }) {
             </div>
           )}
 
-          {/* GitHub visibility + verification action */}
           <div className={`rounded p-3 ${isUnverified ? "bg-amber-100 border border-amber-200" : "bg-green-50 border border-green-200"}`}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -144,7 +138,6 @@ function EntryRow({ entry }) {
             </div>
           </div>
 
-          {/* Locked file verification */}
           {entry.lockedFileVerification && (
             <div>
               <p className="text-xs font-semibold text-slate-600 mb-0.5">Locked file verification</p>
@@ -160,7 +153,7 @@ function EntryRow({ entry }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ExecutionLogPanel() {
-  const entries = [...(PHASE_EXECUTION_LOG.entries ?? [])].reverse(); // most recent first
+  const entries = [...(PHASE_EXECUTION_LOG.entries ?? [])].reverse();
   const unverifiedCount = entries.filter(
     (e) => deriveVisibilityStatus(e.githubVisibility) === "unverified"
   ).length;
@@ -211,5 +204,7 @@ export default function ExecutionLogPanel() {
         )}
       </CardContent>
     </Card>
+  );
+}
   );
 }
