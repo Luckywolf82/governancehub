@@ -16,6 +16,7 @@
 //
 // ENTRY STATE SUMMARY
 //   arch-001  verified   / preliminary: false  — fully usable
+//   arch-002  verified   / preliminary: false  — canonical meta/finding model; Admin UI file placement consistency
 //   prod-001  orphaned   / preliminary: true   — problem verified; implementation fields preliminary
 //   prod-002  orphaned   / preliminary: true   — problem verified; blocked on prod-001 resolution
 //   gov-001   planned    / preliminary: true   — scope only; not executed
@@ -59,6 +60,20 @@ export const AUDIT_INDEX = {
       constraints: "One structural change at a time. Do not modify src/pages/AdminDashboard.jsx. Do not touch canonical governance files. Append PhaseExecutionLog entry after each verified change.",
       acceptanceCriteria: "src/components/AdminDashboard.jsx removed and confirmed absent from GitHub. No new broken imports introduced. Follow-up issues for misplaced product audit files and missing directory documented.",
       oneSafeNextStep: "Remove src/components/AdminDashboard.jsx only.",
+    },
+
+    {
+      id: "arch-002",
+      title: "Admin UI File Placement Consistency",
+      category: "architecture",
+      type: "File Placement Audit",
+      status: "verified",
+      date: "2026-03-15",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      dataFile: "src/components/audits/architecture/admin-ui-file-placement-canonical-audit-2026-03-15.jsx",
     },
 
     {
