@@ -103,6 +103,9 @@ export default function Admin() {
           <div className="space-y-6">
             <StartPromptGeneratorPanel />
             <div className="border-t border-slate-200 pt-4">
+              <GovernanceStarterKitPanel />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
               <ProductIntelligencePanel />
             </div>
           </div>
