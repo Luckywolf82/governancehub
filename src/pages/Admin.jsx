@@ -90,6 +90,19 @@ export default function Admin() {
               <p className="text-sm text-slate-500 mb-1">Kjør audit, send til Orchestrator, opprett issue og verifiser</p>
               <p className="text-xs text-slate-400 bg-slate-100 rounded px-3 py-1.5 inline-block">Kjør audit → Bruk i Orchestrator → Opprett issue → Verifiser</p>
             </div>
+            {activeRepo ? (
+              <div className="flex items-center gap-2 text-xs bg-emerald-50 border border-emerald-200 rounded px-3 py-1.5 w-fit">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                <span className="font-medium text-emerald-800">Aktivt repo: {activeRepo.fullName}</span>
+                <span className="text-emerald-600">· Brukes for repo-aware audit og issue-targeting</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-xs bg-amber-50 border border-amber-200 rounded px-3 py-1.5 w-fit">
+                <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                <span className="font-medium text-amber-800">Ingen aktivt repo valgt</span>
+                <span className="text-amber-600">· Velg repo i toppmenyen før repo-aware audit eller issue-oppretting</span>
+              </div>
+            )}
             <AuditRunnerPanel onUseInOrchestrator={(obj) => { setInjectedAudit(obj); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             <div className="border-t border-slate-200 pt-4">
               <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
