@@ -390,6 +390,9 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     );
   }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
 
+  // ── Dispatch channel ──────────────────────────────────────────────────────
+  const [dispatchChannel, setDispatchChannel] = useState("github-issue"); // "github-issue" | "copilot" | "base44"
+
   // ── Derived guards ─────────────────────────────────────────────────────────
   const requiresAnalysisConfirm = readiness === "analysis-first";
   const canOpenCreateConfirm = !!effectiveOwner.trim() && !!effectiveRepo.trim() && !!githubIssue && (!requiresAnalysisConfirm || analysisConfirmed);
