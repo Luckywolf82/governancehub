@@ -19,6 +19,7 @@
 //   prod-001  orphaned   / preliminary: true   — problem verified; implementation fields preliminary
 //   prod-002  orphaned   / preliminary: true   — problem verified; blocked on prod-001 resolution
 //   gov-001   planned    / preliminary: true   — scope only; not executed
+//   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -134,6 +135,32 @@ export const AUDIT_INDEX = {
       constraints: "Read-only analysis only. Do not modify governance files during audit. Follow locked-file policy.",
       acceptanceCriteria: "All governance workflow checkpoints verified against declared policy. Gaps documented with specific findings. One safe next step identified.",
       oneSafeNextStep: "Execute the audit: inspect governance workflow files and document findings. Do not implement changes during the audit.",
+    },
+
+    {
+      id: "gov-002",
+      title: "Locked-File Definition Normalization",
+      category: "Governance",
+      type: "Governance Drift Remediation",
+      status: "verified",
+      date: "2026-03-15",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary: "Governance drift detected: locked-file definitions were inconsistent across LockedFiles.jsx, AI_PROJECT_INSTRUCTIONS.jsx, .github/copilot-instructions.md, and .github/COPILOT_REVIEW_CHECKLIST.md. LockedFiles.jsx referenced two starter-kit-only files not present in the main repo. Normalization implemented on branch copilot/normalize-locked-file-definitions.",
+      problem: "Four governance files defined the locked-file set inconsistently. LockedFiles.jsx included INSTALL_POLICY.jsx and STARTER_KIT_VERSION.jsx which exist only in starter-kit/, not the main repo. AI_PROJECT_INSTRUCTIONS.jsx, copilot-instructions.md, and COPILOT_REVIEW_CHECKLIST.md each described a different subset of locked files.",
+      impact: "Inconsistent locked-file definitions could mislead Copilot and governance tooling, creating ambiguity about which files require protection.",
+      affectedFiles: [
+        "src/components/governance/LockedFiles.jsx",
+        "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
+        ".github/COPILOT_REVIEW_CHECKLIST.md",
+        ".github/copilot-instructions.md",
+      ],
+      requiredChange: "Remove starter-kit-only file references from LockedFiles.jsx. Align all four files to describe the same canonical 5-file locked set.",
+      constraints: "Modify only the four target files. Do not invent files that do not exist. Preserve export structure.",
+      acceptanceCriteria: "All four files describe the same canonical locked-file set. No file references non-existent main-repo governance files.",
+      oneSafeNextStep: "Add PhaseExecutionLog entry and AUDIT_INDEX record to complete the governance documentation for this normalization change.",
     },
 
     {
