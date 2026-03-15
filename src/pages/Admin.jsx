@@ -161,6 +161,7 @@ export default function Admin() {
                 </div>
               </CardContent>
             </Card>
+            </div>
           </div>
         )}
 
