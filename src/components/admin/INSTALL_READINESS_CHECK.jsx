@@ -142,11 +142,11 @@ export default function InstallReadinessCheck() {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-sm text-slate-700 flex items-center gap-1.5">
-            <ReadinessIcon state={readiness} />
+            <ReadinessIcon state={effectiveReadiness} />
             Install Readiness Check
           </CardTitle>
           <div className="flex items-center gap-2">
-            {readiness !== "idle" && (
+            {effectiveReadiness !== "idle" && (
               <Badge className={`text-xs border ${meta.color}`}>
                 {meta.label}
               </Badge>
@@ -158,14 +158,14 @@ export default function InstallReadinessCheck() {
             >
               {checking
                 ? <><Loader2 className="w-3 h-3 animate-spin" /> Sjekker…</>
-                : <><RefreshCw className="w-3 h-3" /> {readiness === "idle" ? "Kjør sjekk" : "Kjør igjen"}</>
+                : <><RefreshCw className="w-3 h-3" /> {effectiveReadiness === "idle" ? "Kjør sjekk" : "Kjør igjen"}</>
               }
             </button>
           </div>
         </div>
 
         {/* Recommendation */}
-        <p className="text-xs text-slate-500 mt-1">{recommendation(readiness)}</p>
+        <p className="text-xs text-slate-500 mt-1">{recommendation(effectiveReadiness)}</p>
 
         {/* Checked-against repo label */}
         {checkedRepo && (
