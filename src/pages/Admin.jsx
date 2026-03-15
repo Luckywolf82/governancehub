@@ -49,8 +49,6 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-5xl mx-auto space-y-4">
-
-        {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <Shield className="w-7 h-7 text-slate-700" />
@@ -66,7 +64,6 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Tab bar */}
         <div className="flex border-b border-slate-200">
           {TABS.map((t) => (
             <button
@@ -83,7 +80,6 @@ export default function Admin() {
           ))}
         </div>
 
-        {/* Tab: Govern */}
         {tab === "Govern" && (
           <div className="space-y-6">
             <div>
@@ -114,7 +110,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Setup */}
         {tab === "Setup" && (
           <div className="space-y-6">
             <div>
@@ -133,7 +128,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Build Prep */}
         {tab === "Build Prep" && (
           <div className="space-y-6">
             <div>
@@ -164,7 +158,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: Strategy */}
         {tab === "Strategy" && (
           <div className="space-y-6">
             <div>
@@ -217,7 +210,6 @@ export default function Admin() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
