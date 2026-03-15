@@ -96,6 +96,13 @@ export default function Admin() {
           </div>
         )}
 
+        {/* Tab: Product */}
+        {tab === "Product" && (
+          <div className="space-y-4">
+            <ProductIntelligencePanel />
+          </div>
+        )}
+
         {/* Tab: System */}
         {tab === "System" && (
           <div className="space-y-4">
