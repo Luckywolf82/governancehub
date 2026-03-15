@@ -107,6 +107,9 @@ export default function Admin() {
               <GovernanceStarterKitPanel />
             </div>
             <div className="border-t border-slate-200 pt-4">
+              <ProjectBootstrapPanel />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
               <ProductIntelligencePanel />
             </div>
           </div>
