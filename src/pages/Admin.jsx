@@ -8,8 +8,9 @@ import RepoVerificationPanel from "@/components/admin/RepoVerificationPanel";
 import GovernanceOrchestratorPanel from "@/components/admin/GovernanceOrchestratorPanel";
 import AuditRunnerPanel from "@/components/admin/AuditRunnerPanel";
 import RepositoryManagerPanel from "@/components/admin/RepositoryManagerPanel";
+import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePanel";
 
-const TABS = ["Operations", "Repo Tools", "System"];
+const TABS = ["Operations", "Repo Tools", "Product", "System"];
 
 export default function Admin() {
   const [user, setUser] = useState(null);
