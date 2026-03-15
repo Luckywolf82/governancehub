@@ -250,15 +250,24 @@ export default function ProjectBootstrapPanel() {
         </div>
       )}
 
-      {/* Persistence notice */}
-      <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs text-slate-500">
-        <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" />
-        <span>
-          <span className="font-medium text-slate-600">Bootstrap-utkast.</span>{" "}
-          Prosjektregisteret er for øyeblikket statisk (<span className="font-mono">PROJECT_REGISTRY.jsx</span>).
-          Generert pakke er et utkast — legg til oppføringen manuelt for å registrere prosjektet.
-        </span>
-      </div>
+      {/* Persistence notice — context-aware */}
+      {bootstrapMode === "create" ? (
+        <div className="flex items-start gap-2 bg-violet-50 border border-violet-200 rounded px-3 py-2 text-xs text-violet-700">
+          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          <span>
+            <span className="font-medium">Opprett-modus.</span>{" "}
+            Fyller du inn navn og klikker «Opprett prosjekt» lagres prosjektet direkte i Project-databasen og vises på Projects-siden.
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs text-slate-500">
+          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" />
+          <span>
+            <span className="font-medium text-slate-600">Kobling — forhåndsvisning kun.</span>{" "}
+            Å koble til eksisterende prosjekt krever at du velger et prosjekt fra listen. Dette støttes ikke i v1 — pakken er et utkast til manuell bruk.
+          </span>
+        </div>
+      )}
 
       {/* Form */}
       <Card>
