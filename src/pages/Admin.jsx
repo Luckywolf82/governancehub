@@ -119,48 +119,47 @@ export default function Admin() {
           <div className="space-y-6">
             <ProductIntelligencePanel />
             <div className="border-t border-slate-200 pt-4 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { icon: <FileText className="w-5 h-5 text-blue-600" />, title: "Dokumentasjon", desc: "Governance-dokumenter og guider", href: "/docs" },
-                { icon: <Activity className="w-5 h-5 text-green-600" />, title: "Governance", desc: "Oversikt over governance-prosesser", href: "/governance" },
-              ].map(({ icon, title, desc, href }) => (
-                <a key={title} href={href}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                    <CardContent className="p-5 flex items-start gap-4">
-                      <div className="mt-0.5">{icon}</div>
-                      <div>
-                        <p className="font-semibold text-slate-800">{title}</p>
-                        <p className="text-sm text-slate-500">{desc}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </a>
-              ))}
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Systeminformasjon</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-slate-600 space-y-2">
-                <div className="flex justify-between">
-                  <span>Plattform</span>
-                  <span className="font-medium text-slate-800">Base44</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Appnavn</span>
-                  <span className="font-medium text-slate-800">GovernanceHub</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Bruker</span>
-                  <span className="font-medium text-slate-800">{user.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Dato</span>
-                  <span className="font-medium text-slate-800">{new Date().toLocaleDateString("nb-NO")}</span>
-                </div>
-              </CardContent>
-            </Card>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { icon: <FileText className="w-5 h-5 text-blue-600" />, title: "Dokumentasjon", desc: "Governance-dokumenter og guider", href: "/docs" },
+                  { icon: <Activity className="w-5 h-5 text-green-600" />, title: "Governance", desc: "Oversikt over governance-prosesser", href: "/governance" },
+                ].map(({ icon, title, desc, href }) => (
+                  <a key={title} href={href}>
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                      <CardContent className="p-5 flex items-start gap-4">
+                        <div className="mt-0.5">{icon}</div>
+                        <div>
+                          <p className="font-semibold text-slate-800">{title}</p>
+                          <p className="text-sm text-slate-500">{desc}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </a>
+                ))}
+              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Systeminformasjon</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-slate-600 space-y-2">
+                  <div className="flex justify-between">
+                    <span>Plattform</span>
+                    <span className="font-medium text-slate-800">Base44</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Appnavn</span>
+                    <span className="font-medium text-slate-800">GovernanceHub</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Bruker</span>
+                    <span className="font-medium text-slate-800">{user.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Dato</span>
+                    <span className="font-medium text-slate-800">{new Date().toLocaleDateString("nb-NO")}</span>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
