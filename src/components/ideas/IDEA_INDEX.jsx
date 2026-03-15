@@ -246,5 +246,44 @@ export const IDEA_INDEX = {
       notes: "Strong mission fit. Would complement AI_PROJECT_INSTRUCTIONS with scenario-specific guidance.",
     },
 
+    // ── Audit Scope Model ─────────────────────────────────────────────────────
+    {
+      ideaId: "audit-scope-model",
+      title: "Audit Scope Model",
+      description: "Introduce explicit audit scopes (repo, multi-repo, project, global) so audits can run consistently across different contexts.",
+      category: "governance",
+      stage: "concept",
+      strategicType: "foundation",
+      value: { userValue: 4, installDriver: 3, missionFit: 5 },
+      feasibility: { implementationCost: 1, technicalRisk: 1, dependencyRisk: 1 },
+      notes: "Required prerequisite for multi-repo audits and audit definition generator.",
+    },
+
+    // ── Multi-Repo Audit Runner ────────────────────────────────────────────────
+    {
+      ideaId: "multi-repo-audit-runner",
+      title: "Multi-Repo Audit Runner",
+      description: "Extend the audit runner so a single audit can run across multiple repositories to detect governance drift, architecture inconsistencies, and missing capabilities.",
+      category: "governance",
+      stage: "concept",
+      strategicType: "governance-core",
+      value: { userValue: 5, installDriver: 4, missionFit: 5 },
+      feasibility: { implementationCost: 2, technicalRisk: 2, dependencyRisk: 1 },
+      notes: "Requires audit scope model and repo[] support in the audit runner.",
+    },
+
+    // ── Audit Definition Generator ────────────────────────────────────────────
+    {
+      ideaId: "audit-definition-generator",
+      title: "Audit Definition Generator",
+      description: "Allow users to generate new audit definitions using structured prompts (Copilot, GitHub issue, or Base44). Generated audits follow the governance audit schema and are stored as draft audits.",
+      category: "ai-tooling",
+      stage: "concept",
+      strategicType: "platform-capability",
+      value: { userValue: 5, installDriver: 4, missionFit: 4 },
+      feasibility: { implementationCost: 3, technicalRisk: 2, dependencyRisk: 2 },
+      notes: "Outputs governance-compliant audit templates and supports export to Copilot, GitHub issues, or Base44.",
+    },
+
   ],
 };
