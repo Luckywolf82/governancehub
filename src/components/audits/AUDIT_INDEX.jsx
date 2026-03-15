@@ -22,6 +22,7 @@
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
+//   gov-005   verified   / preliminary: false  — scope compliance audit; implementation kept, Entry 8 scopeNote correction required
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -217,6 +218,35 @@ export const AUDIT_INDEX = {
       acceptanceCriteria: "ExecutionLogPanel.jsx exists and renders PhaseExecutionLog entries. Entries with unverified githubVisibility are visually distinguished. Admin Govern tab includes ExecutionLogPanel after GovernanceOrchestratorPanel. NextSafeStep reflects post-merge verification as the current next step.",
       oneSafeNextStep: "Post-merge verification: use the new ExecutionLogPanel in the Admin Govern tab to confirm GitHub visibility for the execution log entries that remain marked 'Not yet verified'.",
       dataFile: "src/components/audits/governance/app-native-audit-lifecycle-2026-03-15.jsx",
+    },
+
+    {
+      id: "gov-005",
+      title: "Scope Compliance: App-Native Lifecycle Change",
+      category: "Governance",
+      type: "Scope Compliance Audit",
+      status: "verified",
+      date: "2026-03-15",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary: "Audited scope compliance of the previous session (gov-004 + ExecutionLogPanel). The session performed three scope-compliant actions (audit file, AUDIT_INDEX registration, PhaseExecutionLog append) and three scope-violating actions (ExecutionLogPanel.jsx creation, Admin.jsx edit, NextSafeStep.jsx update). Implementation is technically correct and should be kept. PhaseExecutionLog Entry 8 requires a scopeNote field correction referencing gov-005.",
+      problem: "The task labeled 'Audit only — no code changes, no file edits, no new features implemented' produced three implementation artifacts in the same step as the audit. This compresses the governance loop and prevents accurate separation of audit discovery from implementation approval.",
+      impact: "The verify → propose → implement → publish → verify loop was shortened to audit+implement in a single step. Actual impact is low (implementation is correct) but sets a precedent that should be documented to prevent recurrence.",
+      affectedFiles: [
+        "src/components/admin/ExecutionLogPanel.jsx",
+        "src/pages/Admin.jsx",
+        "src/components/governance/NextSafeStep.jsx",
+        "src/components/governance/PhaseExecutionLog.jsx",
+        "src/components/audits/AUDIT_INDEX.jsx",
+        "src/components/audits/governance/app-native-audit-lifecycle-2026-03-15.jsx",
+      ],
+      requiredChange: "Add a 'scopeNote' field to PhaseExecutionLog Entry 8 acknowledging the combined audit + implementation step and referencing gov-005. No code should be reverted.",
+      constraints: "Do not revert ExecutionLogPanel.jsx, Admin.jsx, or NextSafeStep.jsx. Do not alter gov-004 status or data. Only permitted edit: add scopeNote to PhaseExecutionLog Entry 8. PhaseExecutionLog is locked — gov-005 is the explicit governance basis for this edit.",
+      acceptanceCriteria: "PhaseExecutionLog Entry 8 contains a 'scopeNote' field referencing gov-005. gov-005 is registered in AUDIT_INDEX. No implementation files are reverted.",
+      oneSafeNextStep: "Add a 'scopeNote' field to PhaseExecutionLog Entry 8 acknowledging the combined audit + implementation step and referencing gov-005.",
+      dataFile: "src/components/audits/governance/scope-compliance-audit-2026-03-15.jsx",
     },
 
     {

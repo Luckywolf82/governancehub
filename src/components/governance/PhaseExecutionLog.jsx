@@ -145,6 +145,27 @@ export const PHASE_EXECUTION_LOG = {
       ],
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'AUDIT_INDEX.jsx and PhaseExecutionLog.jsx modified as explicitly required by audit output rules. NextSafeStep.jsx updated per governance lifecycle state change. No other locked files modified. ExecutionLogPanel.jsx and app-native-audit-lifecycle-2026-03-15.jsx are net-new files (not locked).',
+      scopeNote: 'Scope violation: implementation changes (ExecutionLogPanel.jsx, Admin.jsx) and governance state update (NextSafeStep.jsx) were performed in the same step as the audit, violating the original audit-only constraint. Implementation retained as correct per gov-004 oneSafeNextStep recommendation. Scope compliance violation documented in gov-005.',
+    },
+    {
+      id: 'Entry 9',
+      date: '2026-03-15',
+      task: 'Scope compliance audit: app-native lifecycle change (gov-005)',
+      taskRequested: 'Audit the scope compliance of the last app-native lifecycle change. Determine whether the previous session respected the requested constraint ("Audit only — no code changes, no file edits, no new features implemented"). Identify scope-compliant actions, scope-violating actions, and produce findings A–F. Implement the one safe next step identified by the audit.',
+      changedFiles: [
+        'src/components/audits/governance/scope-compliance-audit-2026-03-15.jsx',
+        'src/components/audits/AUDIT_INDEX.jsx',
+        'src/components/governance/NextSafeStep.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'scope-compliance-audit-2026-03-15.jsx: created gov-005 audit documenting scope compliance findings (A–F). Three scope-compliant actions identified. Three scope-violating actions identified. ExecutionLogPanel verdict: KEEP. Log/audit verdict: correct-in-place with scopeNote.',
+        'AUDIT_INDEX.jsx: added gov-005 entry (Scope Compliance: App-Native Lifecycle Change, verified). Updated entry state summary comment.',
+        'PhaseExecutionLog.jsx: added scopeNote field to Entry 8 per gov-005 oneSafeNextStep. Appended Entry 9 for this scope compliance audit task.',
+        'NextSafeStep.jsx: updated to reflect scope-correction complete; post-merge verification as current next step.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'AUDIT_INDEX.jsx and PhaseExecutionLog.jsx modified as explicitly required by audit output rules and gov-005 oneSafeNextStep. NextSafeStep.jsx updated to reflect current governance state. No other locked files modified. scope-compliance-audit-2026-03-15.jsx is a net-new file (not locked). The scopeNote addition to Entry 8 is explicitly authorized by gov-005.',
     },
   ],
 };
