@@ -28,6 +28,8 @@ Use this checklist before merging any Copilot PR.
 
 Locked files:
 
+src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx  
+src/components/governance/LockedFiles.jsx  
 src/components/governance/PhaseExecutionLog.jsx  
 src/components/audits/AUDIT_INDEX.jsx  
 src/components/audits/AUDIT_SYSTEM_GUIDE.jsx  
