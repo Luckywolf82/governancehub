@@ -115,6 +115,100 @@ export const EXECUTION_LOG_SCHEMA_AUDIT = {
       "are formally incompatible with the canonical requiredFields list in AI_PROJECT_INSTRUCTIONS.",
   },
 
+  // ── Field overlap analysis ─────────────────────────────────────────────────
+  // Answers question 4: Which fields overlap?
+  overlappingFields: {
+    description:
+      "Fields present in both AI_PROJECT_INSTRUCTIONS.executionLog.requiredFields and INSTALL_POLICY.loggingRules.schema",
+    fields: [
+      "id",
+      "date",
+      "taskRequested",
+      "diffSummary",
+      "githubVisibility",
+      "lockedFileVerification",
+    ],
+    count: 6,
+    note:
+      "Six of the eight canonical required fields are already present in INSTALL_POLICY.loggingRules.schema.",
+  },
+
+  // ── Intentional divergence analysis ───────────────────────────────────────
+  // Answers question 6: Is the divergence intentional and justifiable?
+  intentionalDivergenceAnalysis: {
+    assessment: "partially intentional",
+    justification: [
+      "'filesCreated' and 'filesModified' are install-specific granularizations of 'changedFiles'. " +
+        "An install operation has a meaningful distinction between files it creates versus files it modifies. " +
+        "This distinction is not present in general runtime execution entries.",
+      "'commitRef' is install-specific: it captures the commit SHA after an install write, " +
+        "which is not applicable to general runtime governance changes. Its presence is justified.",
+      "Omitting 'task' is not clearly justified. The canonical schema treats 'task' as a required field. " +
+        "Install log entries should record a 'task' value to remain canonical-schema-compliant.",
+      "The divergence is partially intentional (granular file tracking via 'filesCreated'/'filesModified', " +
+        "and 'commitRef' for install traceability) and partially accidental (missing 'task').",
+    ],
+  },
+
+  // ── Options considered ────────────────────────────────────────────────────
+  // Answers question 7 via enumerated options
+  optionsConsidered: [
+    {
+      option: 1,
+      label: "Exact match — align INSTALL_POLICY schema to the canonical requiredFields exactly",
+      description:
+        "Replace 'filesCreated' + 'filesModified' with 'changedFiles', add 'task', remove 'commitRef'.",
+      tradeoffs:
+        "Loses meaningful install granularity. 'filesCreated' vs 'filesModified' is a useful distinction " +
+        "for install auditing. 'commitRef' provides install traceability with no equivalent in runtime logs.",
+      suitable: false,
+    },
+    {
+      option: 2,
+      label: "Explicit install-specific subschema — treat INSTALL_POLICY schema as fully independent",
+      description:
+        "Declare INSTALL_POLICY.loggingRules.schema as a separate schema with no obligation to conform " +
+        "to the canonical required-field list.",
+      tradeoffs:
+        "Install-originated log entries would fail canonical validation. Governance tooling and audit " +
+        "checks could not treat all PhaseExecutionLog entries uniformly.",
+      suitable: false,
+    },
+    {
+      option: 3,
+      label: "Extension of canonical runtime schema — treat INSTALL_POLICY schema as a documented superset",
+      description:
+        "Require INSTALL_POLICY.loggingRules.schema to include all canonical required fields, then explicitly " +
+        "allow additional install-specific fields. Add 'task' to INSTALL_POLICY schema. Document " +
+        "'filesCreated' and 'filesModified' as the install-granular substitution for 'changedFiles'. " +
+        "Retain 'commitRef' as an approved install-specific extension.",
+      tradeoffs:
+        "Requires adding 'task' to INSTALL_POLICY.loggingRules.schema (a locked file). Minor change but " +
+        "justified by schema alignment. All extensions are explicitly documented.",
+      suitable: true,
+    },
+  ],
+
+  // ── Recommended model ──────────────────────────────────────────────────────
+  // Answers question 7: What should be the canonical relationship?
+  recommendedModel: {
+    option: 3,
+    label: "Extension of canonical runtime schema",
+    rationale: [
+      "Six of the eight canonical required fields are already present in INSTALL_POLICY.loggingRules.schema, " +
+        "confirming the install schema was designed with the canonical schema in mind.",
+      "The two missing canonical fields can be resolved minimally: add 'task' explicitly to the schema, " +
+        "and document 'filesCreated' + 'filesModified' as the install-granular equivalent of 'changedFiles'.",
+      "'filesCreated', 'filesModified', and 'commitRef' are genuine install-context additions that " +
+        "improve traceability without conflicting with canonical fields.",
+      "Option 1 loses install-specific granularity with no governance benefit. " +
+        "Option 2 creates a non-canonical schema class that cannot be uniformly validated.",
+    ],
+    minimumChangeRequired:
+      "Add 'task' to INSTALL_POLICY.loggingRules.schema and annotate 'filesCreated' + 'filesModified' " +
+      "as the install-approved substitution for 'changedFiles'.",
+  },
+
   // ── Consolidated drift report ──────────────────────────────────────────────
   problem: `Schema drift detected in two of three places:
 
