@@ -132,9 +132,13 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab: System */}
-        {tab === "System" && (
+        {/* Tab: Strategy */}
+        {tab === "Strategy" && (
           <div className="space-y-6">
+            <div>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Strategy</p>
+              <p className="text-sm text-slate-500">Roadmap, prioritering og referansepanel</p>
+            </div>
             <ProductIntelligencePanel />
             <div className="border-t border-slate-200 pt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
