@@ -83,9 +83,9 @@ export default function Admin() {
         {/* Tab: Operations */}
         {tab === "Operations" && (
           <div className="space-y-6">
-            <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
+            <AuditRunnerPanel onUseInOrchestrator={(obj) => { setInjectedAudit(obj); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             <div className="border-t border-slate-200 pt-4">
-              <AuditRunnerPanel onUseInOrchestrator={(obj) => { setInjectedAudit(obj); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+              <GovernanceOrchestratorPanel injectedAudit={injectedAudit} onClearInjected={() => setInjectedAudit(null)} />
             </div>
           </div>
         )}
@@ -94,7 +94,12 @@ export default function Admin() {
         {tab === "Repo Tools" && (
           <div className="space-y-6">
             <RepositoryManagerPanel />
-            <RepoRawAccessPanel />
+            <div className="border-t border-slate-200 pt-4">
+              <ProjectBootstrapPanel />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
+              <RepoRawAccessPanel />
+            </div>
             <RepoVerificationPanel />
           </div>
         )}
@@ -106,18 +111,14 @@ export default function Admin() {
             <div className="border-t border-slate-200 pt-4">
               <GovernanceStarterKitPanel />
             </div>
-            <div className="border-t border-slate-200 pt-4">
-              <ProjectBootstrapPanel />
-            </div>
-            <div className="border-t border-slate-200 pt-4">
-              <ProductIntelligencePanel />
-            </div>
           </div>
         )}
 
         {/* Tab: System */}
         {tab === "System" && (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <ProductIntelligencePanel />
+            <div className="border-t border-slate-200 pt-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { icon: <FileText className="w-5 h-5 text-blue-600" />, title: "Dokumentasjon", desc: "Governance-dokumenter og guider", href: "/docs" },
