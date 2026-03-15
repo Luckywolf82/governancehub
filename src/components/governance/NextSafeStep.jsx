@@ -1,6 +1,6 @@
 export const NEXT_SAFE_STEP = {
-  title: 'Governance Source-of-Truth Alignment',
-  reason: 'Reconcile governance registry truth before enabling automated audit and task workflows.',
-  scope: 'LockedFiles, AI_STATE, NextSafeStep, PhaseExecutionLog',
-  blockedBy: 'None — baseline audit complete',
+  title: 'Post-merge verification for pending execution log entries',
+  reason: 'ExecutionLogPanel is now live in the Admin Govern tab. Seven entries in PhaseExecutionLog have githubVisibility values that need post-merge confirmation. Verify each unverified entry via GitHub before marking the governance lifecycle as closed.',
+  scope: 'PhaseExecutionLog, ExecutionLogPanel, Admin Govern tab',
+  blockedBy: 'None — ExecutionLogPanel implementation complete',
 };

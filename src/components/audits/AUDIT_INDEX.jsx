@@ -21,6 +21,7 @@
 //   gov-001   planned    / preliminary: true   — scope only; not executed
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
+//   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -188,6 +189,34 @@ export const AUDIT_INDEX = {
       acceptanceCriteria: "All PhaseExecutionLog entries include every field in executionLog.requiredFields. INSTALL_POLICY schema is aligned with or explicitly extends the canonical required-field list.",
       oneSafeNextStep: "Add 'taskRequested' to PhaseExecutionLog Entry 1 and Entry 3.",
       dataFile: "src/components/audits/governance/execution-log-schema-audit-2026-03-15.jsx",
+    },
+
+    {
+      id: "gov-004",
+      title: "App-Native Audit Lifecycle Completion",
+      category: "Governance",
+      type: "Lifecycle Gap Audit",
+      status: "verified",
+      date: "2026-03-15",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary: "Audited GovernanceHub for complete in-app governance lifecycle support with focus on post-merge verification. Found that no ExecutionLogPanel exists, PhaseExecutionLog has no structured lifecycle status field, RepoVerificationPanel is not tied to execution log entries, and the Admin Govern tab workflow is incomplete (stops at task generation, no verify-after-merge step). Implemented ExecutionLogPanel.jsx as the one safe next step.",
+      problem: "GovernanceHub has no in-app execution log panel. Operators cannot see PhaseExecutionLog entries from within the application. The githubVisibility field is unstructured free-text with no controlled lifecycle vocabulary (drafted/implemented/merged/verified). Post-merge verification has no in-app action — it is entirely manual and external. The Admin Govern tab workflow is incomplete: it stops at task generation without a 'verify after merge' step.",
+      impact: "Without an in-app execution log view, the governance lifecycle cannot close within GovernanceHub. The 'verify → propose → implement → publish → verify' loop described in AI_PROJECT_INSTRUCTIONS.developmentLoop has no in-app endpoint. Governance drift risk increases with each unverified log entry if app-native audit creation is enabled before verification exists.",
+      affectedFiles: [
+        "src/components/governance/PhaseExecutionLog.jsx",
+        "src/components/governance/NextSafeStep.jsx",
+        "src/pages/Admin.jsx",
+        "src/components/admin/ExecutionLogPanel.jsx",
+        "src/components/audits/AUDIT_INDEX.jsx",
+      ],
+      requiredChange: "Create src/components/admin/ExecutionLogPanel.jsx. Import and render PHASE_EXECUTION_LOG.entries. Display lifecycle status per entry using githubVisibility. Flag 'Not yet verified' entries with a warning badge. Provide GitHub links for post-merge verification. Add ExecutionLogPanel to Admin.jsx Govern tab after GovernanceOrchestratorPanel.",
+      constraints: "Modify only Admin.jsx and NextSafeStep.jsx in existing non-locked files. New file ExecutionLogPanel.jsx is a net-new addition. Do not modify locked governance files except PhaseExecutionLog (append entry) and AUDIT_INDEX (register audit). One structural change at a time.",
+      acceptanceCriteria: "ExecutionLogPanel.jsx exists and renders PhaseExecutionLog entries. Entries with unverified githubVisibility are visually distinguished. Admin Govern tab includes ExecutionLogPanel after GovernanceOrchestratorPanel. NextSafeStep reflects post-merge verification as the current next step.",
+      oneSafeNextStep: "Post-merge verification: use the new ExecutionLogPanel in the Admin Govern tab to confirm GitHub visibility for the execution log entries that remain marked 'Not yet verified'.",
+      dataFile: "src/components/audits/governance/app-native-audit-lifecycle-2026-03-15.jsx",
     },
 
     {
