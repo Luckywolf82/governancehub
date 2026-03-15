@@ -136,7 +136,9 @@ function buildBootstrapPackage({ repo, bootstrapMode, buildIntent, projectName, 
     `- Verifiser repo før og etter strukturelle endringer.`,
     ``,
     `---`,
-    `⚠️  BOOTSTRAP-UTKAST — Ikke persistert. Legg til oppføringen manuelt i PROJECT_REGISTRY.jsx for å registrere prosjektet.`,
+    bootstrapMode === "create"
+      ? `ℹ️  Klikk «Opprett prosjekt» i panelet for å lagre dette prosjektet direkte i Project-databasen.`
+      : `⚠️  KOBLING-UTKAST — Ikke persistert. Velg eksisterende prosjekt manuelt for å koble repo-referansen.`,
     ``,
     `*Generert av GovernanceHub Project Bootstrap — ${date}*`,
   ].filter((l) => l !== null).join("\n");
