@@ -430,7 +430,7 @@ export default function GovernanceStarterKitPanel() {
                 bg: "bg-slate-100 border-slate-300",
                 text: "text-slate-600",
                 icon: <Circle className="w-4 h-4 text-slate-400 shrink-0" />,
-                label: "Sjekk ausstår",
+                label: "Sjekk gjenstår",
                 message: "Kjør readiness-sjekk ovenfor for å godkjenne installasjon.",
               },
               checking: {
