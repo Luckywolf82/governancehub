@@ -12,6 +12,7 @@ import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePane
 import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPanel";
 import GovernanceStarterKitPanel from "@/components/admin/GovernanceStarterKitPanel";
 import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
+import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
