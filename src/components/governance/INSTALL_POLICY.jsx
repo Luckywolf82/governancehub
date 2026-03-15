@@ -49,7 +49,7 @@ export const INSTALL_POLICY = {
       "Files must never be blindly overwritten. Strict preservation logic applies.",
     lockedFiles: [
       "Never overwrite canonical locked governance files without explicit approval.",
-      "Locked files include AI_STATE, LockedFiles, PhaseExecutionLog, AI_PROJECT_INSTRUCTIONS, and PROJECT_REGISTRY when used as canonical governance identity.",
+      "Locked files include AI_STATE, LockedFiles, PhaseExecutionLog, AI_PROJECT_INSTRUCTIONS, and WORKSTREAM_REGISTRY when used as canonical governance identity.",
       "If a locked file exists and is non-empty, manual audit/merge decision is required.",
       "Locked file verification must be recorded in PhaseExecutionLog.",
     ],
@@ -75,7 +75,7 @@ export const INSTALL_POLICY = {
       "src/components/governance/LockedFiles.jsx",
       "src/components/governance/PhaseExecutionLog.jsx",
       "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
-      "src/components/projects/PROJECT_REGISTRY.jsx",
+      "src/components/projects/WORKSTREAM_REGISTRY.jsx",
     ],
     approvalRequirement: [
       "If canonical locked governance files already exist in target repo, installation must not proceed blindly.",

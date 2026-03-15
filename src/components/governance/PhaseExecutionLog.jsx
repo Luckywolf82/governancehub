@@ -104,5 +104,23 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'INSTALL_POLICY.jsx modified intentionally as the explicit target of this gov-003 remediation task. PhaseExecutionLog.jsx appended with this entry per governance logging rules. No other locked files modified.',
     },
+    {
+      id: 'Entry 7',
+      date: '2026-03-15',
+      task: 'Governance alignment: update locked files to use WORKSTREAM_REGISTRY symbol',
+      taskRequested: 'Complete the post-rename governance alignment after PROJECT_REGISTRY → WORKSTREAM_REGISTRY component-layer rename. Update AI_PROJECT_INSTRUCTIONS canonicalSources and governanceFiles, fix starter-kit INSTALL_POLICY prose, bump AI_PROJECT_INSTRUCTIONS to v2.1.',
+      changedFiles: [
+        'src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx',
+        'starter-kit/src/components/governance/INSTALL_POLICY.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'AI_PROJECT_INSTRUCTIONS.jsx: renamed "PROJECT_REGISTRY" to "WORKSTREAM_REGISTRY" in canonicalSources and governanceFiles arrays. Bumped version from v2.0 to v2.1. Added v2.1 entry to versionHistory.',
+        'starter-kit/src/components/governance/INSTALL_POLICY.jsx: updated overwriteRules.lockedFiles prose to say WORKSTREAM_REGISTRY instead of PROJECT_REGISTRY — aligns starter-kit with canonical src version.',
+        'PhaseExecutionLog.jsx: appended Entry 7 for this governance-alignment step.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'AI_PROJECT_INSTRUCTIONS.jsx modified intentionally for post-rename symbol alignment (version bumped to v2.1 per locked-file update rule). starter-kit INSTALL_POLICY.jsx updated to match canonical src version. PhaseExecutionLog.jsx appended with this entry. src/projects/PROJECT_REGISTRY.js confirmed untouched.',
+    },
   ],
 };

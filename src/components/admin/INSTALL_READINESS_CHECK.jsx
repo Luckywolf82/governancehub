@@ -34,8 +34,8 @@ const CHECKED_FILES = [
     module: "governance",
   },
   {
-    path: "src/components/projects/PROJECT_REGISTRY.jsx",
-    label: "PROJECT_REGISTRY",
+    path: "src/components/projects/WORKSTREAM_REGISTRY.jsx",
+    label: "WORKSTREAM_REGISTRY",
     module: "projects",
   },
 ];

@@ -1,10 +1,12 @@
 /**
- * PROJECT REGISTRY
+ * WORKSTREAM REGISTRY
  *
- * Canonical list of projects managed by GovernanceHub.
+ * Internal workstream and subsystem registry for GovernanceHub.
+ * This file tracks internal workstreams/subsystems — NOT governed external repositories.
+ * For governed repositories, see src/projects/PROJECT_REGISTRY.js instead.
  */
 
-export const PROJECT_REGISTRY = {
+export const WORKSTREAM_REGISTRY = {
   entries: [
     {
       id: "example-project",

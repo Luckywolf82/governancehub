@@ -1,7 +1,9 @@
-// Canonical source of truth for all projects in GovernanceHub.
-// Pages must import from here — do not hardcode project data in page files.
+// Internal workstream and subsystem registry for GovernanceHub.
+// This file tracks internal workstreams/subsystems — NOT governed external repositories.
+// For governed repositories, see src/projects/PROJECT_REGISTRY.js instead.
+// Pages must import from here — do not hardcode workstream data in page files.
 
-export const PROJECT_REGISTRY = {
+export const WORKSTREAM_REGISTRY = {
   entries: [
     {
       id: "proj-001",
