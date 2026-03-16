@@ -1,8 +1,8 @@
 // gov-005 — App-Native Prompt Dispatch Governance Audit
 // Date: 2026-03-16
 // Project: GovernanceHub
-// Status: planned
-// Evidence source: preliminary — scope definitions only; no file inspection performed yet
+// Status: verified
+// Evidence source: repo-derived — all filesToRead inspected directly; findings documented below
 // This audit defines the governance roadmap for operators generating, tailoring,
 // previewing, approving, and dispatching prompts directly from the app while
 // preserving full governance traceability. No dispatch implementation is included.
@@ -13,12 +13,12 @@ export const PROMPT_DISPATCH_GOVERNANCE_AUDIT = {
     title: "App-Native Prompt Dispatch Governance",
     category: "Governance",
     type: "Prompt Dispatch Governance Audit",
-    status: "planned",
+    status: "verified",
     date: "2026-03-16",
     projectId: "governancehub",
     projectSlug: "governancehub",
-    preliminary: true,
-    evidenceSource: "preliminary",
+    preliminary: false,
+    evidenceSource: "repo-derived",
   },
 
   finding: {
@@ -48,8 +48,11 @@ export const PROMPT_DISPATCH_GOVERNANCE_AUDIT = {
         "src/pages/Admin.jsx",
       ],
       note:
-        "All fields in this section are preliminary scope definitions. " +
-        "File inspection must be performed before any field is considered verified.",
+        "Verified by direct file inspection on 2026-03-16. " +
+        "ActiveRepoContext.jsx provides activeRepo (fullName, owner, repo, defaultBranch) and is " +
+        "already used across Admin, AuditRunnerPanel, StartPromptGeneratorPanel, and related panels. " +
+        "It provides GitHub repository identity only — not operator identity or dispatch scope. " +
+        "It is a usable foundation for targeting but not a complete global context for prompt dispatch.",
     },
 
     // ── 2. Prompt profiles ─────────────────────────────────────────────────────
@@ -237,7 +240,7 @@ export const PROMPT_DISPATCH_GOVERNANCE_AUDIT = {
       plannedComponent: "src/components/admin/PromptRolloutPanel.jsx (to be created)",
     },
 
-    // ── Files read (preliminary — list of files to inspect when audit executes) ─
+    // ── Files read (verified — all files below inspected directly on 2026-03-16) ─
     filesToRead: [
       "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
       "src/components/governance/LockedFiles.jsx",
@@ -247,6 +250,96 @@ export const PROMPT_DISPATCH_GOVERNANCE_AUDIT = {
       "src/components/admin/AuditRunnerPanel.jsx",
       "src/components/admin/ExecutionLogPanel.jsx",
       "src/pages/Admin.jsx",
+    ],
+
+    // ── Verified findings (repo-derived, 2026-03-16) ───────────────────────────
+    verifiedFindings: {
+      // Objective 1: Partial prompt-dispatch architecture in Admin system
+      partialDispatchArchitecture: {
+        exists: false,
+        detail:
+          "Admin.jsx has four tabs: Govern, Setup, Build Prep, Strategy. No tab or panel handles " +
+          "prompt dispatch to a target. GovernanceOrchestratorPanel and orchestratorEngine.jsx use " +
+          "the term 'dispatch' exclusively to mean GitHub issue dispatch or Copilot task dispatch — " +
+          "this is structurally unrelated to prompt-to-target dispatch. No PromptPreviewPanel, " +
+          "PromptApprovalGate, PromptRolloutPanel, or DispatchLogPanel exists anywhere in the repository.",
+      },
+
+      // Objective 2: Global repo context
+      globalRepoContext: {
+        exists: "partial",
+        detail:
+          "ActiveRepoContext.jsx provides activeRepo (fullName, owner, repo, defaultBranch) and is " +
+          "already used across Admin, AuditRunnerPanel, StartPromptGeneratorPanel, and related panels. " +
+          "This provides GitHub repository identity only — not operator identity, governance scope, or " +
+          "dispatch targeting metadata. It is a usable foundation but not a complete dispatch context.",
+        gap:
+          "Operator identity, target audience metadata, and dispatch scope are not provided by " +
+          "ActiveRepoContext. These remain gaps for the dispatch workflow.",
+      },
+
+      // Objective 3: Prompt profile logic
+      promptProfileLogic: {
+        exists: false,
+        detail:
+          "No PromptProfileRegistry, no profile schema, no profile selection UI, and no profile " +
+          "approval workflow exists anywhere in the repository. StartPromptGeneratorPanel.jsx has a " +
+          "buildPrompt() function that generates templated AI coding instructions — this is a build " +
+          "prompt generator, not a governed operator-facing prompt profile. It has no versioning, " +
+          "no approvalStatus, no allowedVariables, and no governance metadata.",
+      },
+
+      // Objective 4: Preview-before-send pattern
+      previewBeforeSendPattern: {
+        exists: false,
+        analogFound:
+          "StartPromptGeneratorPanel.jsx generates prompt text and displays it before the user copies " +
+          "it. This is a display-then-copy pattern, not a governed preview gate. There is no " +
+          "acknowledgment step, no dispatch action, no approval gate, and no dispatch record. " +
+          "The CopyBtn in GovernanceOrchestratorPanel.jsx is a minor UI utility reusable in future UI.",
+        reusable: "CopyBtn (GovernanceOrchestratorPanel.jsx) — minor UI copy utility only.",
+      },
+
+      // Objective 5: Dispatch logging mixed with execution logging
+      dispatchLoggingMixedWithExecutionLog: {
+        exists: false,
+        detail:
+          "PhaseExecutionLog.jsx contains 7 entries (Entries 1–7), all recording governance-layer " +
+          "changes (file edits, schema changes, audit registration). None represent prompt dispatch " +
+          "events. ExecutionLogPanel.jsx renders these entries with GitHub verification links. " +
+          "The separation between dispatch history and execution/verification history is NOT currently " +
+          "violated — no dispatch mechanism exists, therefore no dispatch log exists yet. " +
+          "The contamination risk identified in dispatchLog.separationRationale is a future concern, " +
+          "not a current defect. Kept cleanly separated.",
+      },
+
+      // Objective 6: Minimum safe first artifact
+      minimumSafeFirstArtifact: {
+        artifact: "src/components/governance/PromptProfileRegistry.jsx",
+        isCorrect: true,
+        justification:
+          "No prerequisite architectural gap was found that would block registry creation. " +
+          "ActiveRepoContext already exists and is functional. No partial implementation needs " +
+          "cleanup. The registry is a pure data/schema artifact — no UI component, no dispatch " +
+          "logic. No other dispatch workflow component can be built without a profile schema to " +
+          "reference. A prerequisite could only be argued if a blocking structural problem existed " +
+          "in the Admin system — none was found.",
+        blockers: "None. Safe to create as the next separate step after this audit is verified.",
+      },
+    },
+
+    // ── Gaps confirmed ─────────────────────────────────────────────────────────
+    gapsConfirmed: [
+      "No PromptProfileRegistry or profile schema exists.",
+      "No preview-before-send governance gate exists (StartPromptGeneratorPanel is not equivalent).",
+      "No prompt approval gate exists.",
+      "No PromptDispatchLog exists — dispatch log is entirely absent.",
+      "No DispatchLogPanel exists.",
+      "No PromptPreviewPanel exists.",
+      "No PromptApprovalGate component exists.",
+      "No PromptRolloutPanel exists.",
+      "Global repo context (ActiveRepoContext) exists for repository identity only — operator " +
+        "identity and dispatch scope metadata remain gaps.",
     ],
 
     problem:
@@ -290,8 +383,13 @@ export const PROMPT_DISPATCH_GOVERNANCE_AUDIT = {
       "Staged rollout enforces sequential stage progression with per-stage approval.",
 
     oneSafeNextStep:
-      "Execute the audit: inspect all files listed in filesToRead to confirm no partial prompt " +
-      "dispatch implementation exists. Document findings and update this audit's status from " +
-      "'planned' to 'verified'.",
+      "Create src/components/governance/PromptProfileRegistry.jsx with all requiredProfileFields " +
+      "defined in this audit. This is a pure schema/data artifact — no UI component, no dispatch " +
+      "logic. Do not add preview, approval, dispatch, or rollout components in this step.",
+
+    filesChangedInNextStep: [
+      "src/components/governance/PromptProfileRegistry.jsx (net-new — create only)",
+      "src/components/governance/PhaseExecutionLog.jsx (append entry after creation)",
+    ],
   },
 };
