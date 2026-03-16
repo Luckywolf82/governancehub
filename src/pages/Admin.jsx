@@ -160,6 +160,41 @@ export default function Admin() {
               <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Setup</p>
               <p className="text-sm text-slate-500">Registrer repo og opprett eller koble prosjekt</p>
             </div>
+
+            {/* Setup Readiness — compact operator-orientation card */}
+            <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Setup readiness</p>
+              <p className="text-xs text-slate-400">Quick prerequisite overview before continuing to Build Prep and Govern.</p>
+              <div className="space-y-1.5 pt-0.5">
+                {/* Row 1: active repo — truly deterministic */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-amber-400"}`} />
+                  <span className="text-slate-700 font-medium">Active repo</span>
+                  <span className={`ml-1 ${activeRepo ? "text-emerald-700" : "text-amber-700"}`}>
+                    {activeRepo ? `Selected · ${activeRepo.fullName}` : "Not selected · select a repo from the top menu"}
+                  </span>
+                </div>
+                {/* Row 2: repository registration panel — informational */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
+                  <span className="text-slate-700 font-medium">Repository registration</span>
+                  <span className="ml-1 text-slate-400">Managed below in Setup</span>
+                </div>
+                {/* Row 3: project bootstrap — informational */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
+                  <span className="text-slate-700 font-medium">Project bootstrap</span>
+                  <span className="ml-1 text-slate-400">Available below in Setup</span>
+                </div>
+                {/* Row 4: governance installation — informational */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
+                  <span className="text-slate-700 font-medium">Governance installation</span>
+                  <span className="ml-1 text-slate-400">Continues in Build Prep</span>
+                </div>
+              </div>
+            </div>
+
             <RepositoryManagerPanel />
             <div className="border-t border-slate-200 pt-4">
               <p className="text-xs text-slate-400 mb-3">Neste steg etter repo-oppsett: bootstrap eller koble prosjekt</p>
