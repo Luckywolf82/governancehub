@@ -144,6 +144,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [ghRepo, setGhRepo] = useState("");
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [createState, setCreateState] = useState(null); // null | "loading" | {success, url, number} | {error, message}
+  const [createMode, setCreateMode] = useState(null); // null | "github_issue" | "copilot_task"
   const [analysisConfirmed, setAnalysisConfirmed] = useState(false);
   const [dispatchActionFeedback, setDispatchActionFeedback] = useState(null);
 
@@ -452,19 +453,28 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
 
   // ── Derived guards ─────────────────────────────────────────────────────────
   const requiresAnalysisConfirm = readiness === "analysis-first";
-  const canOpenCreateConfirm = !!effectiveOwner.trim() && !!effectiveRepo.trim() && !!githubIssue && (!requiresAnalysisConfirm || analysisConfirmed);
+  // Active issue body/labels: depend on createMode (copilot_task vs normal github_issue)
+  const activeIssueBody = createMode === "copilot_task" ? copilotTask : githubIssue;
+  const activeIssueLabels = useMemo(() => {
+    if (!issuePrep) return [];
+    if (createMode === "copilot_task") {
+      return Array.from(new Set([...issuePrep.labels, "copilot-task"]));
+    }
+    return issuePrep.labels;
+  }, [issuePrep, createMode]);
+  const canOpenCreateConfirm = !!effectiveOwner.trim() && !!effectiveRepo.trim() && !!activeIssueBody && (!requiresAnalysisConfirm || analysisConfirmed);
   const canSubmitCreate = canOpenCreateConfirm && createState !== "loading";
 
   async function handleCreateIssue() {
-    if (!issuePrep || !githubIssue || !effectiveOwner.trim() || !effectiveRepo.trim()) return;
+    if (!issuePrep || !activeIssueBody || !effectiveOwner.trim() || !effectiveRepo.trim()) return;
     setCreateState("loading");
     try {
       const res = await base44.functions.invoke("createGithubIssue", {
         owner: effectiveOwner.trim(),
         repo: effectiveRepo.trim(),
         title: issuePrep.issueTitle,
-        body: githubIssue,
-        labels: issuePrep.labels,
+        body: activeIssueBody,
+        labels: activeIssueLabels,
         auditId: audit.id,
         readiness,
         source: issuePrep.source,
@@ -473,6 +483,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       if (data?.success) {
         setCreateState({ success: true, url: data.issue_url, number: data.issue_number, title: data.title });
         setShowCreateConfirm(false);
+        setCreateMode(null);
       } else if (data?.error === "github_not_connected") {
         setCreateState({ success: false, message: "GitHub-kobling ikke aktiv. Aktiver GitHub-connector i admin-innstillingene." });
       } else {
@@ -536,7 +547,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 </div>
               </div>
               <button
-                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                onClick={() => { onClearInjected?.(); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); setShowCreateConfirm(false); setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }}
                 className="shrink-0 text-indigo-400 hover:text-indigo-700 transition-colors"
                 title="Fjern injisert audit og gå tilbake til AUDIT_INDEX"
               >
@@ -547,7 +558,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             <div>
               <select
                 value={selectedId}
-                onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                onChange={(e) => { setSelectedId(e.target.value); setEnrichment({}); setShowOutputs(false); setConfirmedFiles(""); setActualChangeSummary(""); setShowLogAssistant(false); setShowCreateConfirm(false); setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }}
                 className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
               >
                 <option value="">— Velg en audit fra indeksen —</option>
@@ -706,17 +717,14 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                 {/* ── Dispatch Action Controls ── */}
                 {dispatchRecommendation.dispatchTarget === "copilot_task" && (
                   <div>
-                    {dispatchActionFeedback ? (
-                      <p className="text-purple-700 italic">{dispatchActionFeedback}</p>
-                    ) : (
-                      <button
-                        onClick={() => setDispatchActionFeedback("Coming next — Copilot task dispatch is not yet wired. Use the outputs in Section 3 to create a task manually.")}
-                        className="inline-flex items-center gap-1.5 font-medium px-3 py-1.5 rounded border border-purple-400 text-purple-800 bg-purple-100 hover:bg-purple-200 transition-colors"
-                      >
-                        <Send className="w-3 h-3 shrink-0" />
-                        Create issue for Copilot
-                      </button>
-                    )}
+                    <button
+                      onClick={() => { setCreateMode("copilot_task"); setShowCreateConfirm(true); setCreateState(null); }}
+                      disabled={!copilotTask}
+                      className="inline-flex items-center gap-1.5 font-medium px-3 py-1.5 rounded border border-purple-400 text-purple-800 bg-purple-100 hover:bg-purple-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Send className="w-3 h-3 shrink-0" />
+                      Create issue for Copilot
+                    </button>
                   </div>
                 )}
 
@@ -1003,7 +1011,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       </a>
                     </div>
                   </div>
-                  <button onClick={() => { setCreateState(null); setAnalysisConfirmed(false); }} className="text-green-400 hover:text-green-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => { setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }} className="text-green-400 hover:text-green-700"><RotateCcw className="w-3.5 h-3.5" /></button>
                 </div>
               )}
 
@@ -1021,7 +1029,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       </a>
                     </div>
                   </div>
-                  <button onClick={() => { setCreateState(null); setAnalysisConfirmed(false); }} className="text-blue-400 hover:text-blue-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => { setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }} className="text-blue-400 hover:text-blue-700"><RotateCcw className="w-3.5 h-3.5" /></button>
                 </div>
               )}
 
@@ -1035,7 +1043,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       <p className="opacity-80 mt-0.5">{createState.message}</p>
                     </div>
                   </div>
-                  <button onClick={() => { setCreateState(null); setAnalysisConfirmed(false); }} className="text-red-400 hover:text-red-700"><RotateCcw className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => { setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }} className="text-red-400 hover:text-red-700"><RotateCcw className="w-3.5 h-3.5" /></button>
                 </div>
               )}
 
@@ -1099,7 +1107,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                         <input
                           type="text"
                           value={ghOwner}
-                          onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                          onChange={(e) => { setGhOwner(e.target.value); setShowCreateConfirm(false); setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }}
                           placeholder="e.g. my-org"
                           className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
                         />
@@ -1109,7 +1117,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                         <input
                           type="text"
                           value={ghRepo}
-                          onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); setAnalysisConfirmed(false); }}
+                          onChange={(e) => { setGhRepo(e.target.value); setShowCreateConfirm(false); setCreateState(null); setCreateMode(null); setAnalysisConfirmed(false); }}
                           placeholder="e.g. governance-hub"
                           className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white focus:outline-none focus:border-slate-400"
                         />
@@ -1118,15 +1126,21 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                   )}
 
                   {/* Pre-send review — hidden if duplicate detected */}
-                  {!createState?.error && showCreateConfirm && effectiveOwner.trim() && effectiveRepo.trim() && githubIssue && (
+                  {!createState?.error && showCreateConfirm && effectiveOwner.trim() && effectiveRepo.trim() && activeIssueBody && (
                     <div className="border border-slate-200 rounded bg-slate-50 p-3 space-y-2 text-xs">
                       <p className="font-semibold text-slate-700">Bekreft før oppretting</p>
+                      {createMode === "copilot_task" && (
+                        <p className="flex items-center gap-1.5 text-purple-700 bg-purple-50 border border-purple-200 rounded px-2 py-1">
+                          <Send className="w-3 h-3 shrink-0" />
+                          <span className="font-medium">Copilot Task — body er generert Copilot Task-innhold</span>
+                        </p>
+                      )}
                       <div className="space-y-1">
                         <p><span className="text-slate-400">Repo:</span> <span className="font-mono text-slate-700">{effectiveOwner.trim()}/{effectiveRepo.trim()}</span></p>
                         <p><span className="text-slate-400">Kilde:</span> <span className="font-medium text-slate-700">{repoSourceLabel}</span></p>
                       </div>
                       <p><span className="text-slate-400">Tittel:</span> <span className="font-medium text-slate-800">{issuePrep.issueTitle}</span></p>
-                      <p><span className="text-slate-400">Labels:</span> {issuePrep.labels.join(", ")}</p>
+                      <p><span className="text-slate-400">Labels:</span> {activeIssueLabels.join(", ")}</p>
                       <p>
                         <span className="text-slate-400">Readiness:</span>{" "}
                         {readiness === "execution-ready" && <span className="text-green-700 font-medium">Execution-ready — verifisert implementeringsissue</span>}
@@ -1135,7 +1149,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                       </p>
                       <p><span className="text-slate-400">Audit:</span> <span className="font-mono">{audit.id}</span></p>
                       <p className="text-slate-400 italic">Body-forhåndsvisning (første 200 tegn):</p>
-                      <pre className="text-xs font-mono bg-white border border-slate-100 rounded p-2 whitespace-pre-wrap text-slate-600 max-h-24 overflow-y-auto">{githubIssue.slice(0, 200)}{githubIssue.length > 200 ? "…" : ""}</pre>
+                      <pre className="text-xs font-mono bg-white border border-slate-100 rounded p-2 whitespace-pre-wrap text-slate-600 max-h-24 overflow-y-auto">{activeIssueBody.slice(0, 200)}{activeIssueBody.length > 200 ? "…" : ""}</pre>
                       <div className="flex gap-2 pt-1">
                         <button
                           onClick={handleCreateIssue}
@@ -1146,7 +1160,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                           {createState === "loading" ? "Oppretter…" : "Bekreft og opprett issue"}
                         </button>
                         <button
-                          onClick={() => { setShowCreateConfirm(false); }}
+                          onClick={() => { setShowCreateConfirm(false); setCreateMode(null); }}
                           className="text-xs px-3 py-1.5 rounded border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors"
                         >Avbryt</button>
                       </div>
@@ -1157,7 +1171,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
                   {!showCreateConfirm && (
                     <div className="space-y-1">
                       <button
-                        onClick={() => { setShowCreateConfirm(true); setCreateState(null); }}
+                        onClick={() => { setCreateMode("github_issue"); setShowCreateConfirm(true); setCreateState(null); }}
                         disabled={!canOpenCreateConfirm || createState?.error === 'issue_already_exists'}
                         className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:border-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
