@@ -233,5 +233,27 @@ export const AUDIT_INDEX = {
       oneSafeNextStep: "Post-merge verification: use the new ExecutionLogPanel in the Admin Govern tab to confirm GitHub visibility for the execution log entries that remain marked 'Not yet verified'.",
       dataFile: "src/components/audits/governance/app-native-audit-lifecycle-2026-03-15.jsx",
     },
+
+    {
+      id: "perf-001",
+      title: "Performance Audit Framework",
+      category: "Performance",
+      type: "Planned Audit",
+      status: "planned",
+      date: null,
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: true,
+      evidenceSource: "preliminary",
+      summary: "Placeholder entry defining the future performance audit framework for GovernanceHub.",
+      problem: "Performance audits are referenced in documentation but no registered audit entry currently exists.",
+      impact: "Performance monitoring and optimization audits cannot be tracked through the audit system until a formal entry exists.",
+      affectedFiles: [],
+      requiredChange: "Define and execute a performance audit covering bundle size, render performance, and runtime responsiveness.",
+      constraints: "Audit definition only. Do not implement performance measurement tooling yet.",
+      acceptanceCriteria: "A future performance audit dataFile is created and linked from this entry.",
+      oneSafeNextStep: "Design the performance audit scope and measurement criteria.",
+    },
   ],
 };
+
