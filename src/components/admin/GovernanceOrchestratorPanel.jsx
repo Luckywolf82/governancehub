@@ -459,6 +459,29 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     return prDone && issueNoLongerActive;
   }, [prStatus, issueStatus]);
 
+  // ── Verification template ──────────────────────────────────────────────────
+  const verificationTemplate = useMemo(() => {
+    if (!audit) return "";
+    const issueRef = issueStatus?.found ? `#${issueStatus.number}` : "—";
+    const prRef = prStatus?.found ? `#${prStatus.number}` : "—";
+    return [
+      "Verification after PR merge.",
+      "",
+      `Audit: ${audit.id}`,
+      `Title: ${audit.title}`,
+      "",
+      `GitHub Issue: ${issueRef}`,
+      `Pull Request: ${prRef}`,
+      "",
+      "Verification result:",
+      "- [ ] Verified working",
+      "- [ ] Needs follow-up",
+      "",
+      "Notes:",
+      "-",
+    ].join("\n");
+  }, [audit, issueStatus, prStatus]);
+
   // ── Derived guards ─────────────────────────────────────────────────────────
   const requiresAnalysisConfirm = readiness === "analysis-first";
   // Active issue body/labels: depend on createMode (copilot_task vs normal github_issue)
@@ -1385,6 +1408,25 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* ── Verification banner ── */}
+      {readyForVerification && (
+        <div className="flex items-center justify-between gap-3 bg-green-50 border border-green-300 rounded-lg px-4 py-3">
+          <div className="flex items-center gap-2 text-green-800 text-sm">
+            <ShieldCheck className="w-4 h-4 shrink-0" />
+            <span className="font-semibold">PR merged — verification step recommended.</span>
+          </div>
+          <button
+            onClick={() => {
+              setActualChangeSummary(verificationTemplate);
+              setShowLogAssistant(true);
+            }}
+            className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded border border-green-500 text-green-800 bg-white hover:bg-green-100 transition-colors"
+          >
+            Prefill execution log
+          </button>
+        </div>
       )}
 
       {/* ── SECTION 5: Execution Log Assistant ── */}
