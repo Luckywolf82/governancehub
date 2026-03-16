@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,13 +9,19 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  RefreshCw,
 } from "lucide-react";
 import { PHASE_EXECUTION_LOG } from "@/components/governance/PhaseExecutionLog";
+import { base44 } from "@/api/base44Client";
 
-// ── Lifecycle status helpers ──────────────────────────────────────────────────
-// githubVisibility is currently a free-text field. We derive a display status
-// from it until a structured lifecycleStatus field is added to the schema.
+const REPO_OWNER = "Luckywolf82";
+const REPO_NAME = "governancehub";
+const REPO_BASE = `https://github.com/${REPO_OWNER}/${REPO_NAME}`;
 
+// ── Verification helpers ──────────────────────────────────────────────────────
+
+// Legacy fallback: parse free-text githubVisibility for entries that predate
+// the structured verification model. Used only when no live result is available.
 function deriveVisibilityStatus(githubVisibility) {
   if (!githubVisibility) return "unknown";
   const v = githubVisibility.toLowerCase();
@@ -29,9 +35,16 @@ function deriveVisibilityStatus(githubVisibility) {
   return "unknown";
 }
 
-function VisibilityBadge({ githubVisibility }) {
-  const status = deriveVisibilityStatus(githubVisibility);
+// Primary resolver: uses live auto-verification result as canonical source of
+// truth. Falls back to legacy githubVisibility text parsing only when no live
+// result exists (backward compatibility for older entries without targets).
+function resolveVerificationStatus(entry, liveResults) {
+  const live = liveResults?.[entry.id];
+  if (live?.verificationStatus) return live.verificationStatus;
+  return deriveVisibilityStatus(entry.githubVisibility);
+}
 
+function VisibilityBadge({ status }) {
   if (status === "verified") {
     return (
       <Badge className="bg-green-100 text-green-700 text-xs flex items-center gap-1">
@@ -60,12 +73,28 @@ function VisibilityBadge({ githubVisibility }) {
 
 // ── Entry row ─────────────────────────────────────────────────────────────────
 
-function EntryRow({ entry }) {
+function EntryRow({ entry, liveResults }) {
   const [expanded, setExpanded] = useState(false);
-  const status = deriveVisibilityStatus(entry.githubVisibility);
+  const status = resolveVerificationStatus(entry, liveResults);
   const isUnverified = status === "unverified";
+  const live = liveResults?.[entry.id];
 
-  const repoBase = "https://github.com/Luckywolf82/governancehub";
+  // Build the secondary GitHub inspection link.
+  // Prefers the convenience githubVerificationUrl field when present,
+  // then derives a sensible link from verificationTargetType/Value,
+  // then falls back to the repo commit history.
+  let inspectHref = `${REPO_BASE}/commits/main`;
+  if (entry.githubVerificationUrl) {
+    inspectHref = entry.githubVerificationUrl;
+  } else if (entry.verificationTargetType === "pull_request" && entry.verificationTargetValue) {
+    const asNum = parseInt(entry.verificationTargetValue, 10);
+    inspectHref =
+      !isNaN(asNum) && String(asNum) === entry.verificationTargetValue
+        ? `${REPO_BASE}/pull/${asNum}`
+        : `${REPO_BASE}/pulls?q=head%3A${encodeURIComponent(entry.verificationTargetValue)}`;
+  } else if (entry.verificationTargetType === "commit" && entry.verificationTargetValue) {
+    inspectHref = `${REPO_BASE}/commit/${entry.verificationTargetValue}`;
+  }
 
   return (
     <div
@@ -86,7 +115,7 @@ function EntryRow({ entry }) {
             <span className="text-sm font-medium text-slate-800 truncate">
               {entry.task}
             </span>
-            <VisibilityBadge githubVisibility={entry.githubVisibility} />
+            <VisibilityBadge status={status} />
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
             {entry.date || "Date not recorded"}
@@ -124,7 +153,7 @@ function EntryRow({ entry }) {
                   <div key={f} className="flex items-center gap-1.5">
                     <FileText className="w-3 h-3 text-slate-400 shrink-0" />
                     <a
-                      href={`${repoBase}/blob/main/${f}`}
+                      href={`${REPO_BASE}/blob/main/${f}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs font-mono text-blue-600 hover:underline truncate"
@@ -156,6 +185,7 @@ function EntryRow({ entry }) {
             </div>
           )}
 
+          {/* Verification status block */}
           <div
             className={`rounded p-3 ${
               isUnverified
@@ -164,24 +194,37 @@ function EntryRow({ entry }) {
             }`}
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-slate-700 mb-0.5">
-                  GitHub visibility
+                  Verification status
                 </p>
-                <p className="text-xs text-slate-600">{entry.githubVisibility}</p>
+                {live?.verificationEvidence ? (
+                  <p className="text-xs text-slate-600">
+                    {live.verificationEvidence}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500 italic">
+                    {entry.githubVisibility}
+                  </p>
+                )}
+                {live?.verifiedAt && (
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Auto-verified:{" "}
+                    {new Date(live.verifiedAt).toLocaleString()}
+                  </p>
+                )}
               </div>
 
-              {isUnverified && (
-                <a
-                  href={`${repoBase}/commits/main`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-amber-400 text-amber-800 bg-white hover:bg-amber-50 transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Verify on GitHub
-                </a>
-              )}
+              {/* Secondary inspection link — for manual investigation only, not the source of truth */}
+              <a
+                href={inspectHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Inspect on GitHub
+              </a>
             </div>
           </div>
 
@@ -204,23 +247,82 @@ function EntryRow({ entry }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ExecutionLogPanel() {
-  const entries = [...(PHASE_EXECUTION_LOG.entries ?? [])].reverse();
+  const entries = useMemo(
+    () => [...(PHASE_EXECUTION_LOG.entries ?? [])].reverse(),
+    []
+  );
 
-  const unverifiedCount = entries.filter(
-    (e) => deriveVisibilityStatus(e.githubVisibility) === "unverified"
-  ).length;
+  const [liveResults, setLiveResults] = useState({});
+  const [verifying, setVerifying] = useState(false);
+
+  // Auto-verify entries that carry structured verification target metadata.
+  // Entries without verificationTargetType fall back to legacy githubVisibility parsing.
+  useEffect(() => {
+    const targets = entries.filter(
+      (e) => e.verificationTargetType && e.verificationTargetValue
+    );
+    if (targets.length === 0) return;
+
+    let cancelled = false;
+    setVerifying(true);
+
+    Promise.all(
+      targets.map(async (entry) => {
+        try {
+          const res = await base44.functions.invoke("verifyExecutionLogEntry", {
+            owner: REPO_OWNER,
+            repo: REPO_NAME,
+            entryId: entry.id,
+            verificationTargetType: entry.verificationTargetType,
+            verificationTargetValue: entry.verificationTargetValue,
+          });
+          return { id: entry.id, result: res.data ?? res };
+        } catch (err) {
+          console.error("Auto-verification failed for entry", entry.id, err);
+          return {
+            id: entry.id,
+            result: {
+              verificationStatus: "unknown",
+              verificationEvidence: "Auto-verification unavailable",
+            },
+          };
+        }
+      })
+    ).then((results) => {
+      if (cancelled) return;
+      const map = {};
+      for (const { id, result } of results) {
+        map[id] = result;
+      }
+      setLiveResults((prev) => ({ ...prev, ...map }));
+      setVerifying(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [entries]);
 
   const verifiedCount = entries.filter(
-    (e) => deriveVisibilityStatus(e.githubVisibility) === "verified"
+    (e) => resolveVerificationStatus(e, liveResults) === "verified"
+  ).length;
+
+  const unverifiedCount = entries.filter(
+    (e) => resolveVerificationStatus(e, liveResults) === "unverified"
   ).length;
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base text-slate-800">
-            Execution Log
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base text-slate-800">
+              Execution Log
+            </CardTitle>
+            {verifying && (
+              <RefreshCw className="w-3.5 h-3.5 text-slate-400 animate-spin" />
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
             {unverifiedCount > 0 && (
@@ -241,8 +343,8 @@ export default function ExecutionLogPanel() {
         </div>
 
         <p className="text-xs text-slate-400 mt-1">
-          Governance execution log — most recent first. Amber entries have not yet
-          been verified in GitHub.
+          Governance execution log — most recent first. Verification status is
+          determined automatically from GitHub.
         </p>
 
         {unverifiedCount > 0 && (
@@ -250,11 +352,12 @@ export default function ExecutionLogPanel() {
             <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
             <span>
               <strong>
-                {unverifiedCount} {unverifiedCount === 1 ? "entry" : "entries"} pending
+                {unverifiedCount}{" "}
+                {unverifiedCount === 1 ? "entry" : "entries"} pending
                 post-merge verification.
               </strong>{" "}
-              Open each entry and use the "Verify on GitHub" link to confirm
-              visibility after merge.
+              Verification updates automatically once the corresponding changes
+              are merged to main.
             </span>
           </div>
         )}
@@ -266,7 +369,9 @@ export default function ExecutionLogPanel() {
             No execution log entries found.
           </p>
         ) : (
-          entries.map((entry) => <EntryRow key={entry.id} entry={entry} />)
+          entries.map((entry) => (
+            <EntryRow key={entry.id} entry={entry} liveResults={liveResults} />
+          ))
         )}
       </CardContent>
     </Card>
