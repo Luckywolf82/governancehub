@@ -23,7 +23,7 @@
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
-//   gov-005   planned    / preliminary: true   — scope only; phased roadmap for app-native prompt dispatch governance
+//   gov-005   verified   / preliminary: false  — audit executed; no partial dispatch arch found; PromptProfileRegistry.jsx is one safe next step
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -240,14 +240,13 @@ export const AUDIT_INDEX = {
       title: "App-Native Prompt Dispatch Governance",
       category: "Governance",
       type: "Prompt Dispatch Governance Audit",
-      status: "planned",
+      status: "verified",
       date: "2026-03-16",
       projectId: "governancehub",
       projectSlug: "governancehub",
-      preliminary: true,
-      preliminaryNote: "All fields are preliminary scope definitions. No file inspection has been performed. Audit must be executed before any field is considered verified. No dispatch implementation may proceed until this audit reaches 'verified' status.",
-      evidenceSource: "preliminary",
-      summary: "Planned audit defining a safe phased roadmap for app-native prompt dispatch governance. Covers global repo context, prompt profiles, preview-before-send workflow, approval gate, a dispatch log distinct from PhaseExecutionLog, and staged target rollout. No dispatch implementation is included.",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary: "Audit executed by direct file inspection on 2026-03-16. No partial prompt dispatch architecture exists in the Admin system. Global repo context (ActiveRepoContext) exists for repository identity only — operator identity and dispatch scope remain gaps. No prompt profile logic, preview-before-send gate, approval gate, or dispatch log exists anywhere in the repository. PhaseExecutionLog is clean — dispatch history and execution history are not mixed. PromptProfileRegistry.jsx is confirmed as the correct minimum safe first artifact. One safe next step: create PromptProfileRegistry.jsx (schema only, no UI or dispatch logic).",
       problem: "GovernanceHub has no app-native prompt dispatch capability. Operators have no in-app path to generate, tailor, preview, approve, or dispatch prompts while maintaining governance traceability. Implementing dispatch without a phased governance roadmap risks bypassing the approval and audit trail requirements that govern all other structural actions in the system.",
       impact: "Without a governed dispatch mechanism, prompt generation will either be blocked entirely (no capability) or proceed outside the governance layer (no traceability). A planned audit with a staged roadmap provides the framework to implement dispatch incrementally without sacrificing traceability.",
       affectedFiles: [
@@ -259,7 +258,7 @@ export const AUDIT_INDEX = {
       requiredChange: "Execute this audit by inspecting all filesToRead to verify no partial prompt dispatch implementation already exists. Then implement Phase 1 only: create PromptProfileRegistry.jsx with the schema and governance constraints defined in the audit data file.",
       constraints: "No dispatch implementation may proceed until this audit is executed and status is changed to 'verified'. Profile registry creation is the only action permitted in Phase 1. Locked governance files must not be modified during audit execution. One structural change at a time.",
       acceptanceCriteria: "Audit executed by direct file inspection. PromptProfileRegistry.jsx created with all requiredProfileFields. No dispatchable prompt creatable without approvalStatus === 'approved'. Dispatch log implemented separately from PhaseExecutionLog. Preview step is a blocking gate. Staged rollout enforces sequential stage progression with per-stage approval.",
-      oneSafeNextStep: "Execute the audit: inspect all files listed in the data file's filesToRead to confirm no partial prompt dispatch implementation exists. Document findings and update this audit's status from 'planned' to 'verified'.",
+      oneSafeNextStep: "Create src/components/governance/PromptProfileRegistry.jsx with all requiredProfileFields defined in the audit data file. Schema and governance constraints only — no UI component, no dispatch logic.",
       dataFile: "src/components/audits/governance/prompt-dispatch-governance-audit-2026-03-16.jsx",
     },
 
