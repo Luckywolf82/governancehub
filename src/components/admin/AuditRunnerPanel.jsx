@@ -336,6 +336,13 @@ export default function AuditRunnerPanel({ onUseInOrchestrator }) {
   const [showOutput, setShowOutput] = useState(false);
   const [runId] = useState(() => `run-${Date.now().toString(36)}`);
   const [targetMode, setTargetMode] = useState(() => activeRepo ? "active-repo" : "canonical");
+  const [showVerifiedAudits, setShowVerifiedAudits] = useState(false);
+
+  // AUDIT_INDEX is a static module-level constant — entries never mutate at runtime.
+  const verifiedEntries = useMemo(
+    () => AUDIT_INDEX.entries.filter((e) => e.status === "verified"),
+    [] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   // Fallback to canonical mode if active repo is removed while active-repo mode is selected
   useEffect(() => {
@@ -370,6 +377,58 @@ export default function AuditRunnerPanel({ onUseInOrchestrator }) {
         </div>
         <Badge className="bg-slate-100 text-slate-600 text-xs">Beta</Badge>
       </div>
+
+      {/* Verified AUDIT_INDEX entries — create follow-up tasks */}
+      <Card>
+        <CardHeader className="pb-2 cursor-pointer" onClick={() => setShowVerifiedAudits((v) => !v)}>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-sm text-slate-700">Verifiserte audits (AUDIT_INDEX)</CardTitle>
+              <p className="text-xs text-slate-400 mt-0.5">Send en verifisert audit til Orchestrator for å opprette oppfølgingsoppgave</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-green-100 text-green-700 text-xs">{verifiedEntries.length} verified</Badge>
+              {showVerifiedAudits ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </div>
+          </div>
+        </CardHeader>
+        {showVerifiedAudits && (
+          <CardContent className="pt-0 space-y-3">
+            {verifiedEntries.length === 0 && (
+              <p className="text-xs text-slate-400 italic">Ingen verifiserte audits funnet i AUDIT_INDEX.</p>
+            )}
+            {verifiedEntries.map((entry) => (
+              <div key={entry.id} className="border border-slate-100 rounded p-3 space-y-2">
+                <div className="flex items-start justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-mono bg-green-50 text-green-700 border border-green-200 rounded px-1.5 py-0.5">{entry.id}</span>
+                    <span className="text-xs font-semibold text-slate-800">{entry.title}</span>
+                  </div>
+                  <Badge className="bg-green-100 text-green-700 text-xs shrink-0">verified</Badge>
+                </div>
+                {entry.summary && (
+                  <p className="text-xs text-slate-600">{entry.summary}</p>
+                )}
+                {entry.oneSafeNextStep && (
+                  <div className="flex items-start gap-1.5 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
+                    <span className="font-medium shrink-0">Next step:</span>
+                    <span>{entry.oneSafeNextStep}</span>
+                  </div>
+                )}
+                {onUseInOrchestrator && (
+                  <button
+                    onClick={() => onUseInOrchestrator(entry)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border bg-slate-800 text-white border-slate-800 hover:bg-slate-700 transition-colors"
+                  >
+                    <ArrowRightCircle className="w-3.5 h-3.5" />
+                    Opprett oppfølgingsoppgave
+                  </button>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        )}
+      </Card>
 
       {/* Target Mode Selection */}
       <Card>
