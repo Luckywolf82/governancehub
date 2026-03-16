@@ -311,6 +311,33 @@ export default function Admin() {
               <p className="text-sm text-slate-500">Roadmap, prioritering og referansepanel</p>
             </div>
 
+            {/* Strategy overview — compact operator-orientation card */}
+            <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Strategy overview</p>
+              <p className="text-xs text-slate-400">Current reference and planning surfaces. Use this tab for orientation and review, not as the primary active workflow.</p>
+              <div className="space-y-1.5 pt-0.5">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
+                  <span className="text-slate-700 font-medium">Roadmap and product context</span>
+                  <span className="ml-1 text-slate-400">· Product Intelligence panel below</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
+                  <span className="text-slate-700 font-medium">Governance reference and review</span>
+                  <span className="ml-1 text-slate-400">· Prompt approval status below</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
+                  <span className="text-slate-700 font-medium">Documentation and system context</span>
+                  <span className="ml-1 text-slate-400">· Reference links below</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs pt-0.5">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 mt-0.5" />
+                  <span className="text-slate-400">Grouping here is mixed and may be reorganized in a future step.</span>
+                </div>
+              </div>
+            </div>
+
             {/* Active repo context — lets operators send repo into downstream flows with one click */}
             {activeRepo ? (
               <Card>
