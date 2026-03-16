@@ -168,6 +168,47 @@ export default function Admin() {
               <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Strategy</p>
               <p className="text-sm text-slate-500">Roadmap, prioritering og referansepanel</p>
             </div>
+
+            {/* Active repo context — lets operators send repo into downstream flows with one click */}
+            {activeRepo ? (
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-start justify-between flex-wrap gap-3">
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Aktivt repo</p>
+                      <p className="text-sm font-semibold text-slate-800">{activeRepo.fullName}</p>
+                      {activeRepo.provider && (
+                        <p className="text-xs text-slate-500">{activeRepo.provider} · {activeRepo.owner}/{activeRepo.repo}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => setTab("Build Prep")}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border bg-slate-800 text-white border-slate-800 hover:bg-slate-700 transition-colors"
+                      >
+                        Generer Start Prompt →
+                      </button>
+                      <button
+                        onClick={() => setTab("Govern")}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
+                      >
+                        Kjør audit →
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs bg-emerald-50 border border-emerald-200 rounded px-3 py-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                    <span className="text-emerald-800">Repo-kontekst er aktiv og brukes automatisk i Orchestrator, Audit Runner og Start Prompt Generator.</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="flex items-center gap-2 text-xs bg-amber-50 border border-amber-200 rounded px-3 py-1.5 w-fit">
+                <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                <span className="font-medium text-amber-800">Ingen aktivt repo valgt</span>
+                <span className="text-amber-600">· Velg repo i toppmenyen for å bruke repo-kontekst i downstream-flyt</span>
+              </div>
+            )}
             <Card>
               <CardHeader>
                 <CardTitle>Prompt Approval Status</CardTitle>

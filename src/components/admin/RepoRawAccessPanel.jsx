@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle, Github } from "lucide-react";
+import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 // ── Inline manifest data ──────────────────────────────────────────────────────
@@ -11,6 +11,10 @@ import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main";
 const GH_BASE = "https://github.com/Luckywolf82/governancehub/blob/main";
+
+// The repository this manifest was generated from.
+// Used to determine whether the active repo matches the manifest source.
+const MANIFEST_REPO = { owner: "Luckywolf82", repo: "governancehub" };
 
 const MANIFEST = {
   _meta: { generatedAt: "2026-03-14", generatedBy: "manual-verified" },
@@ -237,10 +241,23 @@ export default function RepoRawAccessPanel() {
 
   return (
     <div className="space-y-4">
-      {activeRepo && (
-        <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
+      {/* Repo identity — always shown; status depends on whether activeRepo matches manifest source */}
+      {activeRepo &&
+      activeRepo.owner?.toLowerCase() === MANIFEST_REPO.owner.toLowerCase() &&
+      activeRepo.repo?.toLowerCase() === MANIFEST_REPO.repo.toLowerCase() ? (
+        <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-200 rounded px-3 py-2 text-xs text-emerald-800">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 mt-0.5 shrink-0" />
+          <span><strong>Repo-kjent:</strong> Aktivt repo samsvarer med manifest-kilde ({activeRepo.fullName}). Filene nedenfor er verifisert mot denne kilden.</span>
+        </div>
+      ) : activeRepo ? (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span><strong>Merk:</strong> Dette panelet viser kanonisk referanseinnhold for GovernanceHub, ikke innholdet fra aktivt valgt repo ({activeRepo.owner}/{activeRepo.repo}). Filene nedenfor er statiske GovernanceHub-referanser og endres ikke basert på valgt repo.</span>
+          <span><strong>Stale manifest-referanse:</strong> Aktivt repo er <strong>{activeRepo.fullName}</strong>, men dette panelet viser GovernanceHub-kanonisk manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). Filene nedenfor gjelder ikke aktivt valgt repo.</span>
+        </div>
+      ) : (
+        <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs text-slate-600">
+          <FileText className="w-3 h-3 mt-0.5 shrink-0" />
+          <span><strong>Ingen aktivt repo.</strong> Viser kanonisk GovernanceHub-manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). Velg aktivt repo i toppmenyen for repo-spesifikk visning.</span>
         </div>
       )}
       <Card>
@@ -249,7 +266,7 @@ export default function RepoRawAccessPanel() {
             <div>
               <CardTitle className="text-base text-slate-800">Repository Raw Access</CardTitle>
               <p className="text-xs text-slate-400 mt-0.5">
-                Kanonisk referanseinnhold · {allFiles.length} filer indeksert · Generert {MANIFEST._meta?.generatedAt}
+                Inspecting: {MANIFEST_REPO.owner}/{MANIFEST_REPO.repo} · {allFiles.length} filer · Generert {MANIFEST._meta?.generatedAt}
               </p>
             </div>
 
