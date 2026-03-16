@@ -81,6 +81,18 @@ export const displaysRegistryFields = [
   { field: "version", purpose: "Display profile version for audit traceability" },
   { field: "targetAudience", purpose: "Display the intended audience of the profile" },
   { field: "intentDescription", purpose: "Display the stated intent of the profile" },
+  {
+    field: "templateBody",
+    purpose:
+      "Display the governed prompt template body content — read-only visibility of governed content only; " +
+      "operational preview and variable resolution for dispatch remain blocked",
+  },
+  {
+    field: "allowedVariables",
+    purpose:
+      "Display the governed variable surface permitted in the template body — read-only visibility only; " +
+      "variable substitution and dispatch remain blocked",
+  },
   { field: "createdBy", purpose: "Display the profile author identity" },
   { field: "createdAt", purpose: "Display when the profile was created" },
   { field: "approvalStatus", purpose: "Display the current approval state from the vocabulary" },
