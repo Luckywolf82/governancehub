@@ -15,6 +15,7 @@ import GovernanceStarterKitPanel from "@/components/admin/GovernanceStarterKitPa
 import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 import BuildIntegrityBanner from "@/components/admin/BuildIntegrityBanner";
+import PromptApprovalGate from "@/components/admin/PromptApprovalGate";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
@@ -167,6 +168,14 @@ export default function Admin() {
               <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Strategy</p>
               <p className="text-sm text-slate-500">Roadmap, prioritering og referansepanel</p>
             </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Prompt Approval Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PromptApprovalGate />
+              </CardContent>
+            </Card>
             <ProductIntelligencePanel />
             <div className="border-t border-slate-200 pt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
