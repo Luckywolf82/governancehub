@@ -189,5 +189,24 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileApprovalPolicy.jsx modified to remove over-scoped condition and strengthen vocabulary source-of-truth comment — it is not a locked file. No other locked files modified.',
     },
+    {
+      id: 'Entry 12',
+      date: '2026-03-16',
+      task: 'Targeted governance cleanup — align PromptProfileApprovalPolicy with PromptProfileRegistry schema',
+      taskRequested: 'Remove policy references to fields and workflow concepts not defined in PromptProfileRegistry.requiredProfileFields. Ensure approval policy references only defined schema fields.',
+      changedFiles: [
+        'src/components/governance/PromptProfileApprovalPolicy.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'PromptProfileApprovalPolicy.jsx: removed policy condition referencing "reviewNote" — field is not defined in PromptProfileRegistry.requiredProfileFields.',
+        'PromptProfileApprovalPolicy.jsx: removed policy condition referencing "deprecationReason" — field is not defined in PromptProfileRegistry.requiredProfileFields.',
+        'PromptProfileApprovalPolicy.jsx: removed policy condition referencing "deprecatedAt" — field is not defined in PromptProfileRegistry.requiredProfileFields.',
+        'PromptProfileApprovalPolicy.jsx: removed "review cycle" condition — workflow concept not defined in any current governance artifact.',
+        'PhaseExecutionLog.jsx: appended Entry 12 for this schema/policy alignment cleanup.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended per governance logging rules. No other locked files modified.',
+    },
   ],
 };
