@@ -70,7 +70,6 @@ export const approvalTransitions = [
     label: "Approve profile",
     requiredActor: "governance-approver",
     conditions: [
-      "Profile must have been in pending-review for at least one review cycle.",
       "approvedBy must be a recognized governance-approver identity — not the same identity as createdBy.",
       "approvedAt must be set to the current date at time of approval.",
     ],
@@ -81,7 +80,6 @@ export const approvalTransitions = [
     label: "Return for revision",
     requiredActor: "governance-approver",
     conditions: [
-      "Rejection reason must be recorded in a review note (field: reviewNote).",
       "version field must be incremented before re-submission.",
     ],
   },
@@ -92,8 +90,6 @@ export const approvalTransitions = [
     requiredActor: "governance-approver",
     conditions: [
       "No in-flight dispatch operations may reference this profile at time of deprecation.",
-      "Deprecation reason must be recorded (field: deprecationReason).",
-      "deprecatedAt must be set to the current date.",
     ],
   },
   {
@@ -103,7 +99,6 @@ export const approvalTransitions = [
     requiredActor: "profile-author",
     conditions: [
       "Draft must not have been submitted for review at any point.",
-      "Deprecation reason must be recorded (field: deprecationReason).",
     ],
   },
 ];
