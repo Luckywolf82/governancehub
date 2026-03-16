@@ -1,7 +1,5 @@
 export const NEXT_SAFE_STEP = {
-  title: 'Post-merge verification — gov-004 implementation',
-  reason: 'ExecutionLogPanel.jsx has been added to the Admin Govern tab (gov-004). Unverified PhaseExecutionLog entries must be confirmed visible in GitHub after merge to close the governance lifecycle for this step.',
-  scope: 'ExecutionLogPanel, Admin Govern tab, PhaseExecutionLog unverified entries',
-  blockedBy: 'gov-004 implementation merge',
-  lifecycleStage: 'implementation_complete_pending_verification',
+  title: 'Governed execution path — DispatchAuthorizationSpec',
+  reason: 'ApprovedChangePlanSpec.jsx and ApprovedChangePromptSpec.jsx now exist. The next safe step is to define the governance contract for AI-agent dispatch before introducing execution-worker or PR-dispatch runtime.',
+  lifecycleStage: 'governed_execution_pipeline_planning',
 };
