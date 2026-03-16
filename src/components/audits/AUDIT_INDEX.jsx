@@ -17,7 +17,7 @@
 // ENTRY STATE SUMMARY
 //   arch-001  verified   / preliminary: false  — fully usable
 //   arch-002  verified   / preliminary: false  — canonical meta/finding model; Admin UI file placement consistency
-//   arch-003  verified   / preliminary: false  — AdminDashboard.jsx classified as deprecation candidate; Admin.jsx confirmed canonical shell
+//   arch-003  verified   / preliminary: false  — AdminDashboard.jsx: deprecation candidate; Admin.jsx: canonical shell; no broken import in AdminDashboard
 //   prod-001  orphaned   / preliminary: true   — problem verified; implementation fields preliminary
 //   prod-002  orphaned   / preliminary: true   — problem verified; blocked on prod-001 resolution
 //   gov-001   planned    / preliminary: true   — scope only; not executed
@@ -89,7 +89,7 @@ export const AUDIT_INDEX = {
       projectSlug: "governancehub",
       preliminary: false,
       evidenceSource: "repo-derived",
-      summary: "src/pages/AdminDashboard.jsx (exports RoadmapAdminPanel) classified as a deprecation candidate. The component is not registered in the router, has empty data objects, has a broken import path, and is not imported by any active component. Admin.jsx is confirmed as the canonical active admin shell. pages.config.js does not register AdminDashboard as a route.",
+      summary: "src/pages/AdminDashboard.jsx (exports RoadmapAdminPanel) classified as a deprecation candidate. The component is not registered in the router, has empty data objects, and is semantically misnamed. AdminDashboard.jsx itself has no broken import. Admin.jsx is confirmed as the canonical active admin shell. The stale-path issue is in src/components/ROADMAP.jsx, which lists a non-existent evidence path.",
       oneSafeNextStep: "Propose removal of src/pages/AdminDashboard.jsx in a dedicated follow-up task. Before removal: update the stale reference in src/components/ROADMAP.jsx that points to the non-existent src/components/admin/RoadmapAdminPanel.jsx.",
       dataFile: "src/components/audits/architecture/admin-roadmap-surface-placement-audit-2026-03-16.jsx",
     },
