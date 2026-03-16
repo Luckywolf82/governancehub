@@ -315,6 +315,48 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     setEnrichment((prev) => ({ ...prev, [name]: val }));
   }
 
+  // ── Manual GitHub lifecycle refresh ───────────────────────────────────────
+
+  async function refreshIssueStatus() {
+    if (!audit || !effectiveOwner.trim() || !effectiveRepo.trim()) return;
+    setCheckingIssueStatus(true);
+    try {
+      const res = await base44.functions.invoke('getGithubIssueForAudit', {
+        owner: effectiveOwner.trim(),
+        repo: effectiveRepo.trim(),
+        auditId: audit.id,
+      });
+      if (res.data) setIssueStatus(res.data);
+    } catch (err) {
+      // Silent fail — status check is non-critical
+      setIssueStatus(null);
+    } finally {
+      setCheckingIssueStatus(false);
+    }
+  }
+
+  async function refreshPrStatus() {
+    if (!audit || !effectiveOwner.trim() || !effectiveRepo.trim()) return;
+    setCheckingPrStatus(true);
+    try {
+      const res = await base44.functions.invoke('getGithubPrForAudit', {
+        owner: effectiveOwner.trim(),
+        repo: effectiveRepo.trim(),
+        auditId: audit.id,
+      });
+      if (res.data) setPrStatus(res.data);
+    } catch (err) {
+      // Silent fail — status check is non-critical
+      setPrStatus(null);
+    } finally {
+      setCheckingPrStatus(false);
+    }
+  }
+
+  async function refreshGithubLifecycle() {
+    await Promise.all([refreshIssueStatus(), refreshPrStatus()]);
+  }
+
   // ── Generated outputs ──────────────────────────────────────────────────────
 
   const recommendedStep = useMemo(() => {
@@ -954,6 +996,15 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               <div className="flex items-center gap-1.5 bg-slate-100 border-b border-slate-200 px-3 py-1.5">
                 <Github className="w-3.5 h-3.5 text-slate-500" />
                 <span className="text-xs font-semibold text-slate-600">GitHub Lifecycle</span>
+                <button
+                  onClick={refreshGithubLifecycle}
+                  disabled={checkingIssueStatus || checkingPrStatus || !effectiveOwner.trim() || !effectiveRepo.trim()}
+                  className="ml-auto inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 px-2 py-0.5 rounded border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="Oppdater GitHub-status for denne auditen"
+                >
+                  <RotateCcw className={`w-3 h-3 ${checkingIssueStatus || checkingPrStatus ? "animate-spin" : ""}`} />
+                  Oppdater GitHub-status
+                </button>
               </div>
               <div className="divide-y divide-slate-100">
 
