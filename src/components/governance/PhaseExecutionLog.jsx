@@ -224,5 +224,25 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptApprovalGateSpec.jsx is a net-new file — not a locked file at creation time. PromptProfileRegistry.jsx and PromptProfileApprovalPolicy.jsx not modified. No other locked files modified.',
     },
+    {
+      id: 'Entry 14',
+      date: '2026-03-16',
+      task: 'gov-004 implementation — ExecutionLogPanel and NextSafeStep lifecycle update',
+      taskRequested: 'Implement gov-004 acceptance criteria: ExecutionLogPanel.jsx renders PhaseExecutionLog entries with lifecycle status badges and GitHub verification links; Admin Govern tab includes ExecutionLogPanel; NextSafeStep reflects current lifecycle state.',
+      changedFiles: [
+        'src/components/admin/ExecutionLogPanel.jsx',
+        'src/pages/Admin.jsx',
+        'src/components/governance/NextSafeStep.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'ExecutionLogPanel.jsx (net-new): renders PHASE_EXECUTION_LOG.entries in reverse-chronological order. Derives lifecycle status from githubVisibility free-text using deriveVisibilityStatus(). Flags unverified entries with amber VisibilityBadge and amber background. Provides "Verify on GitHub" link for each unverified entry pointing to repository commits. Header shows counts: total, verified, not-yet-verified.',
+        'Admin.jsx: imports ExecutionLogPanel from @/components/admin/ExecutionLogPanel. Renders <ExecutionLogPanel /> in the Govern tab after GovernanceOrchestratorPanel, completing the audit → orchestrate → verify operator workflow.',
+        'NextSafeStep.jsx: updated title to post-merge verification for gov-004 implementation. Added lifecycleStage field (implementation_complete_pending_verification). Reflects current state where ExecutionLogPanel is implemented and unverified entries await GitHub confirmation.',
+        'PhaseExecutionLog.jsx: appended Entry 14 for this gov-004 implementation execution.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. NextSafeStep.jsx updated as explicitly required by gov-004 acceptance criteria. Admin.jsx and ExecutionLogPanel.jsx modified as the direct implementation targets. AUDIT_INDEX.jsx already registered gov-004 as verified in a prior step — not re-modified here.',
+    },
   ],
 };
