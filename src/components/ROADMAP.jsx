@@ -37,7 +37,7 @@ export const PRODUCT_INTELLIGENCE_AUDIT = {
     verifiedFromTankRadar: [
       "src/components/audits/product/product-intelligence-audit-2026-03-12.jsx",
       "src/components/roadmap/ROADMAP.jsx",
-      "src/components/admin/RoadmapAdminPanel.jsx",
+      "src/pages/AdminDashboard.jsx",
     ],
     evidenceLevel: [
       "code-observed",
