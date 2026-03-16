@@ -156,5 +156,21 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileRegistry.jsx is a net-new file — not a locked file at creation time. No other locked files modified.',
     },
+    {
+      id: 'Entry 10',
+      date: '2026-03-16',
+      task: 'gov-005 Phase 2 — Create PromptProfileApprovalPolicy.jsx (approval-governance artifact)',
+      taskRequested: 'Implement the first approval-governance step after PromptProfileRegistry. Create src/components/governance/PromptProfileApprovalPolicy.jsx as a pure schema/data artifact defining the approval path for prompt profiles. Define allowed approval transitions, governance roles, approval requirements, blocked capabilities before and after approval, and planned consuming components. No UI components, no approval workflow runtime logic, no dispatch logic, no preview/send capability, no backend automation.',
+      changedFiles: [
+        'src/components/governance/PromptProfileApprovalPolicy.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'PromptProfileApprovalPolicy.jsx (net-new): exports policyMeta, approvalStatusVocabulary (mirrors registry), approvalTransitions (5 allowed state transitions with requiredActor and conditions), governanceRoles (profile-author, governance-approver, system), approvalRequirements (7 pre-conditions for the approved transition), blockedCapabilitiesBeforeApproval (5 dispatch/preview/target capabilities blocked until approved), blockedCapabilitiesAfterApproval (4 capabilities blocked even after approval until future governance phases are verified), and consumingComponentsPlanned (5 future components with phase and usage notes). Schema-only — no runtime logic, no UI, no dispatch coupling.',
+        'PhaseExecutionLog.jsx: appended Entry 10 for this gov-005 Phase 2 execution.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileApprovalPolicy.jsx is a net-new file — not a locked file at creation time. No other locked files modified.',
+    },
   ],
 };
