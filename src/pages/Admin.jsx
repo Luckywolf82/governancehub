@@ -23,12 +23,12 @@ import Verification from "@/components/governance/Verification";
 import ExecutionLog from "@/components/governance/ExecutionLog";
 import { NEXT_SAFE_STEP } from "@/components/governance/NextSafeStep";
 
-const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
+const TABS = ["Setup", "Build Prep", "Govern", "Strategy"];
 
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("Govern");
+  const [tab, setTab] = useState("Setup");
   const [injectedAudit, setInjectedAudit] = useState(null);
   const [pipelineOpen, setPipelineOpen] = useState(false);
   const { activeRepo } = useActiveRepo();
