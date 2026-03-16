@@ -21,6 +21,7 @@ import PromptPreviewPanel from "@/components/admin/PromptPreviewPanel";
 import ExecutionWorker from "@/components/governance/ExecutionWorker";
 import Verification from "@/components/governance/Verification";
 import ExecutionLog from "@/components/governance/ExecutionLog";
+import { NEXT_SAFE_STEP } from "@/components/governance/NextSafeStep";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
@@ -96,6 +97,11 @@ export default function Admin() {
               <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-0.5">Govern</p>
               <p className="text-sm text-slate-500 mb-1">Kjør audit, send til Orchestrator, opprett issue og verifiser</p>
               <p className="text-xs text-slate-400 bg-slate-100 rounded px-3 py-1.5 inline-block">Kjør audit → Bruk i Orchestrator → Opprett issue → Verifiser</p>
+            </div>
+            <div className="border border-slate-300 bg-white rounded-md px-4 py-3 space-y-1">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Canonical next safe step</p>
+              <p className="text-sm font-semibold text-slate-800">{NEXT_SAFE_STEP.title}</p>
+              <p className="text-xs text-slate-500">{NEXT_SAFE_STEP.reason}</p>
             </div>
             {activeRepo ? (
               <div className="flex items-center gap-2 text-xs bg-emerald-50 border border-emerald-200 rounded px-3 py-1.5 w-fit">
