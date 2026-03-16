@@ -192,7 +192,8 @@ export function buildExecutionLogDraft(
   hasManualData,
   enrichedFields,
   isLockedPath,
-  lockedRuleFor
+  lockedRuleFor,
+  verificationNotes = ""
 ) {
   if (!audit) return null;
 
@@ -249,6 +250,11 @@ export function buildExecutionLogDraft(
     `FOLLOW-UP`,
     audit.oneSafeNextStep ? `Registry next safe step: ${audit.oneSafeNextStep}` : "(no oneSafeNextStep defined — review manually)",
     hasManualData ? `Note: Manual enrichment was applied for: ${enrichedFields.join(", ")}` : null,
+    verificationNotes.trim() ? `` : null,
+    verificationNotes.trim() ? `VERIFICATION AFTER MERGE` : null,
+    verificationNotes.trim()
+      ? verificationNotes.trim().split("\n").map((line) => `  - ${line.trim()}`).join("\n")
+      : null,
   ].filter((l) => l !== null).join("\n").trim();
 
   const summaryOnly = `${today} — ${audit.title} (${audit.id}) — ${source} — ${readiness ?? "unknown"}`;
