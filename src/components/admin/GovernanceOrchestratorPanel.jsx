@@ -451,6 +451,14 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
     );
   }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
 
+  // ── Ready-for-verification derived state ──────────────────────────────────
+  // True when: PR exists AND PR is merged/closed (code integrated) AND issue is no longer the active next action.
+  const readyForVerification = useMemo(() => {
+    const prDone = prStatus?.found && (prStatus.merged === true || prStatus.state === "closed");
+    const issueNoLongerActive = !issueStatus?.found || issueStatus?.state === "closed";
+    return prDone && issueNoLongerActive;
+  }, [prStatus, issueStatus]);
+
   // ── Derived guards ─────────────────────────────────────────────────────────
   const requiresAnalysisConfirm = readiness === "analysis-first";
   // Active issue body/labels: depend on createMode (copilot_task vs normal github_issue)
@@ -855,6 +863,66 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
             </div>
           </CardHeader>
           <CardContent className="pt-0 space-y-3">
+
+            {/* ── Lifecycle Status Block ── */}
+            <div className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-100 rounded px-3 py-2">
+              <span className="text-xs font-medium text-slate-500 shrink-0">Lifecycle:</span>
+
+              {/* Issue badge */}
+              {issueStatus === null && !checkingIssueStatus && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-500 border-gray-200">Issue: —</span>
+              )}
+              {checkingIssueStatus && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-400 border-gray-200 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block" />
+                  Issue: checking
+                </span>
+              )}
+              {!checkingIssueStatus && issueStatus !== null && !issueStatus.found && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-500 border-gray-200">Issue: none</span>
+              )}
+              {!checkingIssueStatus && issueStatus?.found && issueStatus.state === "open" && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-blue-100 text-blue-800 border-blue-200">Issue: open</span>
+              )}
+              {!checkingIssueStatus && issueStatus?.found && issueStatus.state !== "open" && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-green-100 text-green-700 border-green-200">Issue: closed</span>
+              )}
+
+              <span className="text-slate-300 text-xs">|</span>
+
+              {/* PR badge */}
+              {prStatus === null && !checkingPrStatus && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-500 border-gray-200">PR: —</span>
+              )}
+              {checkingPrStatus && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-400 border-gray-200 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block" />
+                  PR: checking
+                </span>
+              )}
+              {!checkingPrStatus && prStatus !== null && !prStatus.found && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-500 border-gray-200">PR: none</span>
+              )}
+              {!checkingPrStatus && prStatus?.found && prStatus.state === "open" && (
+                <span className="text-xs px-2 py-0.5 rounded border bg-blue-100 text-blue-800 border-blue-200">PR: open</span>
+              )}
+              {!checkingPrStatus && prStatus?.found && prStatus.state !== "open" && (prStatus.merged ? (
+                <span className="text-xs px-2 py-0.5 rounded border bg-green-100 text-green-700 border-green-200">PR: merged</span>
+              ) : (
+                <span className="text-xs px-2 py-0.5 rounded border bg-amber-100 text-amber-700 border-amber-200">PR: closed</span>
+              ))}
+
+              {/* Ready for verification badge */}
+              {readyForVerification && (
+                <>
+                  <span className="text-slate-300 text-xs">|</span>
+                  <span className="text-xs px-2 py-0.5 rounded border bg-green-100 text-green-700 border-green-300 font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 shrink-0" />
+                    Ready for verification
+                  </span>
+                </>
+              )}
+            </div>
 
             {/* Title row */}
             <div className="flex items-center justify-between gap-2">
