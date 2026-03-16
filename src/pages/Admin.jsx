@@ -29,6 +29,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("Govern");
   const [injectedAudit, setInjectedAudit] = useState(null);
+  const [pipelineOpen, setPipelineOpen] = useState(false);
   const { activeRepo } = useActiveRepo();
 
   useEffect(() => {
@@ -117,19 +118,32 @@ export default function Admin() {
               <ExecutionLogPanel />
             </div>
             <div className="border-t border-slate-200 pt-4">
-              <DispatchReviewPanel />
-            </div>
-            <div className="border-t border-slate-200 pt-4">
-              <PromptPreviewPanel />
-            </div>
-            <div className="border-t border-slate-200 pt-4">
-              <ExecutionWorker />
-            </div>
-            <div className="border-t border-slate-200 pt-4">
-              <Verification />
-            </div>
-            <div className="border-t border-slate-200 pt-4">
-              <ExecutionLog />
+              <button
+                type="button"
+                onClick={() => setPipelineOpen((v) => !v)}
+                className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors w-full text-left"
+              >
+                <span className={`inline-block transition-transform duration-150 ${pipelineOpen ? "rotate-90" : ""}`}>▶</span>
+                Execution pipeline (preview — non-operational)
+                <span className="ml-1 text-slate-400 font-normal">· gov-006 · collapsed by default</span>
+              </button>
+              {pipelineOpen && (
+                <div className="space-y-4 mt-4">
+                  <DispatchReviewPanel />
+                  <div className="border-t border-slate-200 pt-4">
+                    <PromptPreviewPanel />
+                  </div>
+                  <div className="border-t border-slate-200 pt-4">
+                    <ExecutionWorker />
+                  </div>
+                  <div className="border-t border-slate-200 pt-4">
+                    <Verification />
+                  </div>
+                  <div className="border-t border-slate-200 pt-4">
+                    <ExecutionLog />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
