@@ -26,6 +26,7 @@
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
 //   gov-005   verified   / preliminary: false  — audit executed; no partial dispatch arch found; PromptProfileRegistry.jsx is one safe next step
 //   perf-001  planned    / preliminary: true   — scope only; not executed
+//   ui-001    verified   / preliminary: false  — Admin workflow/UI clarity audit; Govern tab overload; no onboarding gate; NEXT_SAFE_STEP invisible; 5 non-operational gov-006 panels inflate Govern tab
 
 export const AUDIT_INDEX = {
   entries: [
@@ -298,6 +299,25 @@ export const AUDIT_INDEX = {
       constraints: "Audit definition only. Do not implement performance measurement tooling yet.",
       acceptanceCriteria: "A future performance audit dataFile is created and linked from this entry.",
       oneSafeNextStep: "Design the performance audit scope and measurement criteria.",
+    },
+
+    {
+      id: "ui-001",
+      title: "Admin Workflow and UI Clarity Audit",
+      category: "ui",
+      type: "Workflow and UX Clarity Audit",
+      status: "verified",
+      date: "2026-03-16",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary:
+        "Deep audit of the Admin workflow and UI clarity. Key findings: (1) Govern tab is the default but Setup is the prerequisite — tab ordering is inverted. (2) Govern tab has 8 stacked panels, 5 of which are non-operational gov-006 scaffolding with no current actionable value. (3) NEXT_SAFE_STEP exists as governance data but is never surfaced as a primary CTA. (4) Active repo selector is split between the global header and inline banners across three tabs. (5) There is no onboarding gate, no readiness signal, and no progressive disclosure. (6) Mobile/webview deployment of the current structure is high-risk. One safe next step: wrap the 5 non-operational gov-006 panels in a collapsed-by-default disclosure section in the Govern tab.",
+      oneSafeNextStep:
+        "Wrap the 5 non-operational gov-006 Govern-tab panels (DispatchReviewPanel, PromptPreviewPanel, ExecutionWorker, Verification, ExecutionLog) in a collapsed-by-default disclosure section in Admin.jsx labeled 'Execution pipeline (preview — non-operational)'. This is a localized Admin.jsx-only change, fully reversible, and immediately reduces Govern tab scroll-depth overload.",
+      dataFile:
+        "src/components/audits/ui/admin-workflow-ui-audit-2026-03-16.jsx",
     },
   ],
 };
