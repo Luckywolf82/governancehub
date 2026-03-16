@@ -15,6 +15,7 @@ function laneFor(tier) {
 
 // Recommended build sequence — foundation-first, respects dependencies
 const RECOMMENDED_BUILD_SEQUENCE = [
+  // ── Foundational governance and product tracks ─────────────────────────────
   "repo-onboarding-flow",
   "start-prompt-generator",
   "governance-starter-kit-export",
@@ -28,13 +29,23 @@ const RECOMMENDED_BUILD_SEQUENCE = [
   "roadmap-generator",
   "project-intelligence-engine",
   "cross-repo-dashboard",
+  // ── Governed execution pipeline (later phase) ──────────────────────────────
+  // Sequence: Audit → ApprovedChangePlan → Deterministic Prompt
+  //           → Dispatch Authorization → Execution Worker
+  //           → PR Registration → Verification → Execution Log
+  "dispatch-authorization-spec",
+  "dispatch-review-panel",
+  "execution-worker-spec",
+  "execution-worker",
+  "pr-registration-linkage",
+  "verification-runner-refinement",
 ];
 
 const allIdeas = IDEA_PRIORITY_AUDIT.ideas;
 
 export const ROADMAP = {
-  version: "1.0.0",
-  updatedAt: "2026-03-15",
+  version: "1.1.0",
+  updatedAt: "2026-03-16",
   derivedFrom: IDEA_PRIORITY_AUDIT.auditId,
   lanes: {
     now:   laneFor("now"),
