@@ -61,7 +61,7 @@ export const AUDIT_INDEX = {
       requiredChange: "Remove src/components/AdminDashboard.jsx — it is an exact duplicate of src/pages/AdminDashboard.jsx and is not registered in the router. This is the one safe first step. Subsequent steps: create src/components/audits/product/, move misplaced audit files, and update PhaseExecutionLog stale reference.",
       constraints: "One structural change at a time. Do not modify src/pages/AdminDashboard.jsx. Do not touch canonical governance files. Append PhaseExecutionLog entry after each verified change.",
       acceptanceCriteria: "src/components/AdminDashboard.jsx removed and confirmed absent from GitHub. No new broken imports introduced. Follow-up issues for misplaced product audit files and missing directory documented.",
-      oneSafeNextStep: "Remove src/components/AdminDashboard.jsx only.",
+      oneSafeNextStep: "src/components/AdminDashboard.jsx confirmed absent (removed in PR #32). Next step: author verified product intelligence audit content at src/components/audits/product/product-intelligence-audit-2026-03-12.jsx to resolve prod-001 orphaned audit.",
     },
 
     {

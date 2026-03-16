@@ -314,5 +314,26 @@ export const PHASE_EXECUTION_LOG = {
       githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Freplace-manual-verification',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended per governance logging rules. ExecutionLogPanel.jsx modified as the explicit implementation target. No other locked files modified.',
     },
+    {
+      id: 'Entry 16',
+      date: '2026-03-16',
+      task: 'arch-001 step 1 — Confirm src/components/AdminDashboard.jsx absent',
+      taskRequested: 'Implement arch-001 required change: Remove src/components/AdminDashboard.jsx (duplicate of src/pages/AdminDashboard.jsx, not registered in router). Append PhaseExecutionLog entry after verified change per arch-001 constraints.',
+      changedFiles: [
+        'src/components/governance/PhaseExecutionLog.jsx',
+        'src/components/audits/AUDIT_INDEX.jsx',
+      ],
+      diffSummary: [
+        'src/components/AdminDashboard.jsx: confirmed absent from repository. File was removed in PR #32 (merged to main). Acceptance criteria for arch-001 step 1 met — file is absent from GitHub with no new broken imports introduced.',
+        'AUDIT_INDEX.jsx: arch-001 oneSafeNextStep updated from stale removal instruction to the next structural step: authoring verified content at src/components/audits/product/product-intelligence-audit-2026-03-12.jsx (addresses prod-001 orphaned audit). prod-001 and prod-002 entries already document the misplaced-file follow-ups.',
+        'PhaseExecutionLog.jsx: appended Entry 16 for this arch-001 step 1 verification.',
+      ],
+      githubVisibility: 'Not yet verified',
+      verificationTargetType: 'pull_request',
+      verificationTargetValue: 'copilot/fix-file-placement-issues',
+      verificationBranch: 'main',
+      githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Ffix-file-placement-issues',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended per governance logging rules. AUDIT_INDEX.jsx arch-001 oneSafeNextStep updated to reflect step 1 completion and identify next structural step. No other locked files modified.',
+    },
   ],
 };
