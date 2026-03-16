@@ -70,6 +70,23 @@ function getBestDefaultAudit(entries) {
   return entries[0]?.id ?? "";
 }
 
+// ── dataFile resolver ────────────────────────────────────────────────────────
+// Pre-declare glob so Vite can statically bundle all audit data files.
+const _auditDataModules = import.meta.glob("/src/components/audits/**/*.jsx");
+
+async function resolveAudit(entry) {
+  if (!entry?.dataFile) return entry;
+  // dataFile paths are project-root-relative (e.g. "src/components/audits/...").
+  // Prefix with "/" so the key matches the import.meta.glob map.
+  const key = entry.dataFile.startsWith("/") ? entry.dataFile : `/${entry.dataFile}`;
+  const loader = _auditDataModules[key];
+  if (!loader) return entry;
+  const module = await loader();
+  // Audit files export a single named constant — take the first (and only) export value.
+  const exportedAudit = Object.values(module)[0];
+  return exportedAudit ?? entry;
+}
+
 // ── CopyBtn ─────────────────────────────────────────────────────────────────
 
 function CopyBtn({ value, label }) {
@@ -118,6 +135,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   const [confirmedFiles, setConfirmedFiles] = useState("");
   const [actualChangeSummary, setActualChangeSummary] = useState("");
 
+  // ── dataFile resolution state ─────────────────────────────────────────────
+  const [resolvedAuditData, setResolvedAuditData] = useState(null);
+  const [resolvedAuditId, setResolvedAuditId] = useState(null);
+
   // ── GitHub Issue Create state ──────────────────────────────────────────────
   const [ghOwner, setGhOwner] = useState("");
   const [ghRepo, setGhRepo] = useState("");
@@ -159,7 +180,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
   // Merge audit index data with manual enrichment; track which fields came from enrichment
   const { audit, enrichedFields } = useMemo(() => {
     if (!baseAudit) return { audit: null, enrichedFields: [] };
-    const normalizedBase = normalizeAuditShape(baseAudit);
+    const effectiveBase = (resolvedAuditData && resolvedAuditId === baseAudit.id)
+      ? resolvedAuditData
+      : baseAudit;
+    const normalizedBase = normalizeAuditShape(effectiveBase);
     // For injected audits, skip enrichment merge — fields are already populated by Audit Runner
     if (isInjected) return { audit: normalizedBase, enrichedFields: [] };
     const merged = { ...normalizedBase };
@@ -172,7 +196,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       }
     });
     return { audit: merged, enrichedFields: used };
-  }, [baseAudit, enrichment]);
+  }, [baseAudit, enrichment, resolvedAuditData, resolvedAuditId]);
   const hasManualData = enrichedFields.length > 0;
 
   const missing = audit ? missingFields(audit) : [];
@@ -185,6 +209,31 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       setSelectedId(orderedEntries[0].id);
     }
   }, [isInjected, selectedId, orderedEntries]);
+
+  // Resolve canonical audit from dataFile when present
+  useEffect(() => {
+    if (!baseAudit?.dataFile) {
+      setResolvedAuditData(null);
+      setResolvedAuditId(null);
+      return;
+    }
+    let cancelled = false;
+    resolveAudit(baseAudit)
+      .then((resolved) => {
+        if (!cancelled) {
+          setResolvedAuditData(resolved);
+          setResolvedAuditId(baseAudit.id);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error(`[GovernanceOrchestratorPanel] Failed to load dataFile for ${baseAudit.id}:`, err);
+          setResolvedAuditData(null);
+          setResolvedAuditId(null);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [baseAudit]);
 
   // Auto-open outputs section for execution-ready audits
   useEffect(() => {
