@@ -100,32 +100,32 @@ export default function Admin() {
             </div>
             {/* Govern workflow framing shell — compact operator-orientation card */}
             <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Govern workflow</p>
-              <p className="text-xs text-slate-400">Active governed development cycle. Use the panels below to run audits, prepare next governed steps, and review implementation progress.</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Govern · arbeidsflyt</p>
+              <p className="text-xs text-slate-400">Aktivt styringssyklus. Bruk panelene nedenfor for å kjøre audit, forberede neste styrte steg og gjennomgå implementasjon.</p>
               <div className="space-y-1.5 pt-0.5">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400 font-medium shrink-0 w-4">1.</span>
-                  <span className="text-slate-700 font-medium">Run audit</span>
-                  <span className="ml-1 text-slate-400">· Use Audit Runner below</span>
+                  <span className="text-slate-700 font-medium">Kjør audit</span>
+                  <span className="ml-1 text-slate-400">· Bruk Audit Runner nedenfor</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400 font-medium shrink-0 w-4">2.</span>
-                  <span className="text-slate-700 font-medium">Review in orchestrator</span>
-                  <span className="ml-1 text-slate-400">· Send audit result to Governance Orchestrator to prepare next governed step</span>
+                  <span className="text-slate-700 font-medium">Gjennomgå i Orchestrator</span>
+                  <span className="ml-1 text-slate-400">· Send auditresultat for å forberede neste styrte steg</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400 font-medium shrink-0 w-4">3.</span>
-                  <span className="text-slate-700 font-medium">Prepare next action</span>
-                  <span className="ml-1 text-slate-400">· Create issue or document the next governed step manually</span>
+                  <span className="text-slate-700 font-medium">Forbered neste steg</span>
+                  <span className="ml-1 text-slate-400">· Opprett issue eller dokumenter neste styrte steg manuelt</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400 font-medium shrink-0 w-4">4.</span>
-                  <span className="text-slate-700 font-medium">Review execution log</span>
-                  <span className="ml-1 text-slate-400">· Review log entries after implementation</span>
+                  <span className="text-slate-700 font-medium">Gjennomgå eksekusjonslogg</span>
+                  <span className="ml-1 text-slate-400">· Se loggoppføringer etter implementasjon</span>
                 </div>
                 <div className="flex items-start gap-2 text-xs pt-0.5">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 mt-0.5" />
-                  <span className="text-slate-400">Downstream execution pipeline preview is available below and remains non-operational.</span>
+                  <span className="text-slate-400">Downstream execution pipeline er tilgjengelig nedenfor og er ikke operativ.</span>
                 </div>
               </div>
             </div>
@@ -195,34 +195,34 @@ export default function Admin() {
 
             {/* Setup Readiness — compact operator-orientation card */}
             <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Setup readiness</p>
-              <p className="text-xs text-slate-400">Quick prerequisite overview before continuing to Build Prep and Govern.</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Setup · forutsetninger</p>
+              <p className="text-xs text-slate-400">Oversikt over forutsetninger før du fortsetter til Build Prep og Govern.</p>
               <div className="space-y-1.5 pt-0.5">
                 {/* Row 1: active repo — truly deterministic */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-amber-400"}`} />
-                  <span className="text-slate-700 font-medium">Active repo</span>
+                  <span className="text-slate-700 font-medium">Aktivt repo</span>
                   <span className={`ml-1 ${activeRepo ? "text-emerald-700" : "text-amber-700"}`}>
-                    {activeRepo ? `Selected · ${activeRepo.fullName}` : "Not selected · select a repo from the top menu"}
+                    {activeRepo ? `Valgt · ${activeRepo.fullName}` : "Ikke valgt · velg repo i toppmenyen"}
                   </span>
                 </div>
                 {/* Row 2: repository registration panel — informational */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Repository registration</span>
-                  <span className="ml-1 text-slate-400">Managed below in Setup</span>
+                  <span className="text-slate-700 font-medium">Repository-registrering</span>
+                  <span className="ml-1 text-slate-400">Administrert nedenfor i Setup</span>
                 </div>
                 {/* Row 3: project bootstrap — informational */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Project bootstrap</span>
-                  <span className="ml-1 text-slate-400">Available below in Setup</span>
+                  <span className="text-slate-700 font-medium">Prosjekt-bootstrap</span>
+                  <span className="ml-1 text-slate-400">Tilgjengelig nedenfor i Setup</span>
                 </div>
                 {/* Row 4: governance installation — informational */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Governance installation</span>
-                  <span className="ml-1 text-slate-400">Continues in Build Prep</span>
+                  <span className="text-slate-700 font-medium">Governance-installasjon</span>
+                  <span className="ml-1 text-slate-400">Fortsetter i Build Prep</span>
                 </div>
               </div>
             </div>
@@ -248,34 +248,34 @@ export default function Admin() {
 
             {/* Build Prep Readiness — compact operator-orientation card */}
             <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Build Prep readiness</p>
-              <p className="text-xs text-slate-400">Quick overview before generating prompts or installing governance starter-kit materials.</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Build Prep · forberedelser</p>
+              <p className="text-xs text-slate-400">Oversikt over forberedelser før du genererer prompt eller installerer governance starter kit.</p>
               <div className="space-y-1.5 pt-0.5">
                 {/* Row 1: active repo — truly deterministic */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-amber-400"}`} />
-                  <span className="text-slate-700 font-medium">Active repo</span>
+                  <span className="text-slate-700 font-medium">Aktivt repo</span>
                   <span className={`ml-1 ${activeRepo ? "text-emerald-700" : "text-amber-700"}`}>
-                    {activeRepo ? `Selected · ${activeRepo.fullName}` : "Not selected · select a repo from the top menu"}
+                    {activeRepo ? `Valgt · ${activeRepo.fullName}` : "Ikke valgt · velg repo i toppmenyen"}
                   </span>
                 </div>
                 {/* Row 2: start prompt generation — informational */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Start prompt generation</span>
-                  <span className="ml-1 text-slate-400">Available below</span>
+                  <span className="text-slate-700 font-medium">Start Prompt-generering</span>
+                  <span className="ml-1 text-slate-400">Tilgjengelig nedenfor</span>
                 </div>
                 {/* Row 3: governance starter kit — informational */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
                   <span className="text-slate-700 font-medium">Governance starter kit</span>
-                  <span className="ml-1 text-slate-400">Managed below</span>
+                  <span className="ml-1 text-slate-400">Administrert nedenfor</span>
                 </div>
                 {/* Row 4: govern workflow — informational */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Govern workflow</span>
-                  <span className="ml-1 text-slate-400">Continues in Govern after Build Prep</span>
+                  <span className="text-slate-700 font-medium">Govern-arbeidsflyt</span>
+                  <span className="ml-1 text-slate-400">Fortsetter i Govern etter Build Prep</span>
                 </div>
               </div>
             </div>
@@ -313,27 +313,27 @@ export default function Admin() {
 
             {/* Strategy overview — compact operator-orientation card */}
             <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Strategy overview</p>
-              <p className="text-xs text-slate-400">Current reference and planning surfaces. Use this tab for orientation and review, not as the primary active workflow.</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Strategy · referanse</p>
+              <p className="text-xs text-slate-400">Referanse- og planleggingsflater. Bruk denne fanen til orientering og gjennomgang, ikke som primær aktiv arbeidsflyt.</p>
               <div className="space-y-1.5 pt-0.5">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Roadmap and product context</span>
-                  <span className="ml-1 text-slate-400">· Product Intelligence panel below</span>
+                  <span className="text-slate-700 font-medium">Roadmap og produktkontekst</span>
+                  <span className="ml-1 text-slate-400">· Product Intelligence-panelet nedenfor</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Governance reference and review</span>
-                  <span className="ml-1 text-slate-400">· Prompt approval status below</span>
+                  <span className="text-slate-700 font-medium">Governance-referanse og gjennomgang</span>
+                  <span className="ml-1 text-slate-400">· Prompt approval-status nedenfor</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300" />
-                  <span className="text-slate-700 font-medium">Documentation and system context</span>
-                  <span className="ml-1 text-slate-400">· Reference links below</span>
+                  <span className="text-slate-700 font-medium">Dokumentasjon og systemkontekst</span>
+                  <span className="ml-1 text-slate-400">· Referanselenker nedenfor</span>
                 </div>
                 <div className="flex items-start gap-2 text-xs pt-0.5">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 mt-0.5" />
-                  <span className="text-slate-400">Grouping here is mixed and may be reorganized in a future step.</span>
+                  <span className="text-slate-400">Grupperingen her er blandet og kan omorganiseres i et fremtidigt steg.</span>
                 </div>
               </div>
             </div>
