@@ -16,6 +16,7 @@ import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 import BuildIntegrityBanner from "@/components/admin/BuildIntegrityBanner";
 import PromptApprovalGate from "@/components/admin/PromptApprovalGate";
+import DispatchReviewPanel from "@/components/admin/DispatchReviewPanel";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
@@ -110,6 +111,9 @@ export default function Admin() {
             </div>
             <div className="border-t border-slate-200 pt-4">
               <ExecutionLogPanel />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
+              <DispatchReviewPanel />
             </div>
           </div>
         )}
