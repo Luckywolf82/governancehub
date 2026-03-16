@@ -150,7 +150,7 @@ export const PHASE_EXECUTION_LOG = {
         'src/components/governance/PhaseExecutionLog.jsx',
       ],
       diffSummary: [
-        'PromptProfileRegistry.jsx (net-new): exports requiredProfileFields array (12 fields), governanceConstraints array (4 constraints), allowedTargets array (3 staged-rollout targets: internal/pilot/full), approvalStatusVocabulary array, and PROMPT_PROFILE_REGISTRY object (meta + 2 draft profiles: profile-001 Governance Status Update, profile-002 Audit Completion Notice). Pure schema/data — no UI components, no dispatch logic.',
+        'PromptProfileRegistry.jsx (net-new): exports requiredProfileFields array (12 fields), governanceConstraints array (4 constraints), approvalStatusVocabulary array, and PROMPT_PROFILE_REGISTRY object (meta + empty profiles array). Schema-only — no populated draft profiles, no rollout policy (allowedTargets belongs with future PromptRolloutPanel per gov-005 Section 6), no UI components, no dispatch logic.',
         'PhaseExecutionLog.jsx: appended Entry 9 for this gov-005 Phase 1 execution.',
       ],
       githubVisibility: 'Not yet verified',
