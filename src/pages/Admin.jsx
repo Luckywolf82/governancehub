@@ -20,6 +20,7 @@ import DispatchReviewPanel from "@/components/admin/DispatchReviewPanel";
 import PromptPreviewPanel from "@/components/admin/PromptPreviewPanel";
 import ExecutionWorker from "@/components/governance/ExecutionWorker";
 import Verification from "@/components/governance/Verification";
+import ExecutionLog from "@/components/governance/ExecutionLog";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
@@ -126,6 +127,9 @@ export default function Admin() {
             </div>
             <div className="border-t border-slate-200 pt-4">
               <Verification />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
+              <ExecutionLog />
             </div>
           </div>
         )}
