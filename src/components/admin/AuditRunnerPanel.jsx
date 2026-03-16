@@ -19,7 +19,8 @@ const PLACEHOLDER_PATTERNS = ["New Base44 App", "YYYY-MM-DD", "yourname/yourrepo
 
 // Extract locked file paths mentioned in AI_PROJECT_INSTRUCTIONS text
 function extractLockedPathsFromInstructions(text) {
-  const lines = text.split("\n");
+  const str = typeof text === "string" ? text : JSON.stringify(text, null, 2);
+  const lines = str.split("\n");
   const paths = [];
   let inLockedSection = false;
   for (const line of lines) {
