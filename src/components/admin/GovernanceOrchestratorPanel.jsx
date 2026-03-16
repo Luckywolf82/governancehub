@@ -924,6 +924,129 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
               )}
             </div>
 
+            {/* ── GitHub Lifecycle Panel ── */}
+            <div className="border border-slate-200 rounded-md overflow-hidden">
+              <div className="flex items-center gap-1.5 bg-slate-100 border-b border-slate-200 px-3 py-1.5">
+                <Github className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-xs font-semibold text-slate-600">GitHub Lifecycle</span>
+              </div>
+              <div className="divide-y divide-slate-100">
+
+                {/* Issue row */}
+                <div className="flex items-start justify-between gap-2 px-3 py-2">
+                  <div className="text-xs min-w-0">
+                    <p className="font-medium text-slate-500 mb-0.5">Issue</p>
+                    {checkingIssueStatus && (
+                      <span className="flex items-center gap-1 text-slate-400 italic">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse inline-block" />
+                        Checking…
+                      </span>
+                    )}
+                    {!checkingIssueStatus && issueStatus?.found && (
+                      <div className="space-y-0.5">
+                        <p className="font-semibold text-slate-800">
+                          #{issueStatus.number}
+                          <span className="font-normal text-slate-600 ml-1 truncate" title={issueStatus.title}>{issueStatus.title}</span>
+                        </p>
+                        <span className={`inline-block text-xs font-medium px-1.5 py-0.5 rounded ${
+                          issueStatus.state === 'open'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {issueStatus.state === 'open' ? 'OPEN' : 'CLOSED'}
+                        </span>
+                      </div>
+                    )}
+                    {!checkingIssueStatus && issueStatus !== null && !issueStatus.found && (
+                      <span className="text-slate-400 italic">No issue found</span>
+                    )}
+                    {!checkingIssueStatus && issueStatus === null && (
+                      <span className="text-slate-400 italic">—</span>
+                    )}
+                  </div>
+                  {!checkingIssueStatus && issueStatus?.found && issueStatus.url && (
+                    <a
+                      href={issueStatus.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 text-slate-400 hover:text-slate-600 transition-colors mt-0.5"
+                      title="Open issue in GitHub"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+
+                {/* PR row */}
+                <div className="flex items-start justify-between gap-2 px-3 py-2">
+                  <div className="text-xs min-w-0">
+                    <p className="font-medium text-slate-500 mb-0.5">Pull Request</p>
+                    {checkingPrStatus && (
+                      <span className="flex items-center gap-1 text-slate-400 italic">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse inline-block" />
+                        Checking…
+                      </span>
+                    )}
+                    {!checkingPrStatus && prStatus?.found && (
+                      <div className="space-y-0.5">
+                        <p className="font-semibold text-slate-800">
+                          #{prStatus.number}
+                          <span className="font-normal text-slate-600 ml-1 truncate" title={prStatus.title}>{prStatus.title}</span>
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`inline-block text-xs font-medium px-1.5 py-0.5 rounded ${
+                            prStatus.state === 'open'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {prStatus.state === 'open' ? 'OPEN' : 'CLOSED'}
+                          </span>
+                          {prStatus.merged && (
+                            <span className="inline-block text-xs font-medium px-1.5 py-0.5 rounded bg-purple-100 text-purple-800">
+                              MERGED
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {!checkingPrStatus && prStatus !== null && !prStatus.found && (
+                      <span className="text-slate-400 italic">No PR found</span>
+                    )}
+                    {!checkingPrStatus && prStatus === null && (
+                      <span className="text-slate-400 italic">—</span>
+                    )}
+                  </div>
+                  {!checkingPrStatus && prStatus?.found && prStatus.url && (
+                    <a
+                      href={prStatus.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 text-slate-400 hover:text-blue-600 transition-colors mt-0.5"
+                      title="Open PR in GitHub"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+
+                {/* Verification row */}
+                <div className="flex items-center gap-2 px-3 py-2">
+                  <span className="text-xs font-medium text-slate-500 shrink-0">Verification</span>
+                  {readyForVerification ? (
+                    <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded border bg-green-100 text-green-700 border-green-300">
+                      <ShieldCheck className="w-3 h-3 shrink-0" />
+                      Ready for verification
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2 py-0.5 rounded border bg-gray-100 text-gray-500 border-gray-200">
+                      Not ready
+                    </span>
+                  )}
+                </div>
+
+              </div>
+            </div>
+
             {/* Title row */}
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
