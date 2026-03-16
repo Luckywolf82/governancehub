@@ -14,6 +14,7 @@ import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPa
 import GovernanceStarterKitPanel from "@/components/admin/GovernanceStarterKitPanel";
 import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
+import BuildIntegrityBanner from "@/components/admin/BuildIntegrityBanner";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
@@ -63,6 +64,8 @@ export default function Admin() {
             <Badge className="bg-slate-900 text-white text-xs">{user.role}</Badge>
           </div>
         </div>
+
+        <BuildIntegrityBanner />
 
         <div className="flex border-b border-slate-200">
           {TABS.map((t) => (
