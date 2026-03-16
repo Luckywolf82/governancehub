@@ -23,6 +23,7 @@
 //   gov-002   verified   / preliminary: false  — locked-file normalization remediation complete
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
+//   gov-005   planned    / preliminary: true   — scope only; phased roadmap for app-native prompt dispatch governance
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 
 export const AUDIT_INDEX = {
@@ -232,6 +233,34 @@ export const AUDIT_INDEX = {
       acceptanceCriteria: "ExecutionLogPanel.jsx exists and renders PhaseExecutionLog entries. Entries with unverified githubVisibility are visually distinguished. Admin Govern tab includes ExecutionLogPanel after GovernanceOrchestratorPanel. NextSafeStep reflects post-merge verification as the current next step.",
       oneSafeNextStep: "Post-merge verification: use the new ExecutionLogPanel in the Admin Govern tab to confirm GitHub visibility for the execution log entries that remain marked 'Not yet verified'.",
       dataFile: "src/components/audits/governance/app-native-audit-lifecycle-2026-03-15.jsx",
+    },
+
+    {
+      id: "gov-005",
+      title: "App-Native Prompt Dispatch Governance",
+      category: "Governance",
+      type: "Prompt Dispatch Governance Audit",
+      status: "planned",
+      date: "2026-03-16",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: true,
+      preliminaryNote: "All fields are preliminary scope definitions. No file inspection has been performed. Audit must be executed before any field is considered verified. No dispatch implementation may proceed until this audit reaches 'verified' status.",
+      evidenceSource: "preliminary",
+      summary: "Planned audit defining a safe phased roadmap for app-native prompt dispatch governance. Covers global repo context, prompt profiles, preview-before-send workflow, approval gate, a dispatch log distinct from PhaseExecutionLog, and staged target rollout. No dispatch implementation is included.",
+      problem: "GovernanceHub has no app-native prompt dispatch capability. Operators have no in-app path to generate, tailor, preview, approve, or dispatch prompts while maintaining governance traceability. Implementing dispatch without a phased governance roadmap risks bypassing the approval and audit trail requirements that govern all other structural actions in the system.",
+      impact: "Without a governed dispatch mechanism, prompt generation will either be blocked entirely (no capability) or proceed outside the governance layer (no traceability). A planned audit with a staged roadmap provides the framework to implement dispatch incrementally without sacrificing traceability.",
+      affectedFiles: [
+        "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",
+        "src/components/governance/LockedFiles.jsx",
+        "src/components/governance/PhaseExecutionLog.jsx",
+        "src/components/audits/AUDIT_INDEX.jsx",
+      ],
+      requiredChange: "Execute this audit by inspecting all filesToRead to verify no partial prompt dispatch implementation already exists. Then implement Phase 1 only: create PromptProfileRegistry.jsx with the schema and governance constraints defined in the audit data file.",
+      constraints: "No dispatch implementation may proceed until this audit is executed and status is changed to 'verified'. Profile registry creation is the only action permitted in Phase 1. Locked governance files must not be modified during audit execution. One structural change at a time.",
+      acceptanceCriteria: "Audit executed by direct file inspection. PromptProfileRegistry.jsx created with all requiredProfileFields. No dispatchable prompt creatable without approvalStatus === 'approved'. Dispatch log implemented separately from PhaseExecutionLog. Preview step is a blocking gate. Staged rollout enforces sequential stage progression with per-stage approval.",
+      oneSafeNextStep: "Execute the audit: inspect all files listed in the data file's filesToRead to confirm no partial prompt dispatch implementation exists. Document findings and update this audit's status from 'planned' to 'verified'.",
+      dataFile: "src/components/audits/governance/prompt-dispatch-governance-audit-2026-03-16.jsx",
     },
 
     {
