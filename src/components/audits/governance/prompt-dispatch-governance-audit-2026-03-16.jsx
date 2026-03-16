@@ -292,7 +292,6 @@ export const PROMPT_DISPATCH_GOVERNANCE_AUDIT = {
     oneSafeNextStep:
       "Execute the audit: inspect all files listed in filesToRead to confirm no partial prompt " +
       "dispatch implementation exists. Document findings and update this audit's status from " +
-      "'planned' to 'verified'. Only after verification: create " +
-      "src/components/governance/PromptProfileRegistry.jsx with the schema defined in this audit.",
+      "'planned' to 'verified'.",
   },
 };

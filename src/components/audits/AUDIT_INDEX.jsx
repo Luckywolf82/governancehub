@@ -259,7 +259,7 @@ export const AUDIT_INDEX = {
       requiredChange: "Execute this audit by inspecting all filesToRead to verify no partial prompt dispatch implementation already exists. Then implement Phase 1 only: create PromptProfileRegistry.jsx with the schema and governance constraints defined in the audit data file.",
       constraints: "No dispatch implementation may proceed until this audit is executed and status is changed to 'verified'. Profile registry creation is the only action permitted in Phase 1. Locked governance files must not be modified during audit execution. One structural change at a time.",
       acceptanceCriteria: "Audit executed by direct file inspection. PromptProfileRegistry.jsx created with all requiredProfileFields. No dispatchable prompt creatable without approvalStatus === 'approved'. Dispatch log implemented separately from PhaseExecutionLog. Preview step is a blocking gate. Staged rollout enforces sequential stage progression with per-stage approval.",
-      oneSafeNextStep: "Execute the audit: inspect all files listed in the data file's filesToRead to confirm no partial prompt dispatch implementation exists. Document findings and update this audit's status from 'planned' to 'verified'. Only after verification: create src/components/governance/PromptProfileRegistry.jsx.",
+      oneSafeNextStep: "Execute the audit: inspect all files listed in the data file's filesToRead to confirm no partial prompt dispatch implementation exists. Document findings and update this audit's status from 'planned' to 'verified'.",
       dataFile: "src/components/audits/governance/prompt-dispatch-governance-audit-2026-03-16.jsx",
     },
 
