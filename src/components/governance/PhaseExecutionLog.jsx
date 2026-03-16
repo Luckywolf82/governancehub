@@ -156,5 +156,38 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileRegistry.jsx is a net-new file — not a locked file at creation time. No other locked files modified.',
     },
+    {
+      id: 'Entry 10',
+      date: '2026-03-16',
+      task: 'gov-005 Phase 2 — Create PromptProfileApprovalPolicy.jsx (approval-governance artifact)',
+      taskRequested: 'Implement the first approval-governance step after PromptProfileRegistry. Create src/components/governance/PromptProfileApprovalPolicy.jsx as a pure schema/data artifact defining the approval path for prompt profiles. Define allowed approval transitions, governance roles, approval requirements, blocked capabilities before and after approval, and planned consuming components. No UI components, no approval workflow runtime logic, no dispatch logic, no preview/send capability, no backend automation.',
+      changedFiles: [
+        'src/components/governance/PromptProfileApprovalPolicy.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'PromptProfileApprovalPolicy.jsx (net-new): exports policyMeta, approvalStatusVocabulary (mirrors registry), approvalTransitions (5 allowed state transitions with requiredActor and conditions), governanceRoles (profile-author, governance-approver, system), approvalRequirements (7 pre-conditions for the approved transition), blockedCapabilitiesBeforeApproval (5 dispatch/preview/target capabilities blocked until approved), blockedCapabilitiesAfterApproval (4 capabilities blocked even after approval until future governance phases are verified), and consumingComponentsPlanned (5 future components with phase and usage notes). Schema-only — no runtime logic, no UI, no dispatch coupling.',
+        'PhaseExecutionLog.jsx: appended Entry 10 for this gov-005 Phase 2 execution.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileApprovalPolicy.jsx is a net-new file — not a locked file at creation time. No other locked files modified.',
+    },
+    {
+      id: 'Entry 11',
+      date: '2026-03-16',
+      task: 'gov-005 Phase 2 — Targeted policy-governance check on PromptProfileApprovalPolicy.jsx',
+      taskRequested: 'Pre-merge policy-governance check: verify approvalStatusVocabulary source-of-truth, confirm approvalTransitions and approvalRequirements are minimum safe only, confirm blockedCapabilitiesAfterApproval is strictly non-dispatchable, confirm file remains a pure policy artifact.',
+      changedFiles: [
+        'src/components/governance/PromptProfileApprovalPolicy.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'PromptProfileApprovalPolicy.jsx: strengthened approvalStatusVocabulary section comment — replaced soft prose reminder with explicit "SINGLE SOURCE OF TRUTH: PromptProfileRegistry.approvalStatusVocabulary" heading and prohibition on independent edits.',
+        'PromptProfileApprovalPolicy.jsx: removed one over-scoped condition from pending-review→approved transition: "No open amendment requests may be outstanding against this profile." The concept of amendment requests is undefined in any Phase 2 governance artifact and implies a workflow-tracking object that does not exist. Remaining three conditions are the minimum safe governance rules for this transition.',
+        'PhaseExecutionLog.jsx: appended Entry 11 for this pre-merge check execution.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileApprovalPolicy.jsx modified to remove over-scoped condition and strengthen vocabulary source-of-truth comment — it is not a locked file. No other locked files modified.',
+    },
   ],
 };
