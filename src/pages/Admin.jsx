@@ -98,6 +98,38 @@ export default function Admin() {
               <p className="text-sm text-slate-500 mb-1">Kjør audit, send til Orchestrator, opprett issue og verifiser</p>
               <p className="text-xs text-slate-400 bg-slate-100 rounded px-3 py-1.5 inline-block">Kjør audit → Bruk i Orchestrator → Opprett issue → Verifiser</p>
             </div>
+            {/* Govern workflow framing shell — compact operator-orientation card */}
+            <div className="border border-slate-200 rounded-md bg-white px-4 py-3 space-y-2">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Govern workflow</p>
+              <p className="text-xs text-slate-400">Active governed development cycle. Use the panels below to run audits, prepare next governed steps, and review implementation progress.</p>
+              <div className="space-y-1.5 pt-0.5">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 font-medium shrink-0 w-4">1.</span>
+                  <span className="text-slate-700 font-medium">Run audit</span>
+                  <span className="ml-1 text-slate-400">· Use Audit Runner below</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 font-medium shrink-0 w-4">2.</span>
+                  <span className="text-slate-700 font-medium">Review in orchestrator</span>
+                  <span className="ml-1 text-slate-400">· Send audit result to Governance Orchestrator to prepare next governed step</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 font-medium shrink-0 w-4">3.</span>
+                  <span className="text-slate-700 font-medium">Prepare next action</span>
+                  <span className="ml-1 text-slate-400">· Create issue or document the next governed step manually</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 font-medium shrink-0 w-4">4.</span>
+                  <span className="text-slate-700 font-medium">Review execution log</span>
+                  <span className="ml-1 text-slate-400">· Review log entries after implementation</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs pt-0.5">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 mt-0.5" />
+                  <span className="text-slate-400">Downstream execution pipeline preview is available below and remains non-operational.</span>
+                </div>
+              </div>
+            </div>
+
             <div className="border border-slate-300 bg-white rounded-md px-4 py-3 space-y-1">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Canonical next safe step</p>
               <p className="text-sm font-semibold text-slate-800">{NEXT_SAFE_STEP.title}</p>
