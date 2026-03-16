@@ -217,7 +217,14 @@ export default function Admin() {
                 <PromptApprovalGate />
               </CardContent>
             </Card>
-            <ProductIntelligencePanel />
+            <ProductIntelligencePanel
+              onUseInOrchestrator={(obj) => {
+                setInjectedAudit(obj);
+                setTab("Govern");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              activeRepo={activeRepo}
+            />
             <div className="border-t border-slate-200 pt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[

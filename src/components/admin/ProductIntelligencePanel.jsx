@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ROADMAP } from "@/components/roadmap/ROADMAP";
 import { IDEA_INDEX } from "@/components/ideas/IDEA_INDEX";
 import { IDEA_PRIORITY_AUDIT } from "@/components/audits/product/idea-priority-audit";
-import { Lightbulb, ArrowRight } from "lucide-react";
+import { Lightbulb, ArrowRight, Send } from "lucide-react";
 
 const IDEA_TYPES = ["Alle", "capability", "architecture", "workflow", "integration", "governance", "platform", "analytics"];
 const TYPE_LABEL = {
@@ -35,7 +35,10 @@ function TierPill({ tier }) {
 // Build ideaType lookup from IDEA_INDEX
 const IDEA_TYPE_MAP = Object.fromEntries(IDEA_INDEX.ideas.map((i) => [i.ideaId, i.ideaType]));
 
-export default function ProductIntelligencePanel() {
+// Build description lookup from IDEA_INDEX
+const IDEA_DESC_MAP = Object.fromEntries(IDEA_INDEX.ideas.map((i) => [i.ideaId, i.description ?? null]));
+
+export default function ProductIntelligencePanel({ onUseInOrchestrator, activeRepo }) {
   const [activeType, setActiveType] = useState("Alle");
   const totalIdeas = IDEA_INDEX.ideas.length;
   const { lanes, recommendedBuildSequence } = ROADMAP;
@@ -126,6 +129,40 @@ export default function ProductIntelligencePanel() {
               <ArrowRight className="w-3 h-3 text-slate-300 shrink-0" />
               <span className="text-slate-700 font-medium flex-1">{item.title}</span>
               <TierPill tier={item.priorityTier} />
+              {onUseInOrchestrator && (
+                <button
+                  onClick={() => onUseInOrchestrator({
+                    id: `strategy-step-${item.ideaId}`,
+                    title: item.title,
+                    category: "Strategy",
+                    type: "Strategy Step",
+                    status: "planned",
+                    date: new Date().toISOString().slice(0, 10),
+                    summary: `Strategy recommended build sequence step ${idx + 1}: ${item.title}`,
+                    problem: IDEA_DESC_MAP[item.ideaId]
+                      ? `${IDEA_DESC_MAP[item.ideaId]}`
+                      : `This step is part of the recommended build sequence (position ${idx + 1}).`,
+                    impact: `Implementation of "${item.title}" advances the product roadmap (priority: ${item.priorityTier ?? "unknown"}, net score: ${item.netScore ?? "N/A"}).`,
+                    affectedFiles: [],
+                    requiredChange: `Implement: ${item.title}`,
+                    constraints: "Follow locked-file policy. One structural change at a time. Update PhaseExecutionLog after each verified change.",
+                    acceptanceCriteria: `"${item.title}" is implemented and verified in the execution log.`,
+                    evidenceSource: "strategy-roadmap",
+                    sourceType: "strategy-step",
+                    sourceId: item.ideaId,
+                    sequencePosition: idx + 1,
+                    priorityTier: item.priorityTier,
+                    netScore: item.netScore,
+                    auditTargetMode: activeRepo ? "active-repo" : "canonical",
+                    auditTargetRepoFullName: activeRepo?.fullName ?? null,
+                  })}
+                  className="shrink-0 inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-400 transition-colors"
+                  title="Send dette steget til Orchestrator"
+                >
+                  <Send className="w-3 h-3" />
+                  Bruk i orchestrator
+                </button>
+              )}
             </div>
           ))}
         </CardContent>
