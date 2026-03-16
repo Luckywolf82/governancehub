@@ -35,9 +35,12 @@ export const policyMeta = {
     "separately created and verified per the gov-005 roadmap.",
 };
 
-// ── Approval status vocabulary (mirrors PromptProfileRegistry) ────────────────
-// Source of truth is PromptProfileRegistry.approvalStatusVocabulary.
-// Repeated here for policy self-containment — changes must stay in sync.
+// ── Approval status vocabulary (read-only copy — do not modify independently) ─
+// SINGLE SOURCE OF TRUTH: PromptProfileRegistry.approvalStatusVocabulary
+// This copy exists only for policy self-containment.
+// Any change to this vocabulary MUST be made in PromptProfileRegistry.jsx first,
+// then reflected here in the same commit. Independent edits to this copy constitute
+// governance drift and are not permitted.
 
 export const approvalStatusVocabulary = [
   "draft",
@@ -70,7 +73,6 @@ export const approvalTransitions = [
       "Profile must have been in pending-review for at least one review cycle.",
       "approvedBy must be a recognized governance-approver identity — not the same identity as createdBy.",
       "approvedAt must be set to the current date at time of approval.",
-      "No open amendment requests may be outstanding against this profile.",
     ],
   },
   {

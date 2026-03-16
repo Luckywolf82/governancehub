@@ -172,5 +172,22 @@ export const PHASE_EXECUTION_LOG = {
       githubVisibility: 'Not yet verified',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileApprovalPolicy.jsx is a net-new file — not a locked file at creation time. No other locked files modified.',
     },
+    {
+      id: 'Entry 11',
+      date: '2026-03-16',
+      task: 'gov-005 Phase 2 — Targeted policy-governance check on PromptProfileApprovalPolicy.jsx',
+      taskRequested: 'Pre-merge policy-governance check: verify approvalStatusVocabulary source-of-truth, confirm approvalTransitions and approvalRequirements are minimum safe only, confirm blockedCapabilitiesAfterApproval is strictly non-dispatchable, confirm file remains a pure policy artifact.',
+      changedFiles: [
+        'src/components/governance/PromptProfileApprovalPolicy.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'PromptProfileApprovalPolicy.jsx: strengthened approvalStatusVocabulary section comment — replaced soft prose reminder with explicit "SINGLE SOURCE OF TRUTH: PromptProfileRegistry.approvalStatusVocabulary" heading and prohibition on independent edits.',
+        'PromptProfileApprovalPolicy.jsx: removed one over-scoped condition from pending-review→approved transition: "No open amendment requests may be outstanding against this profile." The concept of amendment requests is undefined in any Phase 2 governance artifact and implies a workflow-tracking object that does not exist. Remaining three conditions are the minimum safe governance rules for this transition.',
+        'PhaseExecutionLog.jsx: appended Entry 11 for this pre-merge check execution.',
+      ],
+      githubVisibility: 'Not yet verified',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. PromptProfileApprovalPolicy.jsx modified to remove over-scoped condition and strengthen vocabulary source-of-truth comment — it is not a locked file. No other locked files modified.',
+    },
   ],
 };
