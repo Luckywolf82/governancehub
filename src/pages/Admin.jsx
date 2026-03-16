@@ -18,6 +18,7 @@ import BuildIntegrityBanner from "@/components/admin/BuildIntegrityBanner";
 import PromptApprovalGate from "@/components/admin/PromptApprovalGate";
 import DispatchReviewPanel from "@/components/admin/DispatchReviewPanel";
 import PromptPreviewPanel from "@/components/admin/PromptPreviewPanel";
+import ExecutionWorker from "@/components/governance/ExecutionWorker";
 
 const TABS = ["Govern", "Setup", "Build Prep", "Strategy"];
 
@@ -118,6 +119,9 @@ export default function Admin() {
             </div>
             <div className="border-t border-slate-200 pt-4">
               <PromptPreviewPanel />
+            </div>
+            <div className="border-t border-slate-200 pt-4">
+              <ExecutionWorker />
             </div>
           </div>
         )}
