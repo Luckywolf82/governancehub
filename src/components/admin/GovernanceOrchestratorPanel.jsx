@@ -448,9 +448,10 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
       hasManualData,
       enrichedFields,
       isLockedPath,
-      lockedRuleFor
+      lockedRuleFor,
+      verificationNotes
     );
-  }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields]);
+  }, [audit, readiness, isInjected, confirmedFiles, actualChangeSummary, hasManualData, enrichedFields, verificationNotes]);
 
   // ── Ready-for-verification derived state ──────────────────────────────────
   // True when: PR exists AND PR is merged/closed (code integrated) AND issue is no longer the active next action.
