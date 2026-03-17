@@ -1,4 +1,30 @@
 export const PHASE_EXECUTION_LOG = {
+  // Entry field schema — informational, not enforced at runtime.
+  // Documents all recognized optional fields so future entries and consumers
+  // know what the log supports without inspecting individual entries.
+  entrySchema: {
+    required: [
+      'id',
+      'date',
+      'task',
+      'taskRequested',
+      'changedFiles',
+      'diffSummary',
+      'githubVisibility',
+      'lockedFileVerification',
+    ],
+    optional: [
+      // Structured GitHub verification target fields
+      'verificationTargetType',
+      'verificationTargetValue',
+      'verificationBranch',
+      'githubVerificationUrl',
+      // Verification fields — populated after verification step (future integration)
+      'verificationStatus',
+      'missingEvidence',
+      'verificationNotes',
+    ],
+  },
   entries: [
     {
       id: 'Entry 1',
