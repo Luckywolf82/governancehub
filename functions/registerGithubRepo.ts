@@ -13,6 +13,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
  *   notes?: string,
  *   capabilities?: {
  *     "contents:read"?: boolean,
+ *     "contents:write"?: boolean,
  *     "issue:create"?: boolean,
  *     "repo:create"?: boolean,
  *     "dispatch:audit"?: boolean
@@ -35,6 +36,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 const DEFAULT_CAPABILITIES = {
   'contents:read': true,
+  'contents:write': false,
   'issue:create': true,
   'repo:create': false,
   'dispatch:audit': true,

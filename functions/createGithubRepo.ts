@@ -31,6 +31,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 const DEFAULT_CAPABILITIES = {
   'contents:read': true,
+  'contents:write': false,
   'issue:create': true,
   'repo:create': false,
   'dispatch:audit': true,

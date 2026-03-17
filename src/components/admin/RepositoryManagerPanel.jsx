@@ -5,6 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, X, Edit2, Save, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 
+// Canonical set of known capabilities with their safe defaults.
+// All capabilities are shown in the UI regardless of what is stored.
+const KNOWN_CAPABILITIES = {
+  "contents:read": true,
+  "contents:write": false,
+  "issue:create": true,
+  "dispatch:audit": true,
+  "repo:create": false,
+};
+
 export default function RepositoryManagerPanel() {
   const { refreshRepos } = useActiveRepo();
   const [repos, setRepos] = useState([]);
@@ -18,12 +28,7 @@ export default function RepositoryManagerPanel() {
     visibility: "public",
     defaultBranch: "main",
     isEnabled: true,
-    capabilitiesJson: {
-      "contents:read": true,
-      "issue:create": true,
-      "dispatch:audit": true,
-      "repo:create": false,
-    },
+    capabilitiesJson: { ...KNOWN_CAPABILITIES },
     notes: "",
   });
   const [editForm, setEditForm] = useState({});
@@ -83,12 +88,7 @@ export default function RepositoryManagerPanel() {
         visibility: "public",
         defaultBranch: "main",
         isEnabled: true,
-        capabilitiesJson: {
-          "contents:read": true,
-          "issue:create": true,
-          "dispatch:audit": true,
-          "repo:create": false,
-        },
+        capabilitiesJson: { ...KNOWN_CAPABILITIES },
         notes: "",
       });
       setShowCreate(false);
@@ -105,7 +105,16 @@ export default function RepositoryManagerPanel() {
 
   const handleEditStart = (repo) => {
     setEditingId(repo.id);
-    setEditForm({ ...repo });
+    setEditForm({
+      ...repo,
+      // Merge KNOWN_CAPABILITIES (with safe defaults) over the stored capabilities
+      // so that capabilities added after initial registration (e.g. contents:write)
+      // always appear as toggleable checkboxes in the edit form.
+      capabilitiesJson: {
+        ...KNOWN_CAPABILITIES,
+        ...(repo.capabilitiesJson || {}),
+      },
+    });
   };
 
   const handleEditChange = (field, value) => {
