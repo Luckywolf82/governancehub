@@ -19,14 +19,8 @@
 }
 
 /* Shell-level overflow and overscroll discipline */
-html {
+html, body {
   overflow-x: hidden;
-  overscroll-behavior: none;
-}
-
-body {
-  overflow-x: hidden;
-  overscroll-behavior-y: none;
 }
 
 /* Header: pad for top safe area (notch/status bar) */
