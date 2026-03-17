@@ -51,7 +51,7 @@
     },
     {
       "module": "projects",
-      "path": "projects/PROJECT_REGISTRY.jsx",
+      "path": "projects/WORKSTREAM_REGISTRY.jsx",
       "required": true
     }
   ]
