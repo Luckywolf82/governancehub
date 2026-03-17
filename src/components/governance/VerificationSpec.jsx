@@ -87,7 +87,7 @@ export const specMeta = {
     "is implemented and verified.",
   verificationLogOutputStatus:
     "The current Verification.jsx surface exposes a buildVerificationLogEntry() helper that " +
-    "produces a preview-only, append-ready structured log entry. This output is NOT persistent, " +
+    "produces a preview-only structural preview log entry (not append-ready — no write path exists in this phase). This output is NOT persistent, " +
     "NOT committed to PhaseExecutionLog.entries, and NOT written anywhere. No safe write layer " +
     "exists in this phase. The entry is structural scaffolding only.",
   targetRefStatus:
@@ -870,8 +870,8 @@ export const consumingComponents = [
       "This spec defines the canonical vocabulary as 'verified' | 'incomplete' | 'unverifiable' | " +
       "'failed' | 'requires_manual_review'. 'complete' and 'verified' are equivalent for this phase.",
     logOutputNote:
-      "buildVerificationLogEntry() in Verification.jsx produces a preview-only, append-ready " +
-      "structured log entry. This output is NOT persistent, NOT committed to " +
+      "buildVerificationLogEntry() in Verification.jsx produces a preview-only " +
+      "structural log entry (not append-ready — no write path exists in this phase). This output is NOT persistent, NOT committed to " +
       "PhaseExecutionLog.entries, and NOT written anywhere. It is exposed as a console-logged " +
       "structural preview only. No safe write layer exists in this phase.",
     targetRefNote:
