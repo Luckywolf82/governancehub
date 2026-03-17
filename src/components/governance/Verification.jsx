@@ -52,9 +52,9 @@ import {
 } from "@/components/governance/VerificationSpec";
 // Verification status vocabulary aligned with VerificationSpec
 
-// PHASE_EXECUTION_LOG — append-only mutation now permitted.
-// First controlled write: handleCommitVerificationToLog() may push new entries.
-// No existing entries may be modified or removed.
+// PHASE_EXECUTION_LOG imported for structural reference only (read-only).
+// entrySchema is read inside buildVerificationLogEntry() to guide field naming.
+// No mutation of entries is performed here.
 import { PHASE_EXECUTION_LOG } from "@/components/governance/PhaseExecutionLog";
 
 // ── Evidence availability evaluator ───────────────────────────────────────────
@@ -301,27 +301,6 @@ function VerificationInstanceCard({ entry }) {
     };
   }
 
-  // Appends a new verification entry to PHASE_EXECUTION_LOG.
-  // Append-only: no existing entries are modified or removed.
-  // This is the first controlled write to PhaseExecutionLog.
-  function handleCommitVerificationToLog() {
-    const verificationObject = buildVerificationLogEntry();
-    const newEntry = {
-      id: "Entry " + (PHASE_EXECUTION_LOG.entries.length + 1),
-      date: new Date().toISOString().split("T")[0],
-      entryType: "verification",
-      task: "Manual verification log entry",
-      taskRequested: "User-triggered verification commit",
-      changedFiles: [],
-      diffSummary: "Verification-only entry",
-      githubVisibility: "local-only",
-      lockedFileVerification: "No locked files modified",
-      ...verificationObject,
-    };
-    PHASE_EXECUTION_LOG.entries.push(newEntry);
-    console.log("VERIFICATION ENTRY COMMITTED (append-only):", newEntry, "Total entries:", PHASE_EXECUTION_LOG.entries.length);
-  }
-
   return (
     <Card className="border border-slate-200">
       <CardHeader className="pb-2">
@@ -389,19 +368,12 @@ function VerificationInstanceCard({ entry }) {
             size="sm"
             aria-label="Prepare log entry preview — no persistence"
             onClick={() => {
+              // Preview only — builds an append-ready verification entry without writing to PhaseExecutionLog.
               const entry = buildVerificationLogEntry();
-              console.log("VERIFICATION LOG ENTRY PREVIEW:", entry);
+              console.log("APPEND-READY VERIFICATION ENTRY PREVIEW:", entry);
             }}
           >
-            Prepare log entry
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            aria-label="Commit verification entry to PhaseExecutionLog — append-only"
-            onClick={handleCommitVerificationToLog}
-          >
-            Commit verification to log
+            Preview append-ready log entry
           </Button>
         </div>
 
