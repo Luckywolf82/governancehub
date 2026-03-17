@@ -13,6 +13,7 @@ import { base44 } from "@/api/base44Client";
 
 const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main";
 const GH_BASE = "https://github.com/Luckywolf82/governancehub/blob/main";
+const GH_REPO_URL = "https://github.com/Luckywolf82/governancehub";
 
 // Base raw URL for starter-kit source files inside the GovernanceHub repo.
 // These are the canonical installer templates — safe to copy to any target repo.
@@ -99,6 +100,8 @@ const PRIORITY = {
 const DRAFT_SCAFFOLD_PATHS = [
   // repo-aware manifest (generated JSON pushed to the target repo root)
   { path: "GOVERNANCE_MANIFEST.json",                                  group: "manifest",  category: "config"     },
+  // README.md — create-or-update: new repo-aware template if missing, governance section added/updated if present
+  { path: "README.md",                                                 group: "readme",    category: "docs"       },
   // starter-kit: governance module
   { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",    group: "governance", category: "governance" },
   { path: "src/components/governance/AI_STATE.jsx",                   group: "governance", category: "governance" },
@@ -159,6 +162,7 @@ function generateDraftManifest(owner, repo, branch, branchIsDefault) {
 
 const CONTENT_SOURCES = {
   "GOVERNANCE_MANIFEST.json": { type: "manifest" },
+  "README.md":                { type: "readme"   },
   "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx":  { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/AI_PROJECT_INSTRUCTIONS.jsx`  },
   "src/components/governance/AI_STATE.jsx":                 { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/AI_STATE.jsx`                  },
   "src/components/governance/LockedFiles.jsx":              { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/LockedFiles.jsx`               },
@@ -206,6 +210,75 @@ function generateManifestContent(manifest) {
   );
 }
 
+// ── README create-or-update helpers ──────────────────────────────────────────
+// These are used during payload assembly to generate or merge README.md content
+// for the target repo.  A bounded governance section is inserted/updated so that
+// any pre-existing repo identity content is preserved.
+
+const GOVERNANCE_SECTION_START = "<!-- GOVERNANCE:START -->";
+const GOVERNANCE_SECTION_END   = "<!-- GOVERNANCE:END -->";
+
+function buildGovernanceSection(owner, repo) {
+  return [
+    GOVERNANCE_SECTION_START,
+    "## Governance",
+    "",
+    `This repository (\`${owner}/${repo}\`) uses the [GovernanceHub](${GH_REPO_URL}) starter kit for AI-assisted development governance.`,
+    "",
+    "### AI-assisted development governance",
+    "- Structural changes are tracked in `src/components/governance/PhaseExecutionLog.jsx`",
+    "- Locked files are defined in `src/components/governance/LockedFiles.jsx`",
+    "- AI agents must follow `src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`",
+    "",
+    "### Development loop",
+    "1. Read `AI_PROJECT_INSTRUCTIONS.jsx` before any change",
+    "2. Check `NextSafeStep.jsx` for the current approved action",
+    "3. Log all structural changes in `PhaseExecutionLog.jsx`",
+    "4. Verify changes against `LockedFiles.jsx`",
+    "",
+    "### Repository governance rules",
+    "- Do not modify locked files without explicit approval",
+    "- All AI-assisted changes must reference a governance phase",
+    "- Audit artifacts live in `src/components/audits/`",
+    GOVERNANCE_SECTION_END,
+  ].join("\n");
+}
+
+function generateReadmeTemplate(owner, repo, branch) {
+  return [
+    `# ${repo}`,
+    "",
+    `> Repository: \`${owner}/${repo}\` · Branch: \`${branch}\``,
+    "",
+    "## Overview",
+    "",
+    "<!-- Add your project description here -->",
+    "",
+    buildGovernanceSection(owner, repo),
+    "",
+  ].join("\n");
+}
+
+// Inserts the governance section if absent, or replaces an existing one in-place,
+// leaving all surrounding content untouched.
+function mergeGovernanceSection(existingContent, owner, repo) {
+  const govSection = buildGovernanceSection(owner, repo);
+  const startIdx = existingContent.indexOf(GOVERNANCE_SECTION_START);
+  const endIdx   = existingContent.indexOf(GOVERNANCE_SECTION_END);
+
+  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+    // Replace the existing governance section in-place, preserving everything else.
+    return (
+      existingContent.slice(0, startIdx) +
+      govSection +
+      existingContent.slice(endIdx + GOVERNANCE_SECTION_END.length)
+    );
+  }
+
+  // No existing section — append at the end without touching existing content.
+  return `${existingContent.trimEnd()}\n\n${govSection}\n`;
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CATEGORY_COLORS = {
@@ -229,9 +302,10 @@ const PRIORITY_COLORS = {
 };
 
 const SOURCE_META = {
-  manifest:       { label: "manifest",    color: "bg-violet-100 text-violet-800",  title: "Repo-aware manifest generated for this repo" },
+  manifest:       { label: "manifest",    color: "bg-violet-100 text-violet-800",   title: "Repo-aware manifest generated for this repo" },
   "starter-kit":  { label: "starter-kit", color: "bg-emerald-100 text-emerald-800", title: "Content fetched from GovernanceHub starter-kit" },
-  excluded:       { label: "excluded",    color: "bg-red-100 text-red-700",         title: "Omitted — excluded from this push phase" },
+  readme:         { label: "readme",      color: "bg-pink-100 text-pink-800",        title: "README create-or-update: new repo-aware template if missing, governance section inserted/updated if present" },
+  excluded:       { label: "excluded",    color: "bg-red-100 text-red-700",          title: "Omitted — excluded from this push phase" },
   undefined:      { label: "unknown",     color: "bg-gray-100 text-gray-500",        title: "Source not defined" },
 };
 
@@ -490,6 +564,27 @@ function DirectPushSection({ manifest }) {
           pushable.push({ path: file.path, content, source: "starter-kit", rawUrl: src.rawUrl });
         } catch (err) {
           excluded.push({ path: file.path, reason: `Starter-kit fetch failed: ${err.message}` });
+        }
+        continue;
+      }
+
+      if (src.type === "readme") {
+        try {
+          const existingUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/README.md`;
+          const res = await fetch(existingUrl);
+          let content;
+          if (!res.ok) {
+            // Target repo has no README — generate a repo-aware template.
+            content = generateReadmeTemplate(owner, repo, branch);
+          } else {
+            // Target repo already has a README — preserve all existing content
+            // and only insert or update the bounded governance section.
+            const existing = await res.text();
+            content = mergeGovernanceSection(existing, owner, repo);
+          }
+          pushable.push({ path: file.path, content, source: "readme" });
+        } catch (err) {
+          excluded.push({ path: file.path, reason: `README handling failed: ${err.message}` });
         }
         continue;
       }

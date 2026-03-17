@@ -53,6 +53,12 @@
       "module": "projects",
       "path": "projects/WORKSTREAM_REGISTRY.jsx",
       "required": true
+    },
+    {
+      "module": "readme",
+      "path": "README.md",
+      "required": false,
+      "note": "Root-level file. Create-or-update: new repo-aware template if absent, governance section inserted/updated if present. basePath does not apply."
     }
   ]
 }
