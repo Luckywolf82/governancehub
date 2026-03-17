@@ -282,10 +282,15 @@ function VerificationInstanceCard({ entry }) {
     // (verificationStatus, missingEvidence, verificationNotes) — read-only, no mutation.
     void PHASE_EXECUTION_LOG.entrySchema;
 
+    // Target reference (TEMPORARY)
+    // Currently using planId as a placeholder.
+    // This does NOT represent a true plan instance binding.
+    // Will be replaced with planInstanceId once execution-binding is implemented.
     return {
       targetRef: {
         type: "plan_instance",
         id: entry.planId,
+        source: "planId-placeholder",
       },
       verificationStatus: status,
       missingEvidence,
