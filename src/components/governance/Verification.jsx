@@ -52,6 +52,10 @@ import {
 } from "@/components/governance/VerificationSpec";
 // Verification status vocabulary aligned with VerificationSpec
 
+// PHASE_EXECUTION_LOG imported read-only — for structural reference only.
+// DO NOT mutate entries. DO NOT push to entries array.
+import { PHASE_EXECUTION_LOG } from "@/components/governance/PhaseExecutionLog";
+
 // ── Evidence availability evaluator ───────────────────────────────────────────
 // Pure function — no side effects, no state mutation, no inferred values.
 // Returns an array of evidence check results for a single registry entry.
@@ -253,7 +257,7 @@ function VerificationInstanceCard({ entry }) {
   const missingCount = requiredResults.filter((r) => !r.present).length;
 
   // Preview-only helper — reads current verification result and logs it.
-  // Does NOT write to PhaseExecutionLog, does NOT mutate state, does NOT import log file.
+  // Does NOT write to PhaseExecutionLog, does NOT mutate state.
   function handleRecordVerificationResult() {
     const missingEvidence = requiredResults
       .filter((r) => !r.present)
@@ -264,6 +268,26 @@ function VerificationInstanceCard({ entry }) {
       missingEvidence,
       verificationNotes: "manual entry",
     });
+  }
+
+  // Builds a structured log entry preview — read-only, no mutation, no persistence.
+  // References PHASE_EXECUTION_LOG for structural awareness only.
+  // Does NOT push to PHASE_EXECUTION_LOG.entries. Does NOT mutate anything.
+  function buildVerificationLogEntry() {
+    const missingEvidence = requiredResults
+      .filter((r) => !r.present)
+      .map((r) => r.label);
+
+    // Structural reference: PHASE_EXECUTION_LOG.entrySchema defines expected optional fields
+    // (verificationStatus, missingEvidence, verificationNotes) — read-only, no mutation.
+    void PHASE_EXECUTION_LOG.entrySchema;
+
+    return {
+      verificationStatus: status,
+      missingEvidence,
+      verificationNotes: "manual entry",
+      timestamp: new Date().toISOString(),
+    };
   }
 
   return (
@@ -319,7 +343,7 @@ function VerificationInstanceCard({ entry }) {
         />
 
         {/* Preview-only action — no persistence */}
-        <div className="pt-1">
+        <div className="pt-1 flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -327,6 +351,17 @@ function VerificationInstanceCard({ entry }) {
             onClick={handleRecordVerificationResult}
           >
             Record verification result (preview)
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Prepare log entry preview — no persistence"
+            onClick={() => {
+              const entry = buildVerificationLogEntry();
+              console.log("VERIFICATION LOG ENTRY PREVIEW:", entry);
+            }}
+          >
+            Prepare log entry
           </Button>
         </div>
 
