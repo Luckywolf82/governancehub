@@ -74,6 +74,21 @@ export default function Admin() {
           </div>
         </div>
 
+        <div className="flex flex-wrap gap-x-6 gap-y-1.5 items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-4 py-2 text-xs">
+          <span>
+            <span className="text-slate-400 dark:text-slate-500 font-medium mr-1">Repo:</span>
+            <span className="text-slate-700 dark:text-slate-300">{activeRepo?.fullName ?? "Ingen repo valgt"}</span>
+          </span>
+          <span>
+            <span className="text-slate-400 dark:text-slate-500 font-medium mr-1">Audit:</span>
+            <span className="text-slate-700 dark:text-slate-300">{injectedAudit ? (injectedAudit.title ?? injectedAudit.id ?? "Ukjent") : "Ingen audit valgt"}</span>
+          </span>
+          <span>
+            <span className="text-slate-400 dark:text-slate-500 font-medium mr-1">Plan:</span>
+            <span className="text-slate-700 dark:text-slate-300">Ingen plan aktiv</span>
+          </span>
+        </div>
+
         <BuildIntegrityBanner />
 
         <div className="flex border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
