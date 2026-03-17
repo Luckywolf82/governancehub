@@ -31,6 +31,7 @@ export default function Admin() {
   const [tab, setTab] = useState("Setup");
   const [injectedAudit, setInjectedAudit] = useState(null);
   const [pipelineOpen, setPipelineOpen] = useState(false);
+  const [approvalOpen, setApprovalOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const { activeRepo } = useActiveRepo();
 
   useEffect(() => {
@@ -292,6 +293,8 @@ export default function Admin() {
               <p className="text-sm text-slate-500 dark:text-slate-400">Roadmap, prioritering og referansepanel</p>
             </div>
 
+            <p className="text-xs text-slate-400 dark:text-slate-500 italic">Bruk Product Intelligence for prioritering. Approval-panelene er støtte for governance og publisering.</p>
+
             {/* Strategy overview — compact operator-orientation card */}
             <div className="border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 px-4 py-3 space-y-2">
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Strategy · referanse</p>
@@ -326,14 +329,6 @@ export default function Admin() {
               </div>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Prompt Approval Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PromptApprovalGate />
-              </CardContent>
-            </Card>
             <ProductIntelligencePanel
               onUseInOrchestrator={(obj) => {
                 setInjectedAudit(obj);
@@ -342,6 +337,27 @@ export default function Admin() {
               }}
               activeRepo={activeRepo}
             />
+
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+              <button
+                type="button"
+                aria-expanded={approvalOpen}
+                onClick={() => setApprovalOpen((v) => !v)}
+                className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors w-full text-left"
+              >
+                <span className={`inline-block transition-transform duration-150 ${approvalOpen ? "rotate-90" : ""}`}>▶</span>
+                Prompt Approval Status
+              </button>
+              {approvalOpen && (
+                <div className="mt-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <PromptApprovalGate />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </div>
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
