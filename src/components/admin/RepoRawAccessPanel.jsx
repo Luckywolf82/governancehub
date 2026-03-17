@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle } from "lucide-react";
+import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle, Layers, Package, Send } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 // ── Inline manifest data ──────────────────────────────────────────────────────
@@ -83,6 +84,70 @@ const PRIORITY = {
     { path: "src/components/governance/TaskGenerator.js", label: "Task Generator", priority: "normal", whyItMatters: "Utility for generating governance tasks.", rawUrl: `${RAW_BASE}/src/components/governance/TaskGenerator.js`, githubUrl: `${GH_BASE}/src/components/governance/TaskGenerator.js`, lockedFile: false, exists: true },
   ],
 };
+
+// ── Draft manifest generation ─────────────────────────────────────────────────
+// Generates a repo-aware DRAFT manifest based on the GovernanceHub scaffold
+// structure. No GitHub API calls are made — this is a structural template only.
+
+const DRAFT_PLACEHOLDER_CONTENT = "[draft — content not yet loaded]";
+
+const DRAFT_SCAFFOLD_PATHS = [
+  // root
+  { path: "package.json",    group: "root",       category: "config" },
+  { path: "README.md",       group: "root",       category: "docs"   },
+  { path: ".gitignore",      group: "root",       category: "config" },
+  { path: "vite.config.js",  group: "root",       category: "config" },
+  // src
+  { path: "src/App.jsx",     group: "src",        category: "config" },
+  { path: "src/main.jsx",    group: "src",        category: "config" },
+  { path: "src/index.css",   group: "src",        category: "assets" },
+  // governance
+  { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", group: "governance", category: "governance" },
+  { path: "src/components/governance/PhaseExecutionLog.jsx",        group: "governance", category: "governance" },
+  { path: "src/components/governance/LockedFiles.jsx",              group: "governance", category: "governance" },
+  { path: "src/components/governance/AI_STATE.jsx",                 group: "governance", category: "governance" },
+  { path: "src/components/governance/NextSafeStep.jsx",             group: "governance", category: "governance" },
+  // audits
+  { path: "src/components/audits/AUDIT_INDEX.jsx",        group: "audits", category: "audits" },
+  { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx", group: "audits", category: "audits" },
+  // projects
+  { path: "src/components/projects/WORKSTREAM_REGISTRY.jsx", group: "projects", category: "projects" },
+];
+
+function generateDraftManifest(owner, repo, branch, branchIsDefault) {
+  const rawBaseUrl  = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}`;
+  const blobBaseUrl = `https://github.com/${owner}/${repo}/blob/${branch}`;
+
+  const files = DRAFT_SCAFFOLD_PATHS.map(({ path, group, category }) => ({
+    path,
+    group,
+    category,
+    rawUrl:  `${rawBaseUrl}/${path}`,
+    blobUrl: `${blobBaseUrl}/${path}`,
+    action:  "createOrUpdate",
+  }));
+
+  // Group files by their group key
+  const groupMap = files.reduce((acc, f) => {
+    if (!acc[f.group]) acc[f.group] = [];
+    acc[f.group].push(f);
+    return acc;
+  }, {});
+  const fileGroups = Object.entries(groupMap).map(([group, groupFiles]) => ({ group, files: groupFiles }));
+
+  return {
+    owner,
+    repo,
+    branch,
+    branchIsDefault,
+    rawBaseUrl,
+    blobBaseUrl,
+    generatedAt: new Date().toISOString(),
+    status: "draft",
+    fileGroups,
+    files,
+  };
+}
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -190,6 +255,177 @@ function PriorityRow({ file }) {
   );
 }
 
+// ── Draft / Preview / Push-ready sub-components ───────────────────────────────
+
+function DraftManifestSection({ manifest }) {
+  return (
+    <Card className="border-amber-200 bg-amber-50/40">
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Package className="w-4 h-4 text-amber-600" />
+          <CardTitle className="text-base text-slate-800">
+            Draft Manifest — {manifest.owner}/{manifest.repo}
+          </CardTitle>
+          <Badge className="bg-amber-100 text-amber-800 text-xs">Draft – not pushed</Badge>
+        </div>
+        <p className="text-xs text-slate-500 mt-1">
+          Auto-generated scaffold manifest for this repo. Not verified against remote. No API calls made.
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-3">
+        {/* Manifest meta */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          {[
+            { label: "Owner",  value: manifest.owner  },
+            { label: "Repo",   value: manifest.repo   },
+            { label: "Branch", value: `${manifest.branch}${manifest.branchIsDefault ? " (default)" : " (fallback — verify)"}` },
+            { label: "Status", value: "Draft – not pushed" },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-white border border-amber-100 rounded px-2 py-1.5">
+              <p className="text-slate-400 font-medium uppercase tracking-wide text-[10px]">{label}</p>
+              <p className="text-slate-700 font-mono truncate">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* URL bases */}
+        <div className="space-y-1">
+          {[
+            { label: "rawBaseUrl",  value: manifest.rawBaseUrl  },
+            { label: "blobBaseUrl", value: manifest.blobBaseUrl },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex items-center gap-2 text-xs">
+              <span className="text-slate-400 w-24 shrink-0">{label}</span>
+              <code className="bg-white border border-amber-100 rounded px-2 py-0.5 text-slate-600 font-mono flex-1 truncate">{value}</code>
+            </div>
+          ))}
+        </div>
+
+        {/* File groups */}
+        <div className="space-y-2">
+          {manifest.fileGroups.map(({ group, files }) => (
+            <div key={group}>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{group} ({files.length} files)</p>
+              <div className="space-y-0.5">
+                {files.map((f) => (
+                  <div key={f.path} className="flex items-center justify-between text-xs py-0.5">
+                    <span className="font-mono text-slate-600 truncate">{f.path}</span>
+                    <Badge className={`${CATEGORY_COLORS[f.category] || CATEGORY_COLORS.other} text-[10px] ml-2 shrink-0`}>{f.category}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PushPreviewSection({ manifest }) {
+  return (
+    <Card className="border-blue-200 bg-blue-50/30">
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Layers className="w-4 h-4 text-blue-600" />
+          <CardTitle className="text-base text-slate-800">Push Preview</CardTitle>
+          <Badge className="bg-blue-100 text-blue-800 text-xs">Preview only</Badge>
+        </div>
+        <p className="text-xs text-slate-500 mt-1">
+          Files that <em>would</em> be created or updated if a push were executed. No changes have been made.
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="rounded border border-blue-100 bg-white overflow-hidden">
+          {/* Header row */}
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-blue-50 border-b border-blue-100 text-[10px] font-semibold text-blue-700 uppercase tracking-wide">
+            <span>Path</span>
+            <span>Target</span>
+            <span>Action</span>
+          </div>
+          {manifest.files.map((f) => (
+            <div key={f.path} className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
+              <span className="font-mono text-slate-700 truncate">{f.path}</span>
+              <span className="text-slate-400 font-mono whitespace-nowrap">{manifest.owner}/{manifest.repo}@{manifest.branch}</span>
+              <Badge className="bg-slate-100 text-slate-600 text-[10px] whitespace-nowrap">{f.action}</Badge>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-slate-400 mt-2">
+          {manifest.files.length} file{manifest.files.length !== 1 ? "s" : ""} · Branch: <strong>{manifest.branch}</strong>{manifest.branchIsDefault ? " (default)" : " (fallback — confirm before push)"} · Repo: <strong>{manifest.owner}/{manifest.repo}</strong>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PushReadySection({ manifest }) {
+  const [prepared, setPrepared] = useState(false);
+
+  const handlePreparePush = () => {
+    const payload = {
+      owner:  manifest.owner,
+      repo:   manifest.repo,
+      branch: manifest.branch,
+      files:  manifest.files.map((f) => ({
+        path:    f.path,
+        content: DRAFT_PLACEHOLDER_CONTENT,
+        action:  f.action,
+      })),
+    };
+    // eslint-disable-next-line no-console
+    console.log("[GovernanceHub] Push-ready payload (NOT executed):", payload);
+    setPrepared(true);
+  };
+
+  return (
+    <Card className="border-slate-200">
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Send className="w-4 h-4 text-slate-500" />
+          <CardTitle className="text-base text-slate-800">Push-Ready Structure</CardTitle>
+          <Badge className="bg-slate-100 text-slate-600 text-xs">Push not yet implemented</Badge>
+        </div>
+        <p className="text-xs text-slate-500 mt-1">
+          Builds a structured push payload and logs it to the console. No GitHub writes occur.
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-3">
+        <div className="rounded bg-slate-50 border border-slate-200 px-3 py-2 text-xs font-mono text-slate-500 space-y-1">
+          <p className="text-slate-400 font-sans font-medium text-[10px] uppercase tracking-wide mb-1">Payload structure (example)</p>
+          <p>{`{`}</p>
+          <p className="pl-4">{`owner: "${manifest.owner}",`}</p>
+          <p className="pl-4">{`repo: "${manifest.repo}",`}</p>
+          <p className="pl-4">{`branch: "${manifest.branch}",`}</p>
+          <p className="pl-4">{`files: [ { path, content, action: "createOrUpdate" } × ${manifest.files.length} ]`}</p>
+          <p>{`}`}</p>
+        </div>
+
+        <Button
+          variant="outline"
+          onClick={handlePreparePush}
+          className="w-full text-slate-600 border-slate-300 hover:bg-slate-50"
+          title="Builds payload and logs to console — does NOT push to GitHub"
+        >
+          <Send className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+          Prepare Push (Not Executed)
+        </Button>
+
+        {prepared && (
+          <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-800">
+            <span className="w-2 h-2 rounded-full bg-green-400 mt-0.5 shrink-0" />
+            <span>Payload logged to browser console. <strong>No GitHub writes occurred.</strong> Open DevTools → Console to inspect.</span>
+          </div>
+        )}
+
+        <p className="text-[10px] text-slate-400 text-center">
+          ⚠ Push execution is not yet implemented. This button is for structural preview only.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ── Main panel ────────────────────────────────────────────────────────────────
 
 export default function RepoRawAccessPanel() {
@@ -223,6 +459,24 @@ export default function RepoRawAccessPanel() {
     });
   }, [allFiles, query, categoryFilter, folderFilter]);
 
+  // Determine whether the active repo differs from the canonical manifest repo
+  const isDifferentRepo = activeRepo && (
+    activeRepo.owner?.toLowerCase() !== MANIFEST_REPO.owner.toLowerCase() ||
+    activeRepo.repo?.toLowerCase()  !== MANIFEST_REPO.repo.toLowerCase()
+  );
+
+  // Build draft manifest only when a non-canonical repo is selected
+  const draftManifest = useMemo(() => {
+    if (!isDifferentRepo) return null;
+    const owner  = activeRepo.owner  || activeRepo.fullName?.split("/")?.[0];
+    const repo   = activeRepo.repo   || activeRepo.fullName?.split("/")?.[1];
+    if (!owner || !repo) return null; // guard: can't build valid URLs without owner/repo
+    const defaultBranch  = activeRepo.defaultBranch;
+    const branch         = defaultBranch || activeRepo.branch || "main";
+    const branchIsDefault = Boolean(defaultBranch);
+    return generateDraftManifest(owner, repo, branch, branchIsDefault);
+  }, [isDifferentRepo, activeRepo]);
+
   if (!MANIFEST || !MANIFEST.files) {
     return (
       <Card>
@@ -239,7 +493,7 @@ export default function RepoRawAccessPanel() {
 
   return (
     <div className="space-y-4">
-      {/* Repo identity — always shown; status depends on whether activeRepo matches manifest source */}
+      {/* ── Repo identity banner ─────────────────────────────────────── */}
       {activeRepo &&
       activeRepo.owner?.toLowerCase() === MANIFEST_REPO.owner.toLowerCase() &&
       activeRepo.repo?.toLowerCase() === MANIFEST_REPO.repo.toLowerCase() ? (
@@ -258,16 +512,20 @@ export default function RepoRawAccessPanel() {
           <span><strong>Ingen aktivt repo.</strong> Viser kanonisk GovernanceHub-manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). Velg aktivt repo i toppmenyen for repo-spesifikk visning.</span>
         </div>
       )}
+
+      {/* ── SECTION A: GovernanceHub canonical reference ─────────────── */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <CardTitle className="text-base text-slate-800">Repository Raw Access</CardTitle>
+              <div className="flex items-center gap-2 mb-0.5">
+                <CardTitle className="text-base text-slate-800">Repository Raw Access</CardTitle>
+                <Badge className="bg-purple-100 text-purple-700 text-xs">GovernanceHub canonical reference</Badge>
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Inspecting: {MANIFEST_REPO.owner}/{MANIFEST_REPO.repo} · {allFiles.length} filer · Generert {MANIFEST._meta?.generatedAt}
               </p>
             </div>
-
           </div>
 
           {/* Tabs */}
@@ -345,6 +603,20 @@ export default function RepoRawAccessPanel() {
           )}
         </CardContent>
       </Card>
+
+      {/* ── SECTIONS B / PREVIEW / PUSH-READY — only when a different repo is active ── */}
+      {draftManifest && (
+        <>
+          {/* SECTION B: Generated draft manifest */}
+          <DraftManifestSection manifest={draftManifest} />
+
+          {/* PREVIEW section */}
+          <PushPreviewSection manifest={draftManifest} />
+
+          {/* PUSH-READY STRUCTURE */}
+          <PushReadySection manifest={draftManifest} />
+        </>
+      )}
     </div>
   );
 }
