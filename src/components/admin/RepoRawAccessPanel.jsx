@@ -582,7 +582,7 @@ function DirectPushSection({ manifest }) {
             const existing = await res.text();
             content = mergeGovernanceSection(existing, owner, repo);
           }
-          pushable.push({ path: file.path, content, source: "readme" });
+          pushable.push({ path: file.path, content, source: "starter-kit" });
         } catch (err) {
           excluded.push({ path: file.path, reason: `README handling failed: ${err.message}` });
         }
