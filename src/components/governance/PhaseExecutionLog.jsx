@@ -335,5 +335,25 @@ export const PHASE_EXECUTION_LOG = {
       githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Ffix-file-placement-issues',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended per governance logging rules. AUDIT_INDEX.jsx arch-001 oneSafeNextStep updated to reflect step 1 completion and identify next structural step. No other locked files modified.',
     },
+    {
+      id: 'Entry 17',
+      date: '2026-03-17',
+      task: 'gov-006 Phase 10 — Create VerificationSpec.jsx (governance schema/data artifact)',
+      taskRequested: 'Formalize the verification layer as a schema/spec-only artifact that sits between ExecutionWorker/ExecutionWorkerSpec and Verification.jsx. Must not implement external verification, GitHub API calls, or fabricate repo verification. Must keep verification truthful and governance-bound. Define: specMeta, verificationInputs, verificationPreconditions, verificationChecks, verificationStatusVocabulary, verificationDecisionRules, requiredVerificationEvidence, blockedVerificationCapabilities, blockedInterpretations, verificationOutputContract, consumingComponents.',
+      changedFiles: [
+        'src/components/governance/VerificationSpec.jsx',
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'VerificationSpec.jsx (net-new): pure schema/data artifact. Exports: specMeta (phase 10, schema-only, externalVerificationConnected: false), verificationInputs (3 upstream artifacts: ExecutionWorkerSpec, ChangePlanInstanceRegistry, DispatchAuthorizationSpec — all writePermitted: false), verificationPreconditions (4 preconditions: plan instance found in registry, required evidence schema available, read-only enforcement, no network calls), verificationChecks (4 checks: field presence, completeness summary, registry identity inspection, vocabulary conformance — all permitsNetworkCall: false), verificationStatusVocabulary (5 terms: verified, incomplete, unverifiable, failed, requires_manual_review — all externalVerificationPerformed: false), verificationDecisionRules (5 rules mapping evidence presence to status, including governance-violation → failed), requiredVerificationEvidence (12 evidence fields derived from ExecutionWorkerSpec ee-001 through ee-012, each with missingMeaning), blockedVerificationCapabilities (11 explicit blocks: fetch/axios, GitHub API, PR inspection, commit inspection, synthetic evidence, silent fallback, registry mutation, execution log fabrication, completion claims without evidence, background jobs, component state mutation affecting governed data), blockedInterpretations (6 explicit non-equivalences: reference-present vs. artifact-verified, governed-data-verified vs. externally-verified, unverifiable vs. failed, spec-exists vs. runtime-available, VerificationSpec-exists vs. verification-complete, all-evidence-present vs. execution-was-correct), verificationOutputContract (8 output fields: planId, verificationStatus, evidenceResults, requiredEvidencePresentCount, requiredEvidenceTotalCount, externalVerificationPerformed hardcoded false, verificationTimestamp, governanceBoundaryNote), consumingComponents (2: current Verification.jsx with vocabulary alignment note, future ExecutionLog layer).',
+        'PhaseExecutionLog.jsx: appended Entry 17 for this gov-006 Phase 10 VerificationSpec creation.',
+      ],
+      githubVisibility: 'Not yet verified',
+      verificationTargetType: 'pull_request',
+      verificationTargetValue: 'copilot/add-verification-spec-file',
+      verificationBranch: 'main',
+      githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Fadd-verification-spec-file',
+      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. VerificationSpec.jsx is a net-new file — not a locked file at creation time. Verification.jsx not modified — vocabulary alignment is noted in VerificationSpec but intentionally left as a future refactor. No other locked files modified.',
+    },
   ],
 };
