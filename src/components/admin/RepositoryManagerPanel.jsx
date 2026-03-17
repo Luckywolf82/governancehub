@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Edit2, Save, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Plus, Edit2, Save, AlertTriangle } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 // Canonical set of known capabilities with their safe defaults.
@@ -63,7 +63,6 @@ export default function RepositoryManagerPanel() {
   };
 
   const handleCapabilityToggle = (cap, isEdit = false) => {
-    const target = isEdit ? editForm : createForm;
     const setter = isEdit ? setEditForm : setCreateForm;
     setter((prev) => ({
       ...prev,

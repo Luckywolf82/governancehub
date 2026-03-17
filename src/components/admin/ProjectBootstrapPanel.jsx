@@ -199,7 +199,7 @@ export default function ProjectBootstrapPanel() {
   }, [activeRepo, bootstrapMode, buildIntent, projectName, notes]);
 
   const needsName = bootstrapMode === "create";
-  const canGenerate = activeRepo && (bootstrapMode === "link" || projectName.trim());
+  const _canGenerate = activeRepo && (bootstrapMode === "link" || projectName.trim());
 
   async function handleCreate() {
     if (!activeRepo || !projectName.trim()) return;

@@ -138,7 +138,7 @@ export default function InstallReadinessCheck({ onReadinessChange } = {}) {
   // Notify parent whenever the effective readiness state changes
   useEffect(() => {
     onReadinessChange?.(effectiveReadiness);
-  }, [effectiveReadiness]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [effectiveReadiness]);
 
   const meta = READINESS[effectiveReadiness] ?? READINESS.idle;
   const existCount  = results.filter((r) => r.exists).length;

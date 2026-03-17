@@ -341,7 +341,7 @@ export default function AuditRunnerPanel({ onUseInOrchestrator }) {
   // AUDIT_INDEX is a static module-level constant — entries never mutate at runtime.
   const verifiedEntries = useMemo(
     () => AUDIT_INDEX.entries.filter((e) => e.status === "verified"),
-    [] // eslint-disable-line react-hooks/exhaustive-deps
+    [] // AUDIT_INDEX is a static module-level constant — entries never mutate at runtime
   );
 
   // Heuristic split: entries with githubIssueId or githubStatus are considered

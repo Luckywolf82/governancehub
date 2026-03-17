@@ -5,6 +5,16 @@ import pluginReactHooks from "eslint-plugin-react-hooks";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 
 export default [
+  // Global ignores: governance data files stored with .jsx extension
+  // (JSON/Markdown content — not valid JavaScript, must not be parsed by ESLint)
+  {
+    ignores: [
+      "src/components/governance/GITHUB_GOVERNANCE_IMPLEMENTATION.jsx",
+      "src/components/governance/PRIORITY_REPO_FILES.jsx",
+      "src/components/governance/REPO_FILE_MANIFEST.jsx",
+      "src/components/governance/repo-index/**/*.jsx",
+    ],
+  },
   {
     files: [
       "src/components/**/*.{js,mjs,cjs,jsx}",
@@ -46,6 +56,8 @@ export default [
           varsIgnorePattern: "^_",
           args: "after-used",
           argsIgnorePattern: "^_",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
       "react/prop-types": "off",

@@ -267,7 +267,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
         if (res.data) {
           setIssueStatus(res.data);
         }
-      } catch (err) {
+      } catch (_err) {
         // Silent fail — status check is non-critical
         setIssueStatus(null);
       } finally {
@@ -298,7 +298,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
         if (res.data) {
           setPrStatus(res.data);
         }
-      } catch (err) {
+      } catch (_err) {
         // Silent fail — status check is non-critical
         setPrStatus(null);
       } finally {
@@ -327,7 +327,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
         auditId: audit.id,
       });
       if (res.data) setIssueStatus(res.data);
-    } catch (err) {
+    } catch (_err) {
       // Silent fail — status check is non-critical
       setIssueStatus(null);
     } finally {
@@ -345,7 +345,7 @@ export default function GovernanceOrchestratorPanel({ injectedAudit = null, onCl
         auditId: audit.id,
       });
       if (res.data) setPrStatus(res.data);
-    } catch (err) {
+    } catch (_err) {
       // Silent fail — status check is non-critical
       setPrStatus(null);
     } finally {
