@@ -259,6 +259,7 @@ function VerificationInstanceCard({ entry }) {
 
   // Preview-only helper — reads current verification result and logs it.
   // Does NOT write to PhaseExecutionLog, does NOT mutate state.
+  // No append is authorized in this phase.
   function handleRecordVerificationResult() {
     const missingEvidence = requiredResults
       .filter((r) => !r.present)
@@ -366,14 +367,15 @@ function VerificationInstanceCard({ entry }) {
           <Button
             variant="outline"
             size="sm"
-            aria-label="Prepare log entry preview — no persistence"
+            aria-label="Prepare log entry structure preview — no persistence, no append"
             onClick={() => {
-              // Preview only — builds an append-ready verification entry without writing to PhaseExecutionLog.
+              // Preview only — builds a structural log entry preview without writing to PhaseExecutionLog.
+              // No append is authorized in this phase. No persistence. No mutation.
               const entry = buildVerificationLogEntry();
-              console.log("APPEND-READY VERIFICATION ENTRY PREVIEW:", entry);
+              console.log("VERIFICATION ENTRY STRUCTURE PREVIEW (not append-ready — no write path exists):", entry);
             }}
           >
-            Preview append-ready log entry
+            Preview log entry structure (no append)
           </Button>
         </div>
 

@@ -23,9 +23,9 @@ export const PHASE_EXECUTION_LOG = {
       'verificationBranch',
       'githubVerificationUrl',
       // Verification fields — output by buildVerificationLogEntry() in Verification.jsx.
-      // Current output is preview-only and append-ready. NOT persistent. NOT committed to
+      // Current output is preview-only structural scaffolding only. NOT persistent. NOT committed to
       // PHASE_EXECUTION_LOG.entries. NOT written anywhere in this phase.
-      // No safe write layer exists. Verification output is structural scaffolding only.
+      // No safe write layer exists. No append is authorized in this phase.
       'verificationStatus',
       'missingEvidence',
       'verificationNotes',
@@ -404,14 +404,14 @@ export const PHASE_EXECUTION_LOG = {
     mode: "append-only",
     note: "Verification entries are currently preview-only output from buildVerificationLogEntry(). " +
           "They are NOT committed to PHASE_EXECUTION_LOG.entries and NOT written anywhere. " +
-          "No safe write layer exists. The rules below define the governance " +
-          "contract for when a safe write path is introduced.",
+          "No safe write layer exists. No write is authorized in this phase. " +
+          "The rules below are for future reference only — they do not authorize any write now.",
 
     rules: [
       {
         id: "ws-001",
         rule: "Verification results must create a new log entry, not overwrite existing entries",
-        note: "Applies when a safe write path is introduced. Currently, verification output is preview-only and not committed.",
+        note: "Applies only if and when a safe write path is introduced in a future phase. Currently, verification output is preview-only and not committed.",
       },
       {
         id: "ws-002",
