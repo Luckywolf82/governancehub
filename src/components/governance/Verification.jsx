@@ -46,6 +46,11 @@ import {
   specMeta as dispatchSpecMeta,
 } from "@/components/governance/DispatchAuthorizationSpec";
 
+import {
+  verificationStatusVocabulary,
+} from "@/components/governance/VerificationSpec";
+// Verification status vocabulary aligned with VerificationSpec
+
 // ── Evidence availability evaluator ───────────────────────────────────────────
 // Pure function — no side effects, no state mutation, no inferred values.
 // Returns an array of evidence check results for a single registry entry.
@@ -76,14 +81,17 @@ function evaluateEvidence(entry) {
 
 // ── Derive verification status ─────────────────────────────────────────────────
 // Pure read-only derivation.
-// Returns: "complete" | "incomplete" | "unverifiable"
+// Returns a value from verificationStatusVocabulary: "verified" | "incomplete" | "unverifiable"
 //
 // Conservative rule:
 //   - Any required evidence missing → "unverifiable" (if execution not connected at all)
 //     or "incomplete" (if some evidence is present but not all)
-//   - All required evidence present → "complete"
-//     (Note: "complete" here means all required fields are present in governed data —
+//   - All required evidence present → "verified"
+//     (Note: "verified" here means all required fields are present in governed data —
 //      it does NOT mean external repository verification was performed)
+
+// Status string constants sourced from spec vocabulary (spec as source of truth)
+const VERIFIED_STATUS = verificationStatusVocabulary.find((v) => v.status === "verified").status;
 
 function deriveVerificationStatus(evidenceResults) {
   if (!Array.isArray(evidenceResults) || evidenceResults.length === 0) {
@@ -91,7 +99,7 @@ function deriveVerificationStatus(evidenceResults) {
   }
   const requiredResults = evidenceResults.filter((r) => r.required);
   const allPresent = requiredResults.every((r) => r.present);
-  if (allPresent) return "complete";
+  if (allPresent) return VERIFIED_STATUS;
   const anyPresent = requiredResults.some((r) => r.present);
   if (anyPresent) return "incomplete";
   return "unverifiable";
@@ -120,7 +128,7 @@ function GovernanceNoticeBanner() {
 // ── Verification status badge ──────────────────────────────────────────────────
 
 function VerificationStatusBadge({ status }) {
-  if (status === "complete") {
+  if (status === VERIFIED_STATUS) {
     return (
       <Badge className="bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1 w-fit">
         <ClipboardList className="h-3 w-3 shrink-0" />
@@ -191,7 +199,7 @@ function FieldRow({ label, value }) {
 // Explicitly states why verification is incomplete or unverifiable.
 
 function VerificationTruthfulnessBlock({ status, missingCount, totalRequired }) {
-  if (status === "complete") {
+  if (status === VERIFIED_STATUS) {
     return (
       <div className="rounded-md border border-blue-200 bg-blue-50 px-3 py-3 space-y-1">
         <div className="flex items-center gap-2 text-xs font-semibold text-blue-900 uppercase tracking-wide">
