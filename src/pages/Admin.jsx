@@ -89,6 +89,19 @@ export default function Admin() {
           </span>
         </div>
 
+        {/* Workflow hint — read-only guidance layer, not a pipeline state engine */}
+        <div className="border border-slate-200 dark:border-slate-700 rounded px-4 py-3 bg-white dark:bg-slate-900 space-y-1.5">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Workflow hint</p>
+          <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+            Audit <span className="text-slate-400 dark:text-slate-500">→</span> Orchestrate <span className="text-slate-400 dark:text-slate-500">→</span> Execute <span className="text-slate-400 dark:text-slate-500">→</span> Verify <span className="text-slate-400 dark:text-slate-500">→</span> Log
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Start med audit og jobb videre stegvis. Denne visningen er veiledende.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="font-medium">Nåværende fokus:</span>{" "}
+            {injectedAudit ? "Audit valgt" : "Start med audit"}
+          </p>
+        </div>
+
         <BuildIntegrityBanner />
 
         <div className="flex border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
