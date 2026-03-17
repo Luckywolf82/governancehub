@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle, Layers, Package, Send } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
+import { base44 } from "@/api/base44Client";
 
 // ── Inline manifest data ──────────────────────────────────────────────────────
 // Data sourced from REPO_FILE_MANIFEST.json and PRIORITY_REPO_FILES.json.
@@ -12,6 +13,10 @@ import { useActiveRepo } from "@/components/ActiveRepoContext";
 
 const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main";
 const GH_BASE = "https://github.com/Luckywolf82/governancehub/blob/main";
+
+// Base raw URL for starter-kit source files inside the GovernanceHub repo.
+// These are the canonical installer templates — safe to copy to any target repo.
+const SK_RAW_BASE = `${RAW_BASE}/starter-kit/src/components`;
 
 // The repository this manifest was generated from.
 // Used to determine whether the active repo matches the manifest source.
@@ -86,32 +91,27 @@ const PRIORITY = {
 };
 
 // ── Draft manifest generation ─────────────────────────────────────────────────
-// Generates a repo-aware DRAFT manifest based on the GovernanceHub scaffold
-// structure. No GitHub API calls are made — this is a structural template only.
-
-const DRAFT_PLACEHOLDER_CONTENT = "[draft — content not yet loaded]";
+// Generates a repo-aware DRAFT manifest covering the starter-kit push scope only.
+// Phase 1 push scope = repo-aware manifest + starter-kit-approved artifacts.
+// Broad app scaffold files, governance-specific files, and audit/log files are
+// NOT included in this phase.
 
 const DRAFT_SCAFFOLD_PATHS = [
-  // root
-  { path: "package.json",    group: "root",       category: "config" },
-  { path: "README.md",       group: "root",       category: "docs"   },
-  { path: ".gitignore",      group: "root",       category: "config" },
-  { path: "vite.config.js",  group: "root",       category: "config" },
-  // src
-  { path: "src/App.jsx",     group: "src",        category: "config" },
-  { path: "src/main.jsx",    group: "src",        category: "config" },
-  { path: "src/index.css",   group: "src",        category: "assets" },
-  // governance
-  { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", group: "governance", category: "governance" },
-  { path: "src/components/governance/PhaseExecutionLog.jsx",        group: "governance", category: "governance" },
-  { path: "src/components/governance/LockedFiles.jsx",              group: "governance", category: "governance" },
-  { path: "src/components/governance/AI_STATE.jsx",                 group: "governance", category: "governance" },
-  { path: "src/components/governance/NextSafeStep.jsx",             group: "governance", category: "governance" },
-  // audits
-  { path: "src/components/audits/AUDIT_INDEX.jsx",        group: "audits", category: "audits" },
-  { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx", group: "audits", category: "audits" },
-  // projects
-  { path: "src/components/projects/WORKSTREAM_REGISTRY.jsx", group: "projects", category: "projects" },
+  // repo-aware manifest (generated JSON pushed to the target repo root)
+  { path: "GOVERNANCE_MANIFEST.json",                                  group: "manifest",  category: "config"     },
+  // starter-kit: governance module
+  { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",    group: "governance", category: "governance" },
+  { path: "src/components/governance/AI_STATE.jsx",                   group: "governance", category: "governance" },
+  { path: "src/components/governance/LockedFiles.jsx",                group: "governance", category: "governance" },
+  { path: "src/components/governance/NextSafeStep.jsx",               group: "governance", category: "governance" },
+  { path: "src/components/governance/PhaseExecutionLog.jsx",          group: "governance", category: "governance" },
+  { path: "src/components/governance/STARTER_KIT_VERSION.jsx",        group: "governance", category: "governance" },
+  { path: "src/components/governance/INSTALL_POLICY.jsx",             group: "governance", category: "governance" },
+  // starter-kit: audits module
+  { path: "src/components/audits/AUDIT_INDEX.jsx",                    group: "audits",     category: "audits"     },
+  { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx",             group: "audits",     category: "audits"     },
+  // starter-kit: projects module
+  { path: "src/components/projects/WORKSTREAM_REGISTRY.jsx",          group: "projects",   category: "projects"   },
 ];
 
 function generateDraftManifest(owner, repo, branch, branchIsDefault) {
@@ -149,6 +149,63 @@ function generateDraftManifest(owner, repo, branch, branchIsDefault) {
   };
 }
 
+// ── Payload content sources ───────────────────────────────────────────────────
+// Phase 1 push scope:
+//   manifest     → repo-aware GOVERNANCE_MANIFEST.json generated programmatically
+//   starter-kit  → fetched live from GovernanceHub starter-kit/ raw URLs
+//
+// Non-starter-kit scaffold files (package.json, src/App.jsx, etc.) and all
+// GovernanceHub-specific files are NOT in this scope. They have no entry here.
+
+const CONTENT_SOURCES = {
+  "GOVERNANCE_MANIFEST.json": { type: "manifest" },
+  "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx":  { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/AI_PROJECT_INSTRUCTIONS.jsx`  },
+  "src/components/governance/AI_STATE.jsx":                 { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/AI_STATE.jsx`                  },
+  "src/components/governance/LockedFiles.jsx":              { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/LockedFiles.jsx`               },
+  "src/components/governance/NextSafeStep.jsx":             { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/NextSafeStep.jsx`              },
+  "src/components/governance/PhaseExecutionLog.jsx":        { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/PhaseExecutionLog.jsx`         },
+  "src/components/governance/STARTER_KIT_VERSION.jsx":      { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/STARTER_KIT_VERSION.jsx`       },
+  "src/components/governance/INSTALL_POLICY.jsx":           { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/INSTALL_POLICY.jsx`            },
+  "src/components/audits/AUDIT_INDEX.jsx":                  { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/audits/AUDIT_INDEX.jsx`                   },
+  "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx":           { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/audits/AUDIT_SYSTEM_GUIDE.jsx`            },
+  "src/components/projects/WORKSTREAM_REGISTRY.jsx":        { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/projects/WORKSTREAM_REGISTRY.jsx`         },
+};
+
+// Generates the repo-aware GOVERNANCE_MANIFEST.json content for the target repo.
+// This manifest records what starter-kit files were installed and where.
+function generateManifestContent(manifest) {
+  const installable = manifest.files.filter((f) => f.path !== "GOVERNANCE_MANIFEST.json");
+  return JSON.stringify(
+    {
+      _meta: {
+        generatedBy: "GovernanceHub",
+        generatedAt: manifest.generatedAt,
+        starterKitVersion: "1.0.0",
+        schemaVersion: "1",
+      },
+      owner:       manifest.owner,
+      repo:        manifest.repo,
+      branch:      manifest.branch,
+      rawBaseUrl:  manifest.rawBaseUrl,
+      blobBaseUrl: manifest.blobBaseUrl,
+      fileGroups:  manifest.fileGroups
+        .filter((g) => g.group !== "manifest")
+        .map((g) => ({
+          group: g.group,
+          files: g.files.map((f) => ({ path: f.path, category: f.category })),
+        })),
+      files: installable.map((f) => ({
+        path:     f.path,
+        category: f.category,
+        rawUrl:   f.rawUrl,
+        blobUrl:  f.blobUrl,
+      })),
+    },
+    null,
+    2
+  );
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CATEGORY_COLORS = {
@@ -169,6 +226,13 @@ const PRIORITY_COLORS = {
   critical: "bg-red-100 text-red-800",
   high:     "bg-amber-100 text-amber-800",
   normal:   "bg-slate-100 text-slate-600",
+};
+
+const SOURCE_META = {
+  manifest:       { label: "manifest",    color: "bg-violet-100 text-violet-800",  title: "Repo-aware manifest generated for this repo" },
+  "starter-kit":  { label: "starter-kit", color: "bg-emerald-100 text-emerald-800", title: "Content fetched from GovernanceHub starter-kit" },
+  excluded:       { label: "excluded",    color: "bg-red-100 text-red-700",         title: "Omitted — excluded from this push phase" },
+  undefined:      { label: "unknown",     color: "bg-gray-100 text-gray-500",        title: "Source not defined" },
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -269,7 +333,8 @@ function DraftManifestSection({ manifest }) {
           <Badge className="bg-amber-100 text-amber-800 text-xs">Draft – not pushed</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Auto-generated scaffold manifest for this repo. Not verified against remote. No API calls made.
+          Phase 1 push scope: repo-aware <strong>GOVERNANCE_MANIFEST.json</strong> + starter-kit-approved artifacts only.
+          Broad app scaffold files, GovernanceHub-specific files, audits, and execution logs are <strong>not</strong> included.
         </p>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
@@ -323,104 +388,315 @@ function DraftManifestSection({ manifest }) {
 }
 
 function PushPreviewSection({ manifest }) {
+  const manifestFiles    = manifest.files.filter((f) => f.group === "manifest");
+  const starterKitFiles  = manifest.files.filter((f) => f.group !== "manifest");
+
+  const FileSourceRow = ({ f }) => {
+    const src  = CONTENT_SOURCES[f.path];
+    const meta = SOURCE_META[src?.type] ?? SOURCE_META.undefined;
+    return (
+      <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
+        <span className="font-mono text-slate-700 truncate" title={f.path}>{f.path}</span>
+        <Badge className={`${meta.color} text-[10px] whitespace-nowrap`} title={meta.title}>{meta.label}</Badge>
+        <Badge className="bg-slate-100 text-slate-600 text-[10px] whitespace-nowrap">{f.action}</Badge>
+      </div>
+    );
+  };
+
   return (
     <Card className="border-blue-200 bg-blue-50/30">
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <Layers className="w-4 h-4 text-blue-600" />
-          <CardTitle className="text-base text-slate-800">Push Preview</CardTitle>
-          <Badge className="bg-blue-100 text-blue-800 text-xs">Preview only</Badge>
+          <CardTitle className="text-base text-slate-800">Payload Source Preview</CardTitle>
+          <Badge className="bg-blue-100 text-blue-800 text-xs">Preview only — no writes</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Files that <em>would</em> be created or updated if a push were executed. No changes have been made.
+          Phase 1 push scope only: repo-aware manifest + starter-kit artifacts.
+          No broad scaffold, governance-specific, or audit/log files are included.
         </p>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="rounded border border-blue-100 bg-white overflow-hidden">
-          {/* Header row */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-blue-50 border-b border-blue-100 text-[10px] font-semibold text-blue-700 uppercase tracking-wide">
-            <span>Path</span>
-            <span>Target</span>
-            <span>Action</span>
-          </div>
-          {manifest.files.map((f) => (
-            <div key={f.path} className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
-              <span className="font-mono text-slate-700 truncate">{f.path}</span>
-              <span className="text-slate-400 font-mono whitespace-nowrap">{manifest.owner}/{manifest.repo}@{manifest.branch}</span>
-              <Badge className="bg-slate-100 text-slate-600 text-[10px] whitespace-nowrap">{f.action}</Badge>
+      <CardContent className="pt-0 space-y-3">
+        {/* Manifest group */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-700 mb-1">
+            Repo-aware manifest
+          </p>
+          <div className="rounded border border-violet-100 bg-white overflow-hidden">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-violet-50 border-b border-violet-100 text-[10px] font-semibold text-violet-700 uppercase tracking-wide">
+              <span>Path</span><span>Source</span><span>Action</span>
             </div>
-          ))}
+            {manifestFiles.map((f) => <FileSourceRow key={f.path} f={f} />)}
+          </div>
         </div>
-        <p className="text-[10px] text-slate-400 mt-2">
-          {manifest.files.length} file{manifest.files.length !== 1 ? "s" : ""} · Branch: <strong>{manifest.branch}</strong>{manifest.branchIsDefault ? " (default)" : " (fallback — confirm before push)"} · Repo: <strong>{manifest.owner}/{manifest.repo}</strong>
+
+        {/* Starter-kit group */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 mb-1">
+            Starter-kit artifacts ({starterKitFiles.length} files)
+          </p>
+          <div className="rounded border border-emerald-100 bg-white overflow-hidden">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">
+              <span>Path</span><span>Source</span><span>Action</span>
+            </div>
+            {starterKitFiles.map((f) => <FileSourceRow key={f.path} f={f} />)}
+          </div>
+        </div>
+
+        <p className="text-[10px] text-slate-400">
+          {manifest.files.length} file{manifest.files.length !== 1 ? "s" : ""} total · Branch: <strong>{manifest.branch}</strong>{manifest.branchIsDefault ? " (default)" : " (fallback — confirm before push)"} · Repo: <strong>{manifest.owner}/{manifest.repo}</strong>
         </p>
       </CardContent>
     </Card>
   );
 }
 
-function PushReadySection({ manifest }) {
-  const [prepared, setPrepared] = useState(false);
+function DirectPushSection({ manifest }) {
+  const [phase, setPhase] = useState("idle"); // "idle" | "assembling" | "ready" | "pushing" | "done" | "error"
+  const [assembled, setAssembled] = useState(null);   // { pushable: [...], excluded: [...] }
+  const [pushResult, setPushResult] = useState(null);
+  const [pushError, setPushError] = useState(null);
 
-  const handlePreparePush = () => {
-    const payload = {
-      owner:  manifest.owner,
-      repo:   manifest.repo,
-      branch: manifest.branch,
-      files:  manifest.files.map((f) => ({
-        path:    f.path,
-        content: DRAFT_PLACEHOLDER_CONTENT,
-        action:  f.action,
-      })),
-    };
-    // eslint-disable-next-line no-console
-    console.log("[GovernanceHub] Push-ready payload (NOT executed):", payload);
-    setPrepared(true);
+  const { owner, repo, branch, branchIsDefault } = manifest;
+  const canProceed = Boolean(owner && repo && branch);
+
+  const handleAssemble = async () => {
+    setPhase("assembling");
+    setPushError(null);
+    setAssembled(null);
+
+    const pushable = [];
+    const excluded = [];
+
+    for (const file of manifest.files) {
+      const src = CONTENT_SOURCES[file.path];
+
+      if (!src) {
+        excluded.push({ path: file.path, reason: "No content source defined — not in starter-kit scope" });
+        continue;
+      }
+
+      if (src.type === "manifest") {
+        const content = generateManifestContent(manifest);
+        pushable.push({ path: file.path, content, source: "manifest" });
+        continue;
+      }
+
+      if (src.type === "starter-kit") {
+        try {
+          const res = await fetch(src.rawUrl);
+          if (!res.ok) throw new Error(`HTTP ${res.status} from GovernanceHub starter-kit URL`);
+          const content = await res.text();
+          pushable.push({ path: file.path, content, source: "starter-kit", rawUrl: src.rawUrl });
+        } catch (err) {
+          excluded.push({ path: file.path, reason: `Starter-kit fetch failed: ${err.message}` });
+        }
+        continue;
+      }
+
+      // Any other (unexpected) source type is excluded
+      excluded.push({ path: file.path, reason: `Source type "${src.type}" is not permitted in phase 1 push` });
+    }
+
+    setAssembled({ pushable, excluded });
+    setPhase("ready");
+  };
+
+  const handlePush = async () => {
+    if (!assembled || assembled.pushable.length === 0) return;
+    setPhase("pushing");
+    setPushError(null);
+
+    try {
+      const result = await base44.functions.invoke("pushFilesToGithub", {
+        owner,
+        repo,
+        branch,
+        message: `GovernanceHub starter-kit install [${new Date().toISOString()}]`,
+        files: assembled.pushable.map((f) => ({
+          path: f.path,
+          content: f.content,
+          source: f.source,
+        })),
+      });
+      setPushResult(result);
+      setPhase("done");
+    } catch (err) {
+      setPushError(err?.message ?? "Push failed — see browser console for details.");
+      setPhase("error");
+    }
+  };
+
+  const reset = () => {
+    setPhase("idle");
+    setAssembled(null);
+    setPushResult(null);
+    setPushError(null);
   };
 
   return (
-    <Card className="border-slate-200">
+    <Card className="border-slate-300 bg-slate-50/40">
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Send className="w-4 h-4 text-slate-500" />
-          <CardTitle className="text-base text-slate-800">Push-Ready Structure</CardTitle>
-          <Badge className="bg-slate-100 text-slate-600 text-xs">Push not yet implemented</Badge>
+          <Send className="w-4 h-4 text-slate-600" />
+          <CardTitle className="text-base text-slate-800">Install Starter Kit to GitHub</CardTitle>
+          <Badge className="bg-slate-200 text-slate-700 text-xs">Explicit operator action only</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Builds a structured push payload and logs it to the console. No GitHub writes occur.
+          Fetch starter-kit files from GovernanceHub, generate the repo-aware manifest, then push to{" "}
+          <strong>{owner}/{repo}</strong> on branch <strong>{branch}</strong>.
+          Phase 1 scope only — no broad scaffold or governance-specific files.
+          {!branchIsDefault && (
+            <span className="text-amber-600"> ⚠ Branch is not the default — confirm before pushing.</span>
+          )}
         </p>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
-        <div className="rounded bg-slate-50 border border-slate-200 px-3 py-2 text-xs font-mono text-slate-500 space-y-1">
-          <p className="text-slate-400 font-sans font-medium text-[10px] uppercase tracking-wide mb-1">Payload structure (example)</p>
-          <p>{`{`}</p>
-          <p className="pl-4">{`owner: "${manifest.owner}",`}</p>
-          <p className="pl-4">{`repo: "${manifest.repo}",`}</p>
-          <p className="pl-4">{`branch: "${manifest.branch}",`}</p>
-          <p className="pl-4">{`files: [ { path, content, action: "createOrUpdate" } × ${manifest.files.length} ]`}</p>
-          <p>{`}`}</p>
+        {/* Pre-flight checklist */}
+        <div className="rounded border border-slate-200 bg-white px-3 py-2 space-y-1 text-xs">
+          <p className="font-semibold text-slate-500 text-[10px] uppercase tracking-wide mb-1.5">Pre-flight conditions</p>
+          {[
+            { label: "owner resolved",    met: Boolean(owner),                                    value: owner  || "—" },
+            { label: "repo resolved",     met: Boolean(repo),                                     value: repo   || "—" },
+            { label: "branch resolved",   met: Boolean(branch),                                   value: branch || "—" },
+            { label: "payload assembled", met: Boolean(assembled && assembled.pushable.length > 0), value: assembled ? `${assembled.pushable.length} file(s) ready` : "not yet assembled" },
+          ].map(({ label, met, value }) => (
+            <div key={label} className="flex items-center gap-2">
+              <span className={`text-[10px] font-bold shrink-0 w-3 ${met ? "text-emerald-600" : "text-red-400"}`} aria-hidden="true">
+                {met ? "✓" : "✗"}
+              </span>
+              <span className="text-slate-500 w-36 shrink-0">{label}</span>
+              <span className={`font-mono ${met ? "text-slate-700" : "text-slate-400"}`}>{value}</span>
+            </div>
+          ))}
         </div>
 
-        <Button
-          variant="outline"
-          onClick={handlePreparePush}
-          className="w-full text-slate-600 border-slate-300 hover:bg-slate-50"
-          title="Builds payload and logs to console — does NOT push to GitHub"
-        >
-          <Send className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
-          Prepare Push (Not Executed)
-        </Button>
+        {/* Step 1: Assemble */}
+        {(phase === "idle" || phase === "assembling") && (
+          <Button
+            onClick={handleAssemble}
+            disabled={!canProceed || phase === "assembling"}
+            variant="outline"
+            className="w-full text-slate-700 border-slate-300"
+          >
+            {phase === "assembling" ? "Assembling payload…" : "Step 1 — Assemble Payload"}
+          </Button>
+        )}
 
-        {prepared && (
-          <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-800">
-            <span className="w-2 h-2 rounded-full bg-green-400 mt-0.5 shrink-0" />
-            <span>Payload logged to browser console. <strong>No GitHub writes occurred.</strong> Open DevTools → Console to inspect.</span>
+        {/* Assembled payload preview */}
+        {assembled && (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-600">Assembled payload</p>
+
+            {assembled.pushable.length > 0 && (
+              <div className="rounded border border-emerald-200 bg-white overflow-hidden">
+                <div className="px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">
+                  ✓ Pushable ({assembled.pushable.length} file{assembled.pushable.length !== 1 ? "s" : ""})
+                </div>
+                {assembled.pushable.map((f) => (
+                  <div key={f.path} className="flex items-center justify-between gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 text-xs">
+                    <span className="font-mono text-slate-700 truncate">{f.path}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Badge className={`${SOURCE_META[f.source]?.color ?? SOURCE_META.undefined.color} text-[10px]`} title={SOURCE_META[f.source]?.title}>
+                        {SOURCE_META[f.source]?.label ?? "unknown"}
+                      </Badge>
+                      {f.source === "starter-kit" && f.rawUrl && (
+                        <a href={f.rawUrl} target="_blank" rel="noopener noreferrer" title="View GovernanceHub starter-kit source" className="text-slate-400 hover:text-slate-600">
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {assembled.excluded.length > 0 && (
+              <div className="rounded border border-red-100 bg-white overflow-hidden">
+                <div className="px-3 py-1.5 bg-red-50 border-b border-red-100 text-[10px] font-semibold text-red-700 uppercase tracking-wide">
+                  ⛔ Excluded — omitted from push ({assembled.excluded.length})
+                </div>
+                {assembled.excluded.map((f) => (
+                  <div key={f.path} className="flex items-start gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 text-xs">
+                    <span className="font-mono text-slate-600 shrink-0 max-w-[55%] truncate">{f.path}</span>
+                    <span className="text-slate-400 text-[10px]">{f.reason}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        <p className="text-[10px] text-slate-400 text-center">
-          ⚠ Push execution is not yet implemented. This button is for structural preview only.
-        </p>
+        {/* Step 2: Push — only when assembled and pushable files exist */}
+        {phase === "ready" && assembled && assembled.pushable.length > 0 && (
+          <Button
+            onClick={handlePush}
+            className="w-full bg-slate-800 hover:bg-slate-700 text-white"
+          >
+            <Send className="w-3.5 h-3.5 mr-1.5" />
+            Install Starter Kit to GitHub ({assembled.pushable.length} file{assembled.pushable.length !== 1 ? "s" : ""})
+          </Button>
+        )}
+
+        {phase === "ready" && assembled && assembled.pushable.length === 0 && (
+          <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-800">
+            <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+            <span>No pushable files assembled — all files were excluded. Push is not available.</span>
+          </div>
+        )}
+
+        {/* Pushing in progress */}
+        {phase === "pushing" && (
+          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shrink-0" />
+            <span>Pushing to GitHub… do not close this panel.</span>
+          </div>
+        )}
+
+        {/* Push result */}
+        {phase === "done" && pushResult && (
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-800">
+              <span className="w-2 h-2 rounded-full bg-green-400 mt-0.5 shrink-0" />
+              <span>
+                Push complete. <strong>{pushResult.pushed?.length ?? 0} file(s) pushed</strong>
+                {pushResult.errors?.length > 0 && `, ${pushResult.errors.length} error(s)`}.
+              </span>
+            </div>
+            {pushResult.errors?.length > 0 && (
+              <div className="rounded border border-red-100 bg-white px-3 py-2 space-y-1 text-xs">
+                <p className="font-semibold text-red-700">Push errors:</p>
+                {pushResult.errors.map((e) => (
+                  <p key={e.path} className="font-mono text-red-600">{e.path}: {e.error}</p>
+                ))}
+              </div>
+            )}
+            <Button variant="outline" size="sm" onClick={reset} className="text-xs text-slate-500">
+              Reset
+            </Button>
+          </div>
+        )}
+
+        {/* Error state */}
+        {phase === "error" && pushError && (
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-800">
+              <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+              <span>Push failed: {pushError}</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={reset} className="text-xs text-slate-500">
+              Reset
+            </Button>
+          </div>
+        )}
+
+        {/* Safety notice — shown until push completes */}
+        {phase !== "done" && (
+          <p className="text-[10px] text-slate-400 text-center">
+            ⚠ Phase 1 scope only: repo-aware manifest + starter-kit artifacts. No broad scaffold, governance-specific, or audit/log files.
+            Starter-kit files are fetched live from GovernanceHub. No auto-push. Push executes only on explicit operator action above.
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -610,11 +886,11 @@ export default function RepoRawAccessPanel() {
           {/* SECTION B: Generated draft manifest */}
           <DraftManifestSection manifest={draftManifest} />
 
-          {/* PREVIEW section */}
+          {/* PAYLOAD SOURCE PREVIEW */}
           <PushPreviewSection manifest={draftManifest} />
 
-          {/* PUSH-READY STRUCTURE */}
-          <PushReadySection manifest={draftManifest} />
+          {/* DIRECT PUSH */}
+          <DirectPushSection manifest={draftManifest} />
         </>
       )}
     </div>
