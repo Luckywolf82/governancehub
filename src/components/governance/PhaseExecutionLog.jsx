@@ -22,10 +22,18 @@ export const PHASE_EXECUTION_LOG = {
       'verificationTargetValue',
       'verificationBranch',
       'githubVerificationUrl',
-      // Verification fields — populated after verification step (future integration)
+      // Verification fields — output by buildVerificationLogEntry() in Verification.jsx.
+      // Current output is preview-only and append-ready. NOT persistent. NOT committed to
+      // PHASE_EXECUTION_LOG.entries. NOT written anywhere in this phase.
+      // No safe write layer exists. Verification output is structural scaffolding only.
       'verificationStatus',
       'missingEvidence',
       'verificationNotes',
+      // targetRef — included in verification entry previews.
+      // Current runtime uses: { type: "plan_instance", id: planId, source: "planId-placeholder" }.
+      // This is NOT true planInstanceId binding. True binding requires an execution-binding
+      // layer that does not yet exist and must not be introduced in this phase.
+      'targetRef',
     ],
     entryTypes: [
       'execution',
@@ -394,15 +402,21 @@ export const PHASE_EXECUTION_LOG = {
   // This ensures append-only governance and prevents mutation of historical records.
   writeStrategy: {
     mode: "append-only",
+    note: "Verification entries are currently preview-only output from buildVerificationLogEntry(). " +
+          "They are NOT committed to PHASE_EXECUTION_LOG.entries and NOT written anywhere. " +
+          "No safe write layer exists. The rules below define the governance " +
+          "contract for when a safe write path is introduced.",
 
     rules: [
       {
         id: "ws-001",
         rule: "Verification results must create a new log entry, not overwrite existing entries",
+        note: "Applies when a safe write path is introduced. Currently, verification output is preview-only and not committed.",
       },
       {
         id: "ws-002",
         rule: "Each verification entry must include a targetRef",
+        note: "Current preview output uses planId as targetRef.id with source: 'planId-placeholder'. This is NOT true planInstanceId binding. True binding requires an execution-binding layer that does not yet exist.",
       },
       {
         id: "ws-003",
