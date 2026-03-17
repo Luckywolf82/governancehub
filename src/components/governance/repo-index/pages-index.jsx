@@ -1,7 +1,7 @@
 {
   "folder": "src/pages",
   "generatedAt": "2026-03-14",
-  "fileCount": 5,
+  "fileCount": 4,
   "subfolders": [],
   "files": [
     {
@@ -36,14 +36,5 @@
       "category": "admin",
       "exists": true
     },
-    {
-      "path": "src/pages/AdminDashboard.jsx",
-      "fileName": "AdminDashboard.jsx",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/pages/AdminDashboard.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/pages/AdminDashboard.jsx",
-      "category": "admin",
-      "exists": true,
-      "note": "Legacy page — verify whether this is still routed or superseded by Admin.jsx"
-    }
   ]
 }

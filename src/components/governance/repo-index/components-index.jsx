@@ -1,7 +1,7 @@
 {
   "folder": "src/components",
   "generatedAt": "2026-03-14",
-  "fileCount": 7,
+  "fileCount": 6,
   "subfolders": ["audits", "github", "governance", "projects", "ui"],
   "note": "This index covers confirmed files at src/components/ root only. Subfolders have their own indexes.",
   "files": [
@@ -20,15 +20,6 @@
       "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/UserNotRegisteredError.jsx",
       "category": "components",
       "exists": true
-    },
-    {
-      "path": "src/components/AdminDashboard.jsx",
-      "fileName": "AdminDashboard.jsx",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/AdminDashboard.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/AdminDashboard.jsx",
-      "category": "admin",
-      "exists": true,
-      "note": "Legacy stub — replaced by pages/Admin.jsx"
     },
     {
       "path": "src/components/ROADMAP.jsx",

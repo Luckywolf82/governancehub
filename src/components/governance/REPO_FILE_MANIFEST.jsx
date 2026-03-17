@@ -201,16 +201,6 @@
       "exists": true
     },
     {
-      "path": "src/pages/AdminDashboard.jsx",
-      "fileName": "AdminDashboard.jsx",
-      "extension": "jsx",
-      "folder": "src/pages",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/pages/AdminDashboard.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/pages/AdminDashboard.jsx",
-      "category": "admin",
-      "exists": true
-    },
-    {
       "path": "src/pages/Audits.jsx",
       "fileName": "Audits.jsx",
       "extension": "jsx",
@@ -238,16 +228,6 @@
       "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/pages/Projects.jsx",
       "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/pages/Projects.jsx",
       "category": "pages",
-      "exists": true
-    },
-    {
-      "path": "src/components/AdminDashboard.jsx",
-      "fileName": "AdminDashboard.jsx",
-      "extension": "jsx",
-      "folder": "src/components",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/AdminDashboard.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/AdminDashboard.jsx",
-      "category": "admin",
       "exists": true
     },
     {
