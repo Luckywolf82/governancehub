@@ -52,8 +52,9 @@ import {
 } from "@/components/governance/VerificationSpec";
 // Verification status vocabulary aligned with VerificationSpec
 
-// PHASE_EXECUTION_LOG imported read-only — for structural reference only.
-// DO NOT mutate entries. DO NOT push to entries array.
+// PHASE_EXECUTION_LOG imported for structural reference only (read-only).
+// entrySchema is read inside buildVerificationLogEntry() to guide field naming.
+// No mutation of entries is performed here.
 import { PHASE_EXECUTION_LOG } from "@/components/governance/PhaseExecutionLog";
 
 // ── Evidence availability evaluator ───────────────────────────────────────────
@@ -287,6 +288,7 @@ function VerificationInstanceCard({ entry }) {
     // This does NOT represent a true plan instance binding.
     // Will be replaced with planInstanceId once execution-binding is implemented.
     return {
+      entryType: "verification",
       targetRef: {
         type: "plan_instance",
         id: entry.planId,
@@ -366,11 +368,12 @@ function VerificationInstanceCard({ entry }) {
             size="sm"
             aria-label="Prepare log entry preview — no persistence"
             onClick={() => {
+              // Preview only — builds an append-ready verification entry without writing to PhaseExecutionLog.
               const entry = buildVerificationLogEntry();
-              console.log("VERIFICATION LOG ENTRY PREVIEW:", entry);
+              console.log("APPEND-READY VERIFICATION ENTRY PREVIEW:", entry);
             }}
           >
-            Prepare log entry
+            Preview append-ready log entry
           </Button>
         </div>
 
