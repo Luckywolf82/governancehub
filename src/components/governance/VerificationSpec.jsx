@@ -43,14 +43,10 @@
 //   Verification must not mark a task complete unless required evidence is present.
 //
 // Note on Verification.jsx vocabulary alignment:
-//   The current Verification.jsx surface uses "complete" as an internal status string
-//   for the case where all required evidence fields are present in governed data.
-//   This spec defines the canonical vocabulary term "verified" for that state.
-//   The two are semantically equivalent for this phase.
-//   A future refactor of Verification.jsx may align the internal status to "verified".
-//   Until that refactor is verified, "complete" and "verified" must be treated as
-//   equivalent when reading the current Verification.jsx output.
-//   This spec does not change Verification.jsx — it formalizes the canonical contract.
+//   Verification.jsx now uses the canonical vocabulary term "verified" for the case
+//   where all required evidence fields are present in governed data.
+//   This is derived via the VERIFIED_STATUS constant, which resolves to "verified"
+//   from verificationStatusVocabulary. Vocabulary alignment with this spec is complete.
 
 // ── Spec metadata ──────────────────────────────────────────────────────────────
 
@@ -291,9 +287,8 @@ export const verificationChecks = [
 // The verification layer must use exactly these terms when reporting status.
 // No new terms may be introduced without updating this spec.
 //
-// Note: The current Verification.jsx surface uses "complete" where this spec
-// defines "verified". These are semantically equivalent in this phase.
-// A future Verification.jsx refactor may align to the canonical term "verified".
+// Note: Verification.jsx now uses the canonical term "verified" via the VERIFIED_STATUS
+// constant (resolved from verificationStatusVocabulary). Vocabulary alignment is complete.
 
 export const verificationStatusVocabulary = [
   {
@@ -693,7 +688,7 @@ export const blockedInterpretations = [
     interpretationId: "bi-002",
     falseEquivalence: "'Verified from governed data' equals 'externally verified'",
     explanation:
-      "A verificationStatus of 'verified' (or the current surface equivalent 'complete') means " +
+      "A verificationStatus of 'verified' means " +
       "all required evidence fields are present in locally available governed data. " +
       "It does NOT mean external repository, PR, or commit state has been independently verified. " +
       "No external verification has been performed in this phase.",
@@ -863,12 +858,12 @@ export const consumingComponents = [
       "whether execution evidence is present in currently available governed data. " +
       "It reads from ExecutionWorkerSpec.executionWorkerRequiredEvidence and " +
       "ChangePlanInstanceRegistry. It does not connect external verification. " +
-      "Its internal status vocabulary uses 'complete' where this spec defines 'verified'. " +
-      "These are semantically equivalent in this phase. A future refactor may align the terms.",
+      "Its internal status vocabulary uses the canonical term 'verified' (via VERIFIED_STATUS " +
+      "derived from verificationStatusVocabulary). Vocabulary alignment with this spec is complete.",
     vocabularyNote:
-      "Verification.jsx returns 'complete' | 'incomplete' | 'unverifiable'. " +
+      "Verification.jsx returns 'verified' | 'incomplete' | 'unverifiable'. " +
       "This spec defines the canonical vocabulary as 'verified' | 'incomplete' | 'unverifiable' | " +
-      "'failed' | 'requires_manual_review'. 'complete' and 'verified' are equivalent for this phase.",
+      "'failed' | 'requires_manual_review'. Verification.jsx is aligned to the canonical term 'verified'.",
     logOutputNote:
       "buildVerificationLogEntry() in Verification.jsx produces a preview-only " +
       "structural log entry (not append-ready — no write path exists in this phase). This output is NOT persistent, NOT committed to " +
