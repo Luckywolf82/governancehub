@@ -382,4 +382,33 @@ export const PHASE_EXECUTION_LOG = {
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. VerificationSpec.jsx is a net-new file — not a locked file at creation time. Verification.jsx not modified — vocabulary alignment is noted in VerificationSpec but intentionally left as a future refactor. No other locked files modified.',
     },
   ],
+
+  // Defines how new entries are added to the execution log.
+  // This ensures append-only governance and prevents mutation of historical records.
+  writeStrategy: {
+    mode: "append-only",
+
+    rules: [
+      {
+        id: "ws-001",
+        rule: "Verification results must create a new log entry, not overwrite existing entries",
+      },
+      {
+        id: "ws-002",
+        rule: "Each verification entry must include a targetRef",
+      },
+      {
+        id: "ws-003",
+        rule: "Verification entries may reference previous execution entries but must not mutate them",
+      },
+      {
+        id: "ws-004",
+        rule: "Duplicate verification entries are allowed but must be timestamped",
+      },
+      {
+        id: "ws-005",
+        rule: "Verification entries must not be considered authoritative without required evidence",
+      }
+    ]
+  },
 };
