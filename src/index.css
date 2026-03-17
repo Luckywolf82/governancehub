@@ -2,6 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   SHELL: Safe-area & mobile foundation
+   ============================================================ */
+
+:root {
+  /* Device safe-area insets */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Bottom nav height + safe area for content bottom padding */
+  --bottom-nav-height: 56px;
+  --content-bottom-pad: calc(var(--bottom-nav-height) + var(--safe-bottom));
+}
+
+/* Shell-level overflow and overscroll discipline */
+html {
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+/* Header: pad for top safe area (notch/status bar) */
+.app-header-safe {
+  padding-top: var(--safe-top);
+}
+
+/* Bottom nav: pad for bottom safe area (home indicator) */
+.app-bottom-nav-safe {
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Content area: extra bottom padding on mobile to clear fixed bottom nav.
+   767.98px aligns with Tailwind's md breakpoint (min-width: 768px). */
+@media (max-width: 767.98px) {
+  .app-content-safe {
+    padding-bottom: var(--content-bottom-pad);
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
