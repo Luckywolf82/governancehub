@@ -25,6 +25,7 @@
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
 //   gov-005   verified   / preliminary: false  — audit executed; no partial dispatch arch found; PromptProfileRegistry.jsx is one safe next step
+//   gov-006   verified   / preliminary: false  — PhaseExecutionLog safety audit; all 17 entries are dev-phase contamination; recommended: archive + reset
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 //   ui-001    verified   / preliminary: false  — Admin workflow/UI clarity audit; Govern tab overload; no onboarding gate; NEXT_SAFE_STEP invisible; 5 non-operational gov-006 panels inflate Govern tab
 
@@ -278,6 +279,60 @@ export const AUDIT_INDEX = {
       acceptanceCriteria: "Audit executed by direct file inspection. PromptProfileRegistry.jsx created with all requiredProfileFields. No dispatchable prompt creatable without approvalStatus === 'approved'. Dispatch log implemented separately from PhaseExecutionLog. Preview step is a blocking gate. Staged rollout enforces sequential stage progression with per-stage approval.",
       oneSafeNextStep: "Create src/components/governance/PromptProfileRegistry.jsx with all requiredProfileFields defined in the audit data file. Schema and governance constraints only — no UI component, no dispatch logic.",
       dataFile: "src/components/audits/governance/prompt-dispatch-governance-audit-2026-03-16.jsx",
+    },
+
+    {
+      id: "gov-006",
+      title: "PhaseExecutionLog Safety Audit",
+      category: "Governance",
+      type: "Log Safety and Eligibility Audit",
+      status: "verified",
+      date: "2026-03-17",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary:
+        "All 17 entries in PhaseExecutionLog are development-phase contamination — appended directly " +
+        "by Copilot agents outside the app's governance flow. Zero entries meet runtime-eligibility " +
+        "criteria. Only two files import PHASE_EXECUTION_LOG: ExecutionLogPanel.jsx (reads .entries) " +
+        "and Verification.jsx (reads .entrySchema only — entries not consumed). ExecutionLogPanel " +
+        "handles entries: [] gracefully. Recommended model: archive + reset (move entries to " +
+        "devPhaseArchive, clear entries: [], add logEligibilityNote to writeStrategy). Reset is safe " +
+        "from a code perspective. Reset requires a one-time locked-file governance exception " +
+        "justified by this audit.",
+      problem:
+        "PhaseExecutionLog.entries contains 17 development-phase entries appended by Copilot agents " +
+        "via direct file editing. None were produced through the app's runtime governance flow. Entry 1 " +
+        "has a placeholder date and missing required field. No entries include the required 'entryType' " +
+        "field. The UI (ExecutionLogPanel) presents these entries as runtime governance history.",
+      impact:
+        "Development-phase entries drive the ExecutionLogPanel UI, presenting Copilot PR history as " +
+        "app-native governance execution history. Auto-verification calls GitHub API for PR-scoped " +
+        "entries outside the app's execution model. Future runtime entries will be mixed with " +
+        "development entries unless the log is reset.",
+      affectedFiles: [
+        "src/components/governance/PhaseExecutionLog.jsx",
+        "src/components/admin/ExecutionLogPanel.jsx",
+      ],
+      requiredChange:
+        "Step 1 (this PR): Register gov-006 in AUDIT_INDEX. " +
+        "Step 2 (separate supervised PR): add devPhaseArchive: [...currentEntries] to " +
+        "PHASE_EXECUTION_LOG, reset entries: [], add logEligibilityNote to writeStrategy. " +
+        "Do NOT append to PhaseExecutionLog as part of this audit.",
+      constraints:
+        "Do not mutate PhaseExecutionLog.entries as part of audit registration. " +
+        "Do not append a PhaseExecutionLog entry for this audit work. " +
+        "Reset requires a locked-file governance exception justified by this audit. " +
+        "One structural change at a time.",
+      acceptanceCriteria:
+        "gov-006 registered in AUDIT_INDEX. PHASE_EXECUTION_LOG.entries reset to [] in a " +
+        "separate PR. devPhaseArchive preserves all 17 pre-reset entries. logEligibilityNote " +
+        "present in writeStrategy. ExecutionLogPanel shows empty state without crash.",
+      oneSafeNextStep:
+        "In a separate supervised PR: add devPhaseArchive: [...currentEntries] to PHASE_EXECUTION_LOG, " +
+        "set entries: [], and add logEligibilityNote to writeStrategy. Reference gov-006 as justification.",
+      dataFile: "src/components/audits/governance/phase-execution-log-safety-audit-2026-03-17.jsx",
     },
 
     {
