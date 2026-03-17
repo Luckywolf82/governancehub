@@ -75,12 +75,12 @@ export default function Admin() {
 
         <BuildIntegrityBanner />
 
-        <div className="flex border-b border-slate-200 overflow-x-auto scrollbar-hide">
+        <div className="flex border-b border-slate-200">
           {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap min-h-[44px] ${
+              className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                 tab === t
                   ? "border-slate-800 text-slate-900"
                   : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"

@@ -80,17 +80,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-background text-foreground;
-    overscroll-behavior-y: contain;
   }
-
-  /* Safe area support */
-  .safe-top { padding-top: env(safe-area-inset-top); }
-  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-  .safe-left { padding-left: env(safe-area-inset-left); }
-  .safe-right { padding-right: env(safe-area-inset-right); }
 }
