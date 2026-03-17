@@ -23,6 +23,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Lock,
   ShieldOff,
@@ -251,6 +252,20 @@ function VerificationInstanceCard({ entry }) {
   const requiredResults = evidenceResults.filter((r) => r.required);
   const missingCount = requiredResults.filter((r) => !r.present).length;
 
+  // Preview-only helper — reads current verification result and logs it.
+  // Does NOT write to PhaseExecutionLog, does NOT mutate state, does NOT import log file.
+  function handleRecordVerificationResult() {
+    const missingEvidence = requiredResults
+      .filter((r) => !r.present)
+      .map((r) => r.label);
+
+    console.log({
+      verificationStatus: status,
+      missingEvidence,
+      verificationNotes: "manual entry",
+    });
+  }
+
   return (
     <Card className="border border-slate-200">
       <CardHeader className="pb-2">
@@ -302,6 +317,18 @@ function VerificationInstanceCard({ entry }) {
           missingCount={missingCount}
           totalRequired={requiredResults.length}
         />
+
+        {/* Preview-only action — no persistence */}
+        <div className="pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Preview verification result without saving"
+            onClick={handleRecordVerificationResult}
+          >
+            Record verification result (preview)
+          </Button>
+        </div>
 
       </CardContent>
     </Card>
