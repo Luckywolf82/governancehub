@@ -283,6 +283,10 @@ function VerificationInstanceCard({ entry }) {
     void PHASE_EXECUTION_LOG.entrySchema;
 
     return {
+      targetRef: {
+        type: "plan_instance",
+        id: entry.planId,
+      },
       verificationStatus: status,
       missingEvidence,
       verificationNotes: "manual entry",
