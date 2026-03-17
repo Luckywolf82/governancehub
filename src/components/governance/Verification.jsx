@@ -52,8 +52,9 @@ import {
 } from "@/components/governance/VerificationSpec";
 // Verification status vocabulary aligned with VerificationSpec
 
-// PHASE_EXECUTION_LOG imported read-only — for structural reference only.
-// DO NOT mutate entries. DO NOT push to entries array.
+// PHASE_EXECUTION_LOG — append-only mutation now permitted.
+// First controlled write: handleCommitVerificationToLog() may push new entries.
+// No existing entries may be modified or removed.
 import { PHASE_EXECUTION_LOG } from "@/components/governance/PhaseExecutionLog";
 
 // ── Evidence availability evaluator ───────────────────────────────────────────
@@ -287,6 +288,7 @@ function VerificationInstanceCard({ entry }) {
     // This does NOT represent a true plan instance binding.
     // Will be replaced with planInstanceId once execution-binding is implemented.
     return {
+      entryType: "verification",
       targetRef: {
         type: "plan_instance",
         id: entry.planId,
@@ -297,6 +299,27 @@ function VerificationInstanceCard({ entry }) {
       verificationNotes: "manual entry",
       timestamp: new Date().toISOString(),
     };
+  }
+
+  // Appends a new verification entry to PHASE_EXECUTION_LOG.
+  // Append-only: no existing entries are modified or removed.
+  // This is the first controlled write to PhaseExecutionLog.
+  function handleCommitVerificationToLog() {
+    const verificationObject = buildVerificationLogEntry();
+    const newEntry = {
+      id: "Entry " + (PHASE_EXECUTION_LOG.entries.length + 1),
+      date: new Date().toISOString().split("T")[0],
+      entryType: "verification",
+      task: "Manual verification log entry",
+      taskRequested: "User-triggered verification commit",
+      changedFiles: [],
+      diffSummary: "Verification-only entry",
+      githubVisibility: "local-only",
+      lockedFileVerification: "No locked files modified",
+      ...verificationObject,
+    };
+    PHASE_EXECUTION_LOG.entries.push(newEntry);
+    console.log("VERIFICATION ENTRY COMMITTED (append-only):", newEntry, "Total entries:", PHASE_EXECUTION_LOG.entries.length);
   }
 
   return (
@@ -371,6 +394,14 @@ function VerificationInstanceCard({ entry }) {
             }}
           >
             Prepare log entry
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Commit verification entry to PhaseExecutionLog — append-only"
+            onClick={handleCommitVerificationToLog}
+          >
+            Commit verification to log
           </Button>
         </div>
 
