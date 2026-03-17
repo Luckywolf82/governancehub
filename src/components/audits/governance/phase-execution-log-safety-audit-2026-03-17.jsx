@@ -154,43 +154,48 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
       },
     ],
 
-    entryContaminationMap: [
+    entryEligibilityClassification: [
       {
         entryId: "Entry 1",
         date: "YYYY-MM-DD",
-        contaminationType: "placeholder + missing required field",
+        eligibilityClassification: "placeholder + missing required field",
         notes:
           "Placeholder date. Missing 'taskRequested' (noted in gov-003). Early bootstrap entry with " +
-          "no verification target. Most contaminated entry in the log.",
+          "no verification target. Most schema-incomplete entry in the log. The placeholder date and " +
+          "missing required field mean this entry does not meet runtime-eligibility criteria, though " +
+          "it retains development-trace value as the initial bootstrap record.",
         runtimeEligible: false,
       },
       {
         entryId: "Entries 2–7",
         dateRange: "2026-03-14 to 2026-03-15",
-        contaminationType: "development-phase activity",
+        eligibilityClassification: "development-phase origin — not authoritative for app runtime state",
         notes:
           "Governance alignment and schema work. All appended by Copilot agents directly. Some " +
           "carry githubVisibility 'verified' or 'verified via live repo index' — indicating manual " +
-          "GitHub confirmation by the agent, not app-native verification.",
+          "GitHub confirmation by the agent, not app-native verification. Entries retain " +
+          "repository-development trace value but were not produced through the app's governance flow.",
         runtimeEligible: false,
       },
       {
         entryId: "Entries 8–13",
         dateRange: "2026-03-16",
-        contaminationType: "development-phase activity",
+        eligibilityClassification: "development-phase origin — not authoritative for app runtime state",
         notes:
           "gov-005 implementation phases (PromptProfileRegistry, PromptProfileApprovalPolicy, " +
           "PromptApprovalGateSpec). All appended by Copilot agents. All carry " +
-          "'githubVisibility: Not yet verified'.",
+          "'githubVisibility: Not yet verified'. Entries retain development-trace value but were " +
+          "not produced through the app's governance flow.",
         runtimeEligible: false,
       },
       {
         entryId: "Entries 14–17",
         dateRange: "2026-03-16 to 2026-03-17",
-        contaminationType: "development-phase activity",
+        eligibilityClassification: "development-phase origin — not authoritative for app runtime state",
         notes:
           "ExecutionLogPanel, automatic GitHub verification, arch-001 confirmation, gov-006 Phase 10. " +
-          "All appended by Copilot agents. All carry 'githubVisibility: Not yet verified'.",
+          "All appended by Copilot agents. All carry 'githubVisibility: Not yet verified'. Entries " +
+          "retain development-trace value but were not produced through the app's governance flow.",
         runtimeEligible: false,
       },
     ],
@@ -299,8 +304,9 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
       description:
         "LockedFiles.jsx rule for PhaseExecutionLog.jsx is 'Append only. Do not rewrite or delete " +
         "existing entries.' A reset would technically violate this rule as written. The rule was " +
-        "designed for runtime governance safety, but the contaminated state is itself a governance " +
-        "violation that the locked-file rule cannot resolve without an explicit exception.",
+        "designed for runtime governance safety, but the presence of non-authoritative development " +
+        "entries in the active runtime entries list is a governance semantic mismatch that the " +
+        "locked-file rule cannot resolve without an explicit exception.",
       likelihood: "medium",
       impact: "medium",
       mitigatedBy:
@@ -339,12 +345,12 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
       title: "entryType field missing from all current entries",
       description:
         "entrySchema.required includes 'entryType' but none of the 17 existing entries include " +
-        "this field. This is a schema compliance gap independent of the contamination issue.",
+        "this field. This is an additional schema drift indicator independent of the runtime-eligibility issue.",
       likelihood: "certain",
       impact: "low",
       mitigatedBy:
         "After reset, new entries produced via the runtime flow must include entryType. " +
-        "No retroactive fix to existing contaminated entries is needed.",
+        "No retroactive fix to existing non-authoritative entries is needed.",
     },
   ],
 
@@ -356,7 +362,7 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
       label: "No action — keep all current entries",
       description:
         "Leave PhaseExecutionLog.entries unchanged. Accept that the log contains " +
-        "development-phase contamination.",
+        "development-phase entries that are not authoritative for app runtime state.",
       risks: [
         "Development-phase entries continue to be presented as runtime governance history in the UI.",
         "New Copilot agents will append further development entries, treating this as precedent.",
@@ -365,13 +371,14 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
           "than execution-scoped.",
       ],
       suitable: false,
-      reason: "Does not resolve contamination. Perpetuates misleading governance signal.",
+      reason: "Does not resolve the runtime-eligibility mismatch. Perpetuates misleading governance signal.",
     },
     {
       option: 2,
       label: "Full reset — clear entries: []",
       description:
-        "Replace entries array with an empty array. All 17 development-phase entries removed. " +
+        "Replace entries array with an empty array. All 17 non-authoritative development-phase " +
+        "entries removed from the active entries list. " +
         "entrySchema, writeStrategy, and metadata sections preserved.",
       risks: [
         "All development traceability lost from PhaseExecutionLog. The 17 Copilot PR records " +
@@ -405,7 +412,7 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
     },
     {
       option: 4,
-      label: "Filtered reset — keep semantically valid entries, remove contaminated ones",
+      label: "Filtered reset — keep semantically valid entries, remove non-runtime-authoritative ones",
       description:
         "Inspect each entry and retain only those that meet runtime-authoritative criteria " +
         "(produced through the app's governance flow, not via direct Copilot file editing).",
@@ -434,10 +441,11 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
       "populate entries going forward. No code changes to ExecutionLogPanel or Verification.jsx " +
       "are required.",
     rationale: [
-      "All 17 entries are development-phase contamination. Zero entries pass a runtime-eligibility " +
-        "filter. A filtered reset is equivalent to a full reset with no filtering benefit.",
+      "All 17 entries are of development-phase origin and are not authoritative for app runtime " +
+        "state. Zero entries pass the runtime-eligibility filter. A filtered reset therefore " +
+        "produces the same result as a full reset.",
       "The devPhaseArchive field preserves full in-repo development traceability without keeping " +
-        "contaminated entries in the active entries list.",
+        "non-authoritative entries in the active runtime entries list.",
       "ExecutionLogPanel.jsx handles entries.length === 0 gracefully with no code change required.",
       "Verification.jsx is unaffected — it uses only entrySchema, not entries.",
       "The archive + reset approach is the least disruptive path that achieves the correct " +
@@ -461,7 +469,8 @@ export const PHASE_EXECUTION_LOG_SAFETY_AUDIT = {
       "The reset requires a one-time exception to the LockedFiles.jsx 'Append only' rule for " +
       "PhaseExecutionLog.jsx. This audit provides the governance justification. The exception " +
       "is: entries may be archived (moved to devPhaseArchive) and cleared once when the log is " +
-      "reset to remove development-phase contamination, provided this audit is registered in " +
+      "reset to separate non-authoritative development-phase entries from the runtime entries list, " +
+      "provided this audit is registered in " +
       "AUDIT_INDEX, the change is reviewed and approved via PR, and the devPhaseArchive field " +
       "preserves all pre-reset entries.",
   },

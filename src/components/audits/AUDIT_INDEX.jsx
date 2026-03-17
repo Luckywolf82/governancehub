@@ -25,7 +25,7 @@
 //   gov-003   verified   / preliminary: false  — schema drift identified; recommended model: Option 3 (canonical extension)
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
 //   gov-005   verified   / preliminary: false  — audit executed; no partial dispatch arch found; PromptProfileRegistry.jsx is one safe next step
-//   gov-006   verified   / preliminary: false  — PhaseExecutionLog safety audit; all 17 entries are dev-phase contamination; recommended: archive + reset
+//   gov-006   verified   / preliminary: false  — PhaseExecutionLog safety audit; all 17 entries are non-authoritative for app runtime (dev-phase origin); recommended: archive + reset
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 //   ui-001    verified   / preliminary: false  — Admin workflow/UI clarity audit; Govern tab overload; no onboarding gate; NEXT_SAFE_STEP invisible; 5 non-operational gov-006 panels inflate Govern tab
 
@@ -293,7 +293,8 @@ export const AUDIT_INDEX = {
       preliminary: false,
       evidenceSource: "repo-derived",
       summary:
-        "All 17 entries in PhaseExecutionLog are development-phase contamination — appended directly " +
+        "All 17 entries in PhaseExecutionLog are of development-phase origin and are not " +
+        "authoritative for app runtime state — appended directly " +
         "by Copilot agents outside the app's governance flow. Zero entries meet runtime-eligibility " +
         "criteria. Only two files import PHASE_EXECUTION_LOG: ExecutionLogPanel.jsx (reads .entries) " +
         "and Verification.jsx (reads .entrySchema only — entries not consumed). ExecutionLogPanel " +
