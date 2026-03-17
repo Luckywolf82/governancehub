@@ -85,6 +85,16 @@ export const specMeta = {
     "A fully operational verification runtime that inspects external repository state " +
     "must not be built until this spec is verified in GitHub and ExecutionWorker " +
     "is implemented and verified.",
+  verificationLogOutputStatus:
+    "The current Verification.jsx surface exposes a buildVerificationLogEntry() helper that " +
+    "produces a preview-only, append-ready structured log entry. This output is NOT persistent, " +
+    "NOT committed to PhaseExecutionLog.entries, and NOT written anywhere. No safe write layer " +
+    "exists in this phase. The entry is structural scaffolding only.",
+  targetRefStatus:
+    "targetRef in the current log entry preview uses planId as the id field with " +
+    "source: 'planId-placeholder'. This is NOT true planInstanceId binding. It is temporary " +
+    "and preparatory only. True planInstanceId binding requires an execution-binding layer " +
+    "that does not yet exist and must not be introduced in this phase.",
 };
 
 // ── Verification inputs ────────────────────────────────────────────────────────
@@ -817,6 +827,27 @@ export const verificationOutputContract = [
       "External verification not connected in this phase. " +
       "Reference-present labels indicate a reference was recorded — not that the artifact was independently verified.",
   },
+  {
+    outputId: "vo-009",
+    field: "targetRef",
+    type: "object { type: string, id: string, source: string }",
+    description:
+      "Target reference identifying the plan instance associated with this verification log entry. " +
+      "type must be 'plan_instance'. id is the identifier used to locate the plan instance.",
+    required: true,
+    derivedFrom: "CHANGE_PLAN_INSTANCE_REGISTRY.entries",
+    placeholderBindingNote:
+      "CURRENT PLACEHOLDER BINDING: targetRef.id is currently derived from entry.planId. " +
+      "source is set to 'planId-placeholder' to make this explicit. " +
+      "This is NOT true planInstanceId binding. planId is used as a temporary stand-in only. " +
+      "True planInstanceId binding requires an execution-binding layer that does not yet exist " +
+      "and must not be introduced in this phase.",
+    persistenceNote:
+      "The log entry containing this targetRef is preview-only and non-persistent. " +
+      "It is NOT committed to PhaseExecutionLog.entries and NOT written anywhere. " +
+      "No safe write layer exists in this phase. This field is defined here for structural " +
+      "completeness only.",
+  },
 ];
 
 // ── Consuming components ───────────────────────────────────────────────────────
@@ -838,6 +869,16 @@ export const consumingComponents = [
       "Verification.jsx returns 'complete' | 'incomplete' | 'unverifiable'. " +
       "This spec defines the canonical vocabulary as 'verified' | 'incomplete' | 'unverifiable' | " +
       "'failed' | 'requires_manual_review'. 'complete' and 'verified' are equivalent for this phase.",
+    logOutputNote:
+      "buildVerificationLogEntry() in Verification.jsx produces a preview-only, append-ready " +
+      "structured log entry. This output is NOT persistent, NOT committed to " +
+      "PhaseExecutionLog.entries, and NOT written anywhere. It is exposed as a console-logged " +
+      "structural preview only. No safe write layer exists in this phase.",
+    targetRefNote:
+      "The targetRef in the current log entry preview uses planId as the id field " +
+      "and sets source to 'planId-placeholder'. This is NOT true planInstanceId binding. " +
+      "It is temporary and preparatory only. planInstanceId binding requires an " +
+      "execution-binding layer that does not yet exist.",
     externalVerificationConnected: false,
   },
   {
