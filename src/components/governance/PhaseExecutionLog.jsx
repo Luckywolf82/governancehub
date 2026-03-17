@@ -12,6 +12,9 @@ export const PHASE_EXECUTION_LOG = {
       'diffSummary',
       'githubVisibility',
       'lockedFileVerification',
+      // Defines the type of log entry.
+      // Used to distinguish execution events from verification results.
+      'entryType',
     ],
     optional: [
       // Structured GitHub verification target fields
@@ -23,6 +26,10 @@ export const PHASE_EXECUTION_LOG = {
       'verificationStatus',
       'missingEvidence',
       'verificationNotes',
+    ],
+    entryTypes: [
+      'execution',
+      'verification',
     ],
   },
   entries: [
