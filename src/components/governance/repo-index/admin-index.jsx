@@ -1,7 +1,7 @@
 {
   "folder": "admin-related",
   "generatedAt": "2026-03-14",
-  "fileCount": 4,
+  "fileCount": 2,
   "subfolders": [],
   "note": "Admin files are spread across src/pages/ and src/components/. This index collects all confirmed admin-related files.",
   "files": [
@@ -13,24 +13,6 @@
       "category": "admin",
       "exists": true,
       "note": "Active admin page — routed at /Admin"
-    },
-    {
-      "path": "src/pages/AdminDashboard.jsx",
-      "fileName": "AdminDashboard.jsx",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/pages/AdminDashboard.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/pages/AdminDashboard.jsx",
-      "category": "admin",
-      "exists": true,
-      "note": "Verify whether this page is still actively routed"
-    },
-    {
-      "path": "src/components/AdminDashboard.jsx",
-      "fileName": "AdminDashboard.jsx",
-      "rawUrl": "https://raw.githubusercontent.com/Luckywolf82/governancehub/main/src/components/AdminDashboard.jsx",
-      "githubUrl": "https://github.com/Luckywolf82/governancehub/blob/main/src/components/AdminDashboard.jsx",
-      "category": "admin",
-      "exists": true,
-      "note": "Legacy stub component — returns null"
     },
     {
       "path": "src/components/AppLayout.jsx",
