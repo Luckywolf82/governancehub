@@ -396,29 +396,6 @@ export const PHASE_EXECUTION_LOG = {
       githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Fadd-verification-spec-file',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. VerificationSpec.jsx is a net-new file — not a locked file at creation time. Verification.jsx not modified — vocabulary alignment is noted in VerificationSpec but intentionally left as a future refactor. No other locked files modified.',
     },
-    {
-      id: 'Entry 18',
-      date: '2026-03-17',
-      task: 'gov-006 Phase 10 — Close vocabulary drift in VerificationSpec.jsx (wording-alignment)',
-      taskRequested: 'Close remaining wording drift in VerificationSpec.jsx where stale prose still claimed Verification.jsx uses "complete" as the verified status string. Verification.jsx was already updated to use the canonical "verified" term via VERIFIED_STATUS. This step aligns VerificationSpec.jsx prose to match the actual current implementation.',
-      changedFiles: [
-        'src/components/governance/VerificationSpec.jsx',
-        'src/components/governance/PhaseExecutionLog.jsx',
-      ],
-      diffSummary: [
-        'VerificationSpec.jsx header note (lines 43–49): replaced stale "current Verification.jsx surface uses complete" note with accurate statement that vocabulary alignment is complete and Verification.jsx now uses the canonical "verified" term via VERIFIED_STATUS.',
-        'VerificationSpec.jsx verificationStatusVocabulary comment (lines 290–296): replaced stale equivalence note ("complete" and "verified" are equivalent) with accurate statement that vocabulary alignment is complete.',
-        'VerificationSpec.jsx blockedInterpretations bi-002 (line ~696): removed stale "(or the current surface equivalent \'complete\')" parenthetical from verificationStatus description.',
-        'VerificationSpec.jsx consumingComponents[0] usage and vocabularyNote: updated to state Verification.jsx uses the canonical "verified" term; removed stale "complete" | "incomplete" | "unverifiable" vocabulary claim.',
-        'PhaseExecutionLog.jsx: appended Entry 18 for this wording-alignment step.',
-      ],
-      githubVisibility: 'Not yet verified',
-      verificationTargetType: 'pull_request',
-      verificationTargetValue: 'copilot/continue-governancehub-development',
-      verificationBranch: 'main',
-      githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Fcontinue-governancehub-development',
-      lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. VerificationSpec.jsx is a schema/data artifact — not a locked file — and was modified only for wording alignment. No locked files modified. No code logic changed. No write path introduced.',
-    },
   ],
 
   // Defines how new entries are added to the execution log.
