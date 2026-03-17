@@ -396,6 +396,25 @@ export const PHASE_EXECUTION_LOG = {
       githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Fadd-verification-spec-file',
       lockedFileVerification: 'PhaseExecutionLog.jsx appended with this entry per governance logging rules. VerificationSpec.jsx is a net-new file — not a locked file at creation time. Verification.jsx not modified — vocabulary alignment is noted in VerificationSpec but intentionally left as a future refactor. No other locked files modified.',
     },
+    {
+      id: 'Entry 18',
+      date: '2026-03-17',
+      task: 'gov-006 Phase 10 — Define SAFE WRITE CONTRACT as spec-only preparation artifact',
+      taskRequested: 'Add a clearly defined write contract section to PhaseExecutionLog.jsx describing preconditions for write, allowed append-only operation, prohibited operations (no update/delete/partial write/write without verified status), separation rules (preview ≠ write ≠ persistence), and binding requirements (true planInstanceId required). This is a preparation step — no write implementation, no persistence, no PHASE_EXECUTION_LOG.entries mutation, no UI changes.',
+      changedFiles: [
+        'src/components/governance/PhaseExecutionLog.jsx',
+      ],
+      diffSummary: [
+        'PhaseExecutionLog.jsx: added writeContract spec-only section (swc-001) to PHASE_EXECUTION_LOG object. Defines 4 preconditions (swc-pre-001 through swc-pre-004), 1 allowed append-only operation (swc-op-001), 6 prohibited operations (swc-proh-001 through swc-proh-006), 3 separation rules (preview ≠ write, write ≠ persistence, persistence not implemented), and 1 binding requirements block (swc-bind-001). No write implementation added. No persistence added. No UI changes. No entries mutation.',
+        'PhaseExecutionLog.jsx: appended Entry 18 for this spec-only write contract definition.',
+      ],
+      githubVisibility: 'Not yet verified',
+      verificationTargetType: 'pull_request',
+      verificationTargetValue: 'copilot/add-verification-output-preview',
+      verificationBranch: 'main',
+      githubVerificationUrl: 'https://github.com/Luckywolf82/governancehub/pulls?q=head%3Acopilot%2Fadd-verification-output-preview',
+      lockedFileVerification: 'PhaseExecutionLog.jsx modified as the explicit target of this write-contract spec task. Only writeContract section and Entry 18 appended — no other content changed. No other locked files modified.',
+    },
   ],
 
   // Defines how new entries are added to the execution log.
@@ -431,5 +450,186 @@ export const PHASE_EXECUTION_LOG = {
         rule: "Verification entries must not be considered authoritative without required evidence",
       }
     ]
+  },
+
+  // ── SAFE WRITE CONTRACT ─────────────────────────────────────────────────────
+  // SPEC ONLY — this is a preparation contract, not an implementation.
+  // No write path exists. No append is authorized in this phase.
+  // This contract defines what must be true BEFORE any write capability is introduced.
+  // Nothing in this section authorizes, implements, or simulates a write operation.
+  writeContract: {
+    specId: "swc-001",
+    status: "spec-only",
+    note:
+      "This write contract is a preparation artifact only. " +
+      "No write implementation exists. No safe write layer has been introduced. " +
+      "PHASE_EXECUTION_LOG.entries is append-only by governance convention but is NOT " +
+      "writable at runtime in this phase. All verification output is preview-only. " +
+      "This contract must be verified and a safe write layer must be implemented " +
+      "before any of the conditions below can be acted upon.",
+
+    // 1. PRECONDITIONS FOR WRITE
+    // All preconditions must be true before a verification entry may be written.
+    // Partial satisfaction is not permitted. These are contract rules — not runtime code.
+    preconditions: [
+      {
+        id: "swc-pre-001",
+        label: "Verification status must be determined",
+        description:
+          "The verificationStatus field must have been derived from evaluating all required " +
+          "execution evidence fields via the canonical verification layer. " +
+          "A write is not permitted without a derived verificationStatus.",
+        requiredValue: ["verified", "incomplete", "unverifiable", "failed", "requires_manual_review"],
+        source: "VerificationSpec.verificationStatusVocabulary",
+      },
+      {
+        id: "swc-pre-002",
+        label: "targetRef must be complete and resolved",
+        description:
+          "The targetRef field must identify a true, resolved planInstanceId — not a planId placeholder. " +
+          "A write using targetRef.source === 'planId-placeholder' is not permitted. " +
+          "targetRef.id must resolve to a real plan instance in CHANGE_PLAN_INSTANCE_REGISTRY.",
+        requiredFields: ["type", "id", "source"],
+        prohibitedSource: "planId-placeholder",
+        note:
+          "Current preview output uses planId as targetRef.id with source: 'planId-placeholder'. " +
+          "This placeholder must be replaced with a real planInstanceId before a write is permitted.",
+      },
+      {
+        id: "swc-pre-003",
+        label: "A safe write layer must exist",
+        description:
+          "A governed, reviewed, and verified write layer must be introduced before any " +
+          "append to PHASE_EXECUTION_LOG.entries is authorized. " +
+          "No such layer exists in this phase. Verification output is preview-only.",
+        currentState: "no safe write layer exists",
+      },
+      {
+        id: "swc-pre-004",
+        label: "No existing entry may be mutated during write",
+        description:
+          "The write operation must not touch any existing entry in PHASE_EXECUTION_LOG.entries. " +
+          "If the operation would modify, overwrite, or delete any existing entry, it must be rejected.",
+        currentState: "not applicable — no write path exists",
+      },
+    ],
+
+    // 2. ALLOWED OPERATION
+    // Only one class of write operation is ever permitted: append of a new entry.
+    allowedOperation: {
+      id: "swc-op-001",
+      label: "Append new entry",
+      description:
+        "The only permitted write operation is appending a new entry to the end of " +
+        "PHASE_EXECUTION_LOG.entries. The new entry must conform to entrySchema.required " +
+        "and may include entrySchema.optional fields.",
+      semantics: "append-only",
+      mutatesExistingEntries: false,
+      overwritesExistingEntries: false,
+      deletesExistingEntries: false,
+      note:
+        "This operation is not yet authorized. It may only be introduced after " +
+        "all preconditions in writeContract.preconditions are satisfied and a safe " +
+        "write layer has been implemented and verified.",
+    },
+
+    // 3. PROHIBITED OPERATIONS
+    // These operations are unconditionally forbidden regardless of verification status.
+    prohibitedOperations: [
+      {
+        id: "swc-proh-001",
+        label: "No update of existing entries",
+        description:
+          "No existing entry in PHASE_EXECUTION_LOG.entries may be updated, edited, or amended " +
+          "by any write operation. Historical entries are immutable once appended.",
+      },
+      {
+        id: "swc-proh-002",
+        label: "No delete of existing entries",
+        description:
+          "No existing entry in PHASE_EXECUTION_LOG.entries may be deleted or removed. " +
+          "Removal of any historical entry is a governance violation.",
+      },
+      {
+        id: "swc-proh-003",
+        label: "No partial write",
+        description:
+          "A write that produces an entry missing any required field from entrySchema.required " +
+          "is not permitted. All required fields must be present before an entry is written.",
+      },
+      {
+        id: "swc-proh-004",
+        label: "No write without verified status",
+        description:
+          "A verification entry may not be written if verificationStatus has not been derived " +
+          "from the canonical verification layer. A write using a null, undefined, or fabricated " +
+          "verificationStatus is not permitted.",
+      },
+      {
+        id: "swc-proh-005",
+        label: "No write using planId placeholder as targetRef",
+        description:
+          "A verification entry may not be written if targetRef.source is 'planId-placeholder'. " +
+          "The targetRef must resolve to a real planInstanceId before any write is authorized.",
+      },
+      {
+        id: "swc-proh-006",
+        label: "No write from Verification.jsx",
+        description:
+          "Verification.jsx is a read-only surface. It must not perform any write to " +
+          "PHASE_EXECUTION_LOG.entries. buildVerificationLogEntry() in Verification.jsx " +
+          "produces a preview-only structural preview — it must never be wired to an append path.",
+      },
+    ],
+
+    // 4. SEPARATION RULES
+    // These rules define the hard boundaries between preview, write, and persistence.
+    separationRules: {
+      previewIsNotWrite: {
+        rule: "preview ≠ write",
+        description:
+          "Calling buildVerificationLogEntry() or logging its output to the console is a preview. " +
+          "It does not constitute a write. No entry is appended to PHASE_EXECUTION_LOG.entries. " +
+          "No data is persisted. The preview output must never be treated as an authoritative log entry.",
+      },
+      writeIsNotPersistence: {
+        rule: "write ≠ persistence",
+        description:
+          "Even if a safe write layer is introduced and a verification entry is appended to " +
+          "PHASE_EXECUTION_LOG.entries at runtime, that write is in-memory only. " +
+          "It is not persistence. Persistence requires a storage backend that does not exist and " +
+          "must not be introduced in this phase.",
+      },
+      persistenceNotImplemented: {
+        rule: "persistence not implemented",
+        description:
+          "No backend, database, file write, GitHub sync, or equivalent persistence mechanism " +
+          "exists in this system in this phase. Writing to PHASE_EXECUTION_LOG.entries at runtime " +
+          "does not persist across sessions, reloads, or deployments.",
+        currentState: "persistence not implemented",
+      },
+    },
+
+    // 5. BINDING REQUIREMENTS (FUTURE)
+    // Conditions that must be met before write can be bound to a real plan instance.
+    bindingRequirements: {
+      id: "swc-bind-001",
+      label: "True planInstanceId required for write binding",
+      description:
+        "Write binding requires a resolved planInstanceId — not the planId placeholder " +
+        "currently used in buildVerificationLogEntry(). " +
+        "A true planInstanceId is a runtime-resolved identifier that maps to a specific " +
+        "plan instance in CHANGE_PLAN_INSTANCE_REGISTRY through an execution-binding layer.",
+      currentState:
+        "targetRef currently uses planId with source: 'planId-placeholder'. " +
+        "This is temporary and preparatory only. It must not be written to the log.",
+      requiredBeforeBinding: [
+        "An execution-binding layer must be implemented and verified.",
+        "The execution-binding layer must resolve planId to a real planInstanceId.",
+        "The resolved planInstanceId must be confirmed present in CHANGE_PLAN_INSTANCE_REGISTRY.",
+        "targetRef.source must be updated from 'planId-placeholder' to a governed binding source.",
+      ],
+      implementationStatus: "not implemented — must not be introduced in this phase",
+    },
   },
 };
