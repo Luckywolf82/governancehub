@@ -88,6 +88,10 @@
     overscroll-behavior-y: contain;
   }
 
+  button, a, [role="tab"], nav a, nav button {
+    @apply select-none;
+  }
+
   /* Safe area support */
   .safe-top { padding-top: env(safe-area-inset-top); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
