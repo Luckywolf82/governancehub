@@ -1,9 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, FolderKanban, ClipboardList, Home, Shield, GitBranch, Trash2, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LayoutDashboard, FolderKanban, ClipboardList, Home, Shield, Trash2, LogOut } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import AccountDeletionDialog from "@/components/AccountDeletionDialog";
+import RepoSelectorDrawer from "@/components/RepoSelectorDrawer";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/Home", icon: Home },
@@ -14,55 +15,72 @@ const NAV_ITEMS = [
 
 export default function AppLayout({ children }) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { activeRepo, repos, selectRepo, clearActiveRepo } = useActiveRepo();
   const [user, setUser] = useState(null);
   const [showDeletion, setShowDeletion] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Preserve scroll positions per route
+  const scrollPositions = useRef({});
+
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  // Save scroll position when leaving a route
+  useEffect(() => {
+    const saveScroll = () => {
+      scrollPositions.current[pathname] = window.scrollY;
+    };
+    window.addEventListener("scroll", saveScroll, { passive: true });
+    return () => window.removeEventListener("scroll", saveScroll);
+  }, [pathname]);
+
+  // Restore scroll position when entering a route
+  useEffect(() => {
+    const saved = scrollPositions.current[pathname];
+    if (saved !== undefined) {
+      // Defer to let layout paint first
+      requestAnimationFrame(() => window.scrollTo(0, saved));
+    }
+  }, [pathname]);
+
+  const handleBottomTabClick = (href) => {
+    const isActive = pathname === href || (href !== "/Home" && pathname.startsWith(href));
+    if (isActive) {
+      // Reset: scroll to top and navigate to root
+      scrollPositions.current[href] = 0;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      navigate(href, { replace: true });
+    } else {
+      navigate(href);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
       {/* Top nav */}
-      <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sticky top-0 z-30"
-        style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      <header
+        className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sticky top-0 z-30"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
-          <Link to="/Home" className="font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 shrink-0">
+          <Link
+            to="/Home"
+            className="font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 shrink-0 select-none"
+          >
             <LayoutDashboard className="w-5 h-5 text-slate-700 dark:text-slate-300" />
             <span className="hidden sm:inline">GovernanceHub</span>
           </Link>
 
-          {/* Global Active Repo Selector */}
-          <div className="flex items-center gap-1.5 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md min-w-0 flex-1 max-w-xs">
-            <GitBranch className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
-            <select
-              value={activeRepo?.id || ""}
-              onChange={(e) => {
-                if (e.target.value === "") clearActiveRepo();
-                else {
-                  const repo = repos.find((r) => r.id === e.target.value);
-                  if (repo) selectRepo(repo);
-                }
-              }}
-              disabled={repos.length === 0}
-              className="text-xs font-medium text-slate-700 dark:text-slate-200 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed w-full truncate"
-            >
-              {repos.length === 0 ? (
-                <option value="">Ingen aktive repo</option>
-              ) : (
-                <>
-                  <option value="">Velg repo</option>
-                  {repos.map((repo) => (
-                    <option key={repo.id} value={repo.id}>
-                      {repo.owner}/{repo.repo}
-                    </option>
-                  ))}
-                </>
-              )}
-            </select>
-          </div>
+          {/* Drawer-based Repo Selector */}
+          <RepoSelectorDrawer
+            repos={repos}
+            activeRepo={activeRepo}
+            onSelect={selectRepo}
+            onClear={clearActiveRepo}
+          />
 
           {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-1">
@@ -72,7 +90,7 @@ export default function AppLayout({ children }) {
                 <Link
                   key={href}
                   to={href}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors min-h-[44px] select-none ${
                     active
                       ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white"
                       : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -90,7 +108,7 @@ export default function AppLayout({ children }) {
             <div className="relative">
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-200 shrink-0 min-w-[44px] min-h-[44px]"
+                className="rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-200 shrink-0 min-w-[44px] min-h-[44px] select-none"
                 aria-label="Account menu"
               >
                 {user.full_name?.[0]?.toUpperCase() || "U"}
@@ -135,18 +153,18 @@ export default function AppLayout({ children }) {
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
           const active = pathname === href || (href !== "/Home" && pathname.startsWith(href));
           return (
-            <Link
+            <button
               key={href}
-              to={href}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors ${
+              onClick={() => handleBottomTabClick(href)}
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-colors select-none ${
                 active
                   ? "text-slate-900 dark:text-white"
                   : "text-slate-400 dark:text-slate-500"
               }`}
             >
-              <Icon className={`w-5 h-5 ${active ? "text-slate-900 dark:text-white" : ""}`} />
+              <Icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{label}</span>
-            </Link>
+            </button>
           );
         })}
       </nav>
