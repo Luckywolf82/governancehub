@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink, Lock, Search, FileText, AlertTriangle, Layers, Package, Send } from "lucide-react";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
+import { base44 } from "@/api/base44Client";
 
 // ── Inline manifest data ──────────────────────────────────────────────────────
 // Data sourced from REPO_FILE_MANIFEST.json and PRIORITY_REPO_FILES.json.
@@ -89,8 +90,6 @@ const PRIORITY = {
 // Generates a repo-aware DRAFT manifest based on the GovernanceHub scaffold
 // structure. No GitHub API calls are made — this is a structural template only.
 
-const DRAFT_PLACEHOLDER_CONTENT = "[draft — content not yet loaded]";
-
 const DRAFT_SCAFFOLD_PATHS = [
   // root
   { path: "package.json",    group: "root",       category: "config" },
@@ -149,6 +148,144 @@ function generateDraftManifest(owner, repo, branch, branchIsDefault) {
   };
 }
 
+// ── Payload content sources ───────────────────────────────────────────────────
+// For each draft scaffold path, declares how content will be assembled:
+//   canonical → fetched from GovernanceHub source at push time via raw URL
+//   template  → explicit generated content, clearly labeled per-repo
+//   excluded  → no safe content source; file is omitted from push
+
+const CONTENT_SOURCES = {
+  "package.json":    { type: "template" },
+  "README.md":       { type: "template" },
+  ".gitignore":      { type: "canonical", rawUrl: `${RAW_BASE}/.gitignore` },
+  "vite.config.js":  { type: "canonical", rawUrl: `${RAW_BASE}/vite.config.js` },
+  "src/App.jsx":     { type: "template" },
+  "src/main.jsx":    { type: "canonical", rawUrl: `${RAW_BASE}/src/main.jsx` },
+  "src/index.css":   { type: "canonical", rawUrl: `${RAW_BASE}/src/index.css` },
+  "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx": {
+    type: "canonical",
+    rawUrl: `${RAW_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`,
+  },
+  "src/components/governance/PhaseExecutionLog.jsx": {
+    type: "excluded",
+    reason: "Contains GovernanceHub-specific execution history — not safe to copy to another repo",
+  },
+  "src/components/governance/LockedFiles.jsx": {
+    type: "canonical",
+    rawUrl: `${RAW_BASE}/src/components/governance/LockedFiles.jsx`,
+  },
+  "src/components/governance/AI_STATE.jsx":    { type: "template" },
+  "src/components/governance/NextSafeStep.jsx": { type: "template" },
+  "src/components/audits/AUDIT_INDEX.jsx":        { type: "template" },
+  "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx": {
+    type: "canonical",
+    rawUrl: `${RAW_BASE}/src/components/audits/AUDIT_SYSTEM_GUIDE.jsx`,
+  },
+  "src/components/projects/WORKSTREAM_REGISTRY.jsx": { type: "template" },
+};
+
+// Generates explicit template content for a scaffold path.
+// Returns null if no template is defined (caller should treat as excluded).
+function generateTemplateContent(path, owner, repo) {
+  const ts = new Date().toISOString().split("T")[0];
+
+  if (path === "package.json") {
+    return JSON.stringify(
+      {
+        name: repo,
+        private: true,
+        version: "0.0.0",
+        type: "module",
+        scripts: { dev: "vite", build: "vite build", preview: "vite preview" },
+      },
+      null,
+      2
+    );
+  }
+
+  if (path === "README.md") {
+    return [
+      `# ${repo}`,
+      ``,
+      `> Generated from GovernanceHub scaffold on ${ts}.`,
+      `> Replace this file with project-specific documentation.`,
+      ``,
+    ].join("\n");
+  }
+
+  if (path === "src/App.jsx") {
+    return [
+      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
+      `// Generated: ${ts}`,
+      `import React from "react";`,
+      ``,
+      `export default function App() {`,
+      `  return (`,
+      `    <div>`,
+      `      <h1>${repo}</h1>`,
+      `      <p>GovernanceHub scaffold — update App.jsx for this project.</p>`,
+      `    </div>`,
+      `  );`,
+      `}`,
+    ].join("\n");
+  }
+
+  if (path === "src/components/governance/AI_STATE.jsx") {
+    return [
+      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
+      `// Generated: ${ts}`,
+      `export const AI_STATE = {`,
+      `  projectName: ${JSON.stringify(repo)},`,
+      `  phase: "Bootstrap",`,
+      `  status: "Initial scaffold deployed from GovernanceHub",`,
+      `  lastVerified: ${JSON.stringify(ts)},`,
+      `  currentFocus: "Verify scaffold and configure governance for this project",`,
+      `};`,
+      ``,
+      `export default AI_STATE;`,
+    ].join("\n");
+  }
+
+  if (path === "src/components/governance/NextSafeStep.jsx") {
+    return [
+      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
+      `// Generated: ${ts}`,
+      `export const NEXT_SAFE_STEP = {`,
+      `  title: ${JSON.stringify(`Configure governance for ${repo}`)},`,
+      `  reason: "Initial scaffold deployed. Define project-specific governance rules.",`,
+      `  lifecycleStage: "bootstrap",`,
+      `};`,
+      ``,
+      `export default NEXT_SAFE_STEP;`,
+    ].join("\n");
+  }
+
+  if (path === "src/components/audits/AUDIT_INDEX.jsx") {
+    return [
+      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
+      `// Generated: ${ts}`,
+      `// Audit index for ${owner}/${repo} — add audit records here.`,
+      `export const AUDIT_INDEX = [];`,
+      ``,
+      `export default AUDIT_INDEX;`,
+    ].join("\n");
+  }
+
+  if (path === "src/components/projects/WORKSTREAM_REGISTRY.jsx") {
+    return [
+      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
+      `// Generated: ${ts}`,
+      `export const WORKSTREAM_REGISTRY = [`,
+      `  // { id: "ws-001", name: "Example Workstream", status: "active" },`,
+      `];`,
+      ``,
+      `export default WORKSTREAM_REGISTRY;`,
+    ].join("\n");
+  }
+
+  return null;
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CATEGORY_COLORS = {
@@ -169,6 +306,13 @@ const PRIORITY_COLORS = {
   critical: "bg-red-100 text-red-800",
   high:     "bg-amber-100 text-amber-800",
   normal:   "bg-slate-100 text-slate-600",
+};
+
+const SOURCE_META = {
+  canonical: { label: "canonical", color: "bg-emerald-100 text-emerald-800", title: "Content fetched from GovernanceHub source file at push time" },
+  template:  { label: "template",  color: "bg-blue-100 text-blue-800",       title: "Explicit generated template content, clearly labeled" },
+  excluded:  { label: "excluded",  color: "bg-red-100 text-red-700",         title: "Omitted — no safe content source" },
+  undefined: { label: "unknown",   color: "bg-gray-100 text-gray-500",       title: "Source not defined" },
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -328,11 +472,12 @@ function PushPreviewSection({ manifest }) {
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <Layers className="w-4 h-4 text-blue-600" />
-          <CardTitle className="text-base text-slate-800">Push Preview</CardTitle>
-          <Badge className="bg-blue-100 text-blue-800 text-xs">Preview only</Badge>
+          <CardTitle className="text-base text-slate-800">Payload Source Preview</CardTitle>
+          <Badge className="bg-blue-100 text-blue-800 text-xs">Preview only — no writes</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Files that <em>would</em> be created or updated if a push were executed. No changes have been made.
+          Shows each file&apos;s planned content source. Canonical files are fetched from GovernanceHub at push time.
+          Template files use generated content. Excluded files are omitted from the push.
         </p>
       </CardHeader>
       <CardContent className="pt-0">
@@ -340,16 +485,22 @@ function PushPreviewSection({ manifest }) {
           {/* Header row */}
           <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-blue-50 border-b border-blue-100 text-[10px] font-semibold text-blue-700 uppercase tracking-wide">
             <span>Path</span>
-            <span>Target</span>
+            <span>Source</span>
             <span>Action</span>
           </div>
-          {manifest.files.map((f) => (
-            <div key={f.path} className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
-              <span className="font-mono text-slate-700 truncate">{f.path}</span>
-              <span className="text-slate-400 font-mono whitespace-nowrap">{manifest.owner}/{manifest.repo}@{manifest.branch}</span>
-              <Badge className="bg-slate-100 text-slate-600 text-[10px] whitespace-nowrap">{f.action}</Badge>
-            </div>
-          ))}
+          {manifest.files.map((f) => {
+            const src = CONTENT_SOURCES[f.path];
+            const meta = SOURCE_META[src?.type] ?? SOURCE_META.undefined;
+            return (
+              <div key={f.path} className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
+                <span className="font-mono text-slate-700 truncate" title={f.path}>{f.path}</span>
+                <Badge className={`${meta.color} text-[10px] whitespace-nowrap`} title={meta.title}>{meta.label}</Badge>
+                <Badge className={`text-[10px] whitespace-nowrap ${src?.type === "excluded" ? "bg-red-50 text-red-400 line-through" : "bg-slate-100 text-slate-600"}`}>
+                  {src?.type === "excluded" ? "skip" : f.action}
+                </Badge>
+              </div>
+            );
+          })}
         </div>
         <p className="text-[10px] text-slate-400 mt-2">
           {manifest.files.length} file{manifest.files.length !== 1 ? "s" : ""} · Branch: <strong>{manifest.branch}</strong>{manifest.branchIsDefault ? " (default)" : " (fallback — confirm before push)"} · Repo: <strong>{manifest.owner}/{manifest.repo}</strong>
@@ -359,68 +510,251 @@ function PushPreviewSection({ manifest }) {
   );
 }
 
-function PushReadySection({ manifest }) {
-  const [prepared, setPrepared] = useState(false);
+function DirectPushSection({ manifest }) {
+  const [phase, setPhase] = useState("idle"); // "idle" | "assembling" | "ready" | "pushing" | "done" | "error"
+  const [assembled, setAssembled] = useState(null);   // { pushable: [...], excluded: [...] }
+  const [pushResult, setPushResult] = useState(null);
+  const [pushError, setPushError] = useState(null);
 
-  const handlePreparePush = () => {
-    const payload = {
-      owner:  manifest.owner,
-      repo:   manifest.repo,
-      branch: manifest.branch,
-      files:  manifest.files.map((f) => ({
-        path:    f.path,
-        content: DRAFT_PLACEHOLDER_CONTENT,
-        action:  f.action,
-      })),
-    };
-    // eslint-disable-next-line no-console
-    console.log("[GovernanceHub] Push-ready payload (NOT executed):", payload);
-    setPrepared(true);
+  const { owner, repo, branch, branchIsDefault } = manifest;
+  const canProceed = Boolean(owner && repo && branch);
+
+  const handleAssemble = async () => {
+    setPhase("assembling");
+    setPushError(null);
+    setAssembled(null);
+
+    const pushable = [];
+    const excluded = [];
+
+    for (const file of manifest.files) {
+      const src = CONTENT_SOURCES[file.path];
+
+      if (!src || src.type === "excluded") {
+        excluded.push({ path: file.path, reason: src?.reason ?? "No content source defined for this path" });
+        continue;
+      }
+
+      if (src.type === "canonical") {
+        try {
+          const res = await fetch(src.rawUrl);
+          if (!res.ok) throw new Error(`HTTP ${res.status} from GovernanceHub raw URL`);
+          const content = await res.text();
+          pushable.push({ path: file.path, content, source: "canonical", rawUrl: src.rawUrl });
+        } catch (err) {
+          excluded.push({ path: file.path, reason: `Canonical fetch failed: ${err.message}` });
+        }
+        continue;
+      }
+
+      if (src.type === "template") {
+        const content = generateTemplateContent(file.path, owner, repo);
+        if (!content) {
+          excluded.push({ path: file.path, reason: "Template generator returned no content for this path" });
+          continue;
+        }
+        pushable.push({ path: file.path, content, source: "template" });
+      }
+    }
+
+    setAssembled({ pushable, excluded });
+    setPhase("ready");
+  };
+
+  const handlePush = async () => {
+    if (!assembled || assembled.pushable.length === 0) return;
+    setPhase("pushing");
+    setPushError(null);
+
+    try {
+      const result = await base44.functions.invoke("pushFilesToGithub", {
+        owner,
+        repo,
+        branch,
+        message: `GovernanceHub scaffold: initial draft push [${new Date().toISOString()}]`,
+        files: assembled.pushable.map((f) => ({
+          path: f.path,
+          content: f.content,
+          source: f.source,
+        })),
+      });
+      setPushResult(result);
+      setPhase("done");
+    } catch (err) {
+      setPushError(err?.message ?? "Push failed — see browser console for details.");
+      setPhase("error");
+    }
+  };
+
+  const reset = () => {
+    setPhase("idle");
+    setAssembled(null);
+    setPushResult(null);
+    setPushError(null);
   };
 
   return (
-    <Card className="border-slate-200">
+    <Card className="border-slate-300 bg-slate-50/40">
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Send className="w-4 h-4 text-slate-500" />
-          <CardTitle className="text-base text-slate-800">Push-Ready Structure</CardTitle>
-          <Badge className="bg-slate-100 text-slate-600 text-xs">Push not yet implemented</Badge>
+          <Send className="w-4 h-4 text-slate-600" />
+          <CardTitle className="text-base text-slate-800">Push Draft to GitHub</CardTitle>
+          <Badge className="bg-slate-200 text-slate-700 text-xs">Explicit operator action only</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Builds a structured push payload and logs it to the console. No GitHub writes occur.
+          Assemble real file content, then push directly to{" "}
+          <strong>{owner}/{repo}</strong> on branch <strong>{branch}</strong>.
+          {!branchIsDefault && (
+            <span className="text-amber-600"> ⚠ Branch is not the default — confirm before pushing.</span>
+          )}
         </p>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
-        <div className="rounded bg-slate-50 border border-slate-200 px-3 py-2 text-xs font-mono text-slate-500 space-y-1">
-          <p className="text-slate-400 font-sans font-medium text-[10px] uppercase tracking-wide mb-1">Payload structure (example)</p>
-          <p>{`{`}</p>
-          <p className="pl-4">{`owner: "${manifest.owner}",`}</p>
-          <p className="pl-4">{`repo: "${manifest.repo}",`}</p>
-          <p className="pl-4">{`branch: "${manifest.branch}",`}</p>
-          <p className="pl-4">{`files: [ { path, content, action: "createOrUpdate" } × ${manifest.files.length} ]`}</p>
-          <p>{`}`}</p>
+        {/* Pre-flight checklist */}
+        <div className="rounded border border-slate-200 bg-white px-3 py-2 space-y-1 text-xs">
+          <p className="font-semibold text-slate-500 text-[10px] uppercase tracking-wide mb-1.5">Pre-flight conditions</p>
+          {[
+            { label: "owner resolved",    met: Boolean(owner),                                    value: owner  || "—" },
+            { label: "repo resolved",     met: Boolean(repo),                                     value: repo   || "—" },
+            { label: "branch resolved",   met: Boolean(branch),                                   value: branch || "—" },
+            { label: "payload assembled", met: Boolean(assembled && assembled.pushable.length > 0), value: assembled ? `${assembled.pushable.length} file(s) ready` : "not yet assembled" },
+          ].map(({ label, met, value }) => (
+            <div key={label} className="flex items-center gap-2">
+              <span className={`text-[10px] font-bold shrink-0 w-3 ${met ? "text-emerald-600" : "text-red-400"}`} aria-hidden="true">
+                {met ? "✓" : "✗"}
+              </span>
+              <span className="text-slate-500 w-36 shrink-0">{label}</span>
+              <span className={`font-mono ${met ? "text-slate-700" : "text-slate-400"}`}>{value}</span>
+            </div>
+          ))}
         </div>
 
-        <Button
-          variant="outline"
-          onClick={handlePreparePush}
-          className="w-full text-slate-600 border-slate-300 hover:bg-slate-50"
-          title="Builds payload and logs to console — does NOT push to GitHub"
-        >
-          <Send className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
-          Prepare Push (Not Executed)
-        </Button>
+        {/* Step 1: Assemble */}
+        {(phase === "idle" || phase === "assembling") && (
+          <Button
+            onClick={handleAssemble}
+            disabled={!canProceed || phase === "assembling"}
+            variant="outline"
+            className="w-full text-slate-700 border-slate-300"
+          >
+            {phase === "assembling" ? "Assembling payload…" : "Step 1 — Assemble Payload"}
+          </Button>
+        )}
 
-        {prepared && (
-          <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-800">
-            <span className="w-2 h-2 rounded-full bg-green-400 mt-0.5 shrink-0" />
-            <span>Payload logged to browser console. <strong>No GitHub writes occurred.</strong> Open DevTools → Console to inspect.</span>
+        {/* Assembled payload preview */}
+        {assembled && (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-600">Assembled payload</p>
+
+            {assembled.pushable.length > 0 && (
+              <div className="rounded border border-emerald-200 bg-white overflow-hidden">
+                <div className="px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">
+                  ✓ Pushable ({assembled.pushable.length} file{assembled.pushable.length !== 1 ? "s" : ""})
+                </div>
+                {assembled.pushable.map((f) => (
+                  <div key={f.path} className="flex items-center justify-between gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 text-xs">
+                    <span className="font-mono text-slate-700 truncate">{f.path}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Badge className={`${SOURCE_META[f.source]?.color ?? SOURCE_META.undefined.color} text-[10px]`} title={SOURCE_META[f.source]?.title}>
+                        {SOURCE_META[f.source]?.label ?? "unknown"}
+                      </Badge>
+                      {f.source === "canonical" && f.rawUrl && (
+                        <a href={f.rawUrl} target="_blank" rel="noopener noreferrer" title="View GovernanceHub source" className="text-slate-400 hover:text-slate-600">
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {assembled.excluded.length > 0 && (
+              <div className="rounded border border-red-100 bg-white overflow-hidden">
+                <div className="px-3 py-1.5 bg-red-50 border-b border-red-100 text-[10px] font-semibold text-red-700 uppercase tracking-wide">
+                  ⛔ Excluded — omitted from push ({assembled.excluded.length})
+                </div>
+                {assembled.excluded.map((f) => (
+                  <div key={f.path} className="flex items-start gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 text-xs">
+                    <span className="font-mono text-slate-600 shrink-0 max-w-[55%] truncate">{f.path}</span>
+                    <span className="text-slate-400 text-[10px]">{f.reason}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        <p className="text-[10px] text-slate-400 text-center">
-          ⚠ Push execution is not yet implemented. This button is for structural preview only.
-        </p>
+        {/* Step 2: Push — only when assembled and pushable files exist */}
+        {phase === "ready" && assembled && assembled.pushable.length > 0 && (
+          <Button
+            onClick={handlePush}
+            className="w-full bg-slate-800 hover:bg-slate-700 text-white"
+          >
+            <Send className="w-3.5 h-3.5 mr-1.5" />
+            Push Draft to GitHub ({assembled.pushable.length} file{assembled.pushable.length !== 1 ? "s" : ""})
+          </Button>
+        )}
+
+        {phase === "ready" && assembled && assembled.pushable.length === 0 && (
+          <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-800">
+            <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+            <span>No pushable files assembled — all files were excluded. Push is not available.</span>
+          </div>
+        )}
+
+        {/* Pushing in progress */}
+        {phase === "pushing" && (
+          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-800">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shrink-0" />
+            <span>Pushing to GitHub… do not close this panel.</span>
+          </div>
+        )}
+
+        {/* Push result */}
+        {phase === "done" && pushResult && (
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-800">
+              <span className="w-2 h-2 rounded-full bg-green-400 mt-0.5 shrink-0" />
+              <span>
+                Push complete. <strong>{pushResult.pushed?.length ?? 0} file(s) pushed</strong>
+                {pushResult.errors?.length > 0 && `, ${pushResult.errors.length} error(s)`}.
+              </span>
+            </div>
+            {pushResult.errors?.length > 0 && (
+              <div className="rounded border border-red-100 bg-white px-3 py-2 space-y-1 text-xs">
+                <p className="font-semibold text-red-700">Push errors:</p>
+                {pushResult.errors.map((e) => (
+                  <p key={e.path} className="font-mono text-red-600">{e.path}: {e.error}</p>
+                ))}
+              </div>
+            )}
+            <Button variant="outline" size="sm" onClick={reset} className="text-xs text-slate-500">
+              Reset
+            </Button>
+          </div>
+        )}
+
+        {/* Error state */}
+        {phase === "error" && pushError && (
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-800">
+              <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+              <span>Push failed: {pushError}</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={reset} className="text-xs text-slate-500">
+              Reset
+            </Button>
+          </div>
+        )}
+
+        {/* Safety notice — shown until push completes */}
+        {phase !== "done" && (
+          <p className="text-[10px] text-slate-400 text-center">
+            ⚠ Canonical files are fetched live from GovernanceHub. Template content is explicitly generated.
+            No auto-push. No background writes. Push only executes on explicit operator confirmation above.
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -610,11 +944,11 @@ export default function RepoRawAccessPanel() {
           {/* SECTION B: Generated draft manifest */}
           <DraftManifestSection manifest={draftManifest} />
 
-          {/* PREVIEW section */}
+          {/* PAYLOAD SOURCE PREVIEW */}
           <PushPreviewSection manifest={draftManifest} />
 
-          {/* PUSH-READY STRUCTURE */}
-          <PushReadySection manifest={draftManifest} />
+          {/* DIRECT PUSH */}
+          <DirectPushSection manifest={draftManifest} />
         </>
       )}
     </div>
