@@ -21,7 +21,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
  *     {
  *       path:    string,        // repo-relative file path
  *       content: string,        // UTF-8 text content (will be base64-encoded)
- *       source:  "canonical" | "template"
+ *       source:  "starter-kit" | "manifest"
  *     },
  *     ...
  *   ]
@@ -108,9 +108,9 @@ Deno.serve(async (req) => {
           error: `File "${f.path}" has empty content — only explicit content may be pushed`,
         }, { status: 400 });
       }
-      if (!['canonical', 'template'].includes(f.source)) {
+      if (!['starter-kit', 'manifest'].includes(f.source)) {
         return Response.json({
-          error: `File "${f.path}" has an unrecognised source "${f.source}" — must be "canonical" or "template"`,
+          error: `File "${f.path}" has an unrecognised source "${f.source}" — must be "starter-kit" or "manifest"`,
         }, { status: 400 });
       }
     }
@@ -201,7 +201,9 @@ Deno.serve(async (req) => {
         // Network error reading existing file — proceed without SHA (will fail on update)
       }
 
-      // Encode content as base64 using a chunk-safe approach
+      // Encode content as base64 using a chunk-safe approach.
+      // 0x8000 (32 768) bytes per chunk avoids call-stack overflow in
+      // String.fromCharCode spread for large governance files.
       const encoder = new TextEncoder();
       const bytes = encoder.encode(file.content);
       let binary = '';

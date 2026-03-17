@@ -14,6 +14,10 @@ import { base44 } from "@/api/base44Client";
 const RAW_BASE = "https://raw.githubusercontent.com/Luckywolf82/governancehub/main";
 const GH_BASE = "https://github.com/Luckywolf82/governancehub/blob/main";
 
+// Base raw URL for starter-kit source files inside the GovernanceHub repo.
+// These are the canonical installer templates — safe to copy to any target repo.
+const SK_RAW_BASE = `${RAW_BASE}/starter-kit/src/components`;
+
 // The repository this manifest was generated from.
 // Used to determine whether the active repo matches the manifest source.
 const MANIFEST_REPO = { owner: "Luckywolf82", repo: "governancehub" };
@@ -87,30 +91,27 @@ const PRIORITY = {
 };
 
 // ── Draft manifest generation ─────────────────────────────────────────────────
-// Generates a repo-aware DRAFT manifest based on the GovernanceHub scaffold
-// structure. No GitHub API calls are made — this is a structural template only.
+// Generates a repo-aware DRAFT manifest covering the starter-kit push scope only.
+// Phase 1 push scope = repo-aware manifest + starter-kit-approved artifacts.
+// Broad app scaffold files, governance-specific files, and audit/log files are
+// NOT included in this phase.
 
 const DRAFT_SCAFFOLD_PATHS = [
-  // root
-  { path: "package.json",    group: "root",       category: "config" },
-  { path: "README.md",       group: "root",       category: "docs"   },
-  { path: ".gitignore",      group: "root",       category: "config" },
-  { path: "vite.config.js",  group: "root",       category: "config" },
-  // src
-  { path: "src/App.jsx",     group: "src",        category: "config" },
-  { path: "src/main.jsx",    group: "src",        category: "config" },
-  { path: "src/index.css",   group: "src",        category: "assets" },
-  // governance
-  { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx", group: "governance", category: "governance" },
-  { path: "src/components/governance/PhaseExecutionLog.jsx",        group: "governance", category: "governance" },
-  { path: "src/components/governance/LockedFiles.jsx",              group: "governance", category: "governance" },
-  { path: "src/components/governance/AI_STATE.jsx",                 group: "governance", category: "governance" },
-  { path: "src/components/governance/NextSafeStep.jsx",             group: "governance", category: "governance" },
-  // audits
-  { path: "src/components/audits/AUDIT_INDEX.jsx",        group: "audits", category: "audits" },
-  { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx", group: "audits", category: "audits" },
-  // projects
-  { path: "src/components/projects/WORKSTREAM_REGISTRY.jsx", group: "projects", category: "projects" },
+  // repo-aware manifest (generated JSON pushed to the target repo root)
+  { path: "GOVERNANCE_MANIFEST.json",                                  group: "manifest",  category: "config"     },
+  // starter-kit: governance module
+  { path: "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx",    group: "governance", category: "governance" },
+  { path: "src/components/governance/AI_STATE.jsx",                   group: "governance", category: "governance" },
+  { path: "src/components/governance/LockedFiles.jsx",                group: "governance", category: "governance" },
+  { path: "src/components/governance/NextSafeStep.jsx",               group: "governance", category: "governance" },
+  { path: "src/components/governance/PhaseExecutionLog.jsx",          group: "governance", category: "governance" },
+  { path: "src/components/governance/STARTER_KIT_VERSION.jsx",        group: "governance", category: "governance" },
+  { path: "src/components/governance/INSTALL_POLICY.jsx",             group: "governance", category: "governance" },
+  // starter-kit: audits module
+  { path: "src/components/audits/AUDIT_INDEX.jsx",                    group: "audits",     category: "audits"     },
+  { path: "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx",             group: "audits",     category: "audits"     },
+  // starter-kit: projects module
+  { path: "src/components/projects/WORKSTREAM_REGISTRY.jsx",          group: "projects",   category: "projects"   },
 ];
 
 function generateDraftManifest(owner, repo, branch, branchIsDefault) {
@@ -149,141 +150,60 @@ function generateDraftManifest(owner, repo, branch, branchIsDefault) {
 }
 
 // ── Payload content sources ───────────────────────────────────────────────────
-// For each draft scaffold path, declares how content will be assembled:
-//   canonical → fetched from GovernanceHub source at push time via raw URL
-//   template  → explicit generated content, clearly labeled per-repo
-//   excluded  → no safe content source; file is omitted from push
+// Phase 1 push scope:
+//   manifest     → repo-aware GOVERNANCE_MANIFEST.json generated programmatically
+//   starter-kit  → fetched live from GovernanceHub starter-kit/ raw URLs
+//
+// Non-starter-kit scaffold files (package.json, src/App.jsx, etc.) and all
+// GovernanceHub-specific files are NOT in this scope. They have no entry here.
 
 const CONTENT_SOURCES = {
-  "package.json":    { type: "template" },
-  "README.md":       { type: "template" },
-  ".gitignore":      { type: "canonical", rawUrl: `${RAW_BASE}/.gitignore` },
-  "vite.config.js":  { type: "canonical", rawUrl: `${RAW_BASE}/vite.config.js` },
-  "src/App.jsx":     { type: "template" },
-  "src/main.jsx":    { type: "canonical", rawUrl: `${RAW_BASE}/src/main.jsx` },
-  "src/index.css":   { type: "canonical", rawUrl: `${RAW_BASE}/src/index.css` },
-  "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx": {
-    type: "canonical",
-    rawUrl: `${RAW_BASE}/src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx`,
-  },
-  "src/components/governance/PhaseExecutionLog.jsx": {
-    type: "excluded",
-    reason: "Contains GovernanceHub-specific execution history — not safe to copy to another repo",
-  },
-  "src/components/governance/LockedFiles.jsx": {
-    type: "canonical",
-    rawUrl: `${RAW_BASE}/src/components/governance/LockedFiles.jsx`,
-  },
-  "src/components/governance/AI_STATE.jsx":    { type: "template" },
-  "src/components/governance/NextSafeStep.jsx": { type: "template" },
-  "src/components/audits/AUDIT_INDEX.jsx":        { type: "template" },
-  "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx": {
-    type: "canonical",
-    rawUrl: `${RAW_BASE}/src/components/audits/AUDIT_SYSTEM_GUIDE.jsx`,
-  },
-  "src/components/projects/WORKSTREAM_REGISTRY.jsx": { type: "template" },
+  "GOVERNANCE_MANIFEST.json": { type: "manifest" },
+  "src/components/governance/AI_PROJECT_INSTRUCTIONS.jsx":  { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/AI_PROJECT_INSTRUCTIONS.jsx`  },
+  "src/components/governance/AI_STATE.jsx":                 { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/AI_STATE.jsx`                  },
+  "src/components/governance/LockedFiles.jsx":              { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/LockedFiles.jsx`               },
+  "src/components/governance/NextSafeStep.jsx":             { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/NextSafeStep.jsx`              },
+  "src/components/governance/PhaseExecutionLog.jsx":        { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/PhaseExecutionLog.jsx`         },
+  "src/components/governance/STARTER_KIT_VERSION.jsx":      { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/STARTER_KIT_VERSION.jsx`       },
+  "src/components/governance/INSTALL_POLICY.jsx":           { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/governance/INSTALL_POLICY.jsx`            },
+  "src/components/audits/AUDIT_INDEX.jsx":                  { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/audits/AUDIT_INDEX.jsx`                   },
+  "src/components/audits/AUDIT_SYSTEM_GUIDE.jsx":           { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/audits/AUDIT_SYSTEM_GUIDE.jsx`            },
+  "src/components/projects/WORKSTREAM_REGISTRY.jsx":        { type: "starter-kit", rawUrl: `${SK_RAW_BASE}/projects/WORKSTREAM_REGISTRY.jsx`         },
 };
 
-// Generates explicit template content for a scaffold path.
-// Returns null if no template is defined (caller should treat as excluded).
-function generateTemplateContent(path, owner, repo) {
-  const ts = new Date().toISOString().split("T")[0];
-
-  if (path === "package.json") {
-    return JSON.stringify(
-      {
-        name: repo,
-        private: true,
-        version: "0.0.0",
-        type: "module",
-        scripts: { dev: "vite", build: "vite build", preview: "vite preview" },
+// Generates the repo-aware GOVERNANCE_MANIFEST.json content for the target repo.
+// This manifest records what starter-kit files were installed and where.
+function generateManifestContent(manifest) {
+  const installable = manifest.files.filter((f) => f.path !== "GOVERNANCE_MANIFEST.json");
+  return JSON.stringify(
+    {
+      _meta: {
+        generatedBy: "GovernanceHub",
+        generatedAt: manifest.generatedAt,
+        starterKitVersion: "1.0.0",
+        schemaVersion: "1",
       },
-      null,
-      2
-    );
-  }
-
-  if (path === "README.md") {
-    return [
-      `# ${repo}`,
-      ``,
-      `> Generated from GovernanceHub scaffold on ${ts}.`,
-      `> Replace this file with project-specific documentation.`,
-      ``,
-    ].join("\n");
-  }
-
-  if (path === "src/App.jsx") {
-    return [
-      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
-      `// Generated: ${ts}`,
-      `import React from "react";`,
-      ``,
-      `export default function App() {`,
-      `  return (`,
-      `    <div>`,
-      `      <h1>${repo}</h1>`,
-      `      <p>GovernanceHub scaffold — update App.jsx for this project.</p>`,
-      `    </div>`,
-      `  );`,
-      `}`,
-    ].join("\n");
-  }
-
-  if (path === "src/components/governance/AI_STATE.jsx") {
-    return [
-      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
-      `// Generated: ${ts}`,
-      `export const AI_STATE = {`,
-      `  projectName: ${JSON.stringify(repo)},`,
-      `  phase: "Bootstrap",`,
-      `  status: "Initial scaffold deployed from GovernanceHub",`,
-      `  lastVerified: ${JSON.stringify(ts)},`,
-      `  currentFocus: "Verify scaffold and configure governance for this project",`,
-      `};`,
-      ``,
-      `export default AI_STATE;`,
-    ].join("\n");
-  }
-
-  if (path === "src/components/governance/NextSafeStep.jsx") {
-    return [
-      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
-      `// Generated: ${ts}`,
-      `export const NEXT_SAFE_STEP = {`,
-      `  title: ${JSON.stringify(`Configure governance for ${repo}`)},`,
-      `  reason: "Initial scaffold deployed. Define project-specific governance rules.",`,
-      `  lifecycleStage: "bootstrap",`,
-      `};`,
-      ``,
-      `export default NEXT_SAFE_STEP;`,
-    ].join("\n");
-  }
-
-  if (path === "src/components/audits/AUDIT_INDEX.jsx") {
-    return [
-      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
-      `// Generated: ${ts}`,
-      `// Audit index for ${owner}/${repo} — add audit records here.`,
-      `export const AUDIT_INDEX = [];`,
-      ``,
-      `export default AUDIT_INDEX;`,
-    ].join("\n");
-  }
-
-  if (path === "src/components/projects/WORKSTREAM_REGISTRY.jsx") {
-    return [
-      `// [GENERATED TEMPLATE — update for ${owner}/${repo}]`,
-      `// Generated: ${ts}`,
-      `export const WORKSTREAM_REGISTRY = [`,
-      `  // { id: "ws-001", name: "Example Workstream", status: "active" },`,
-      `];`,
-      ``,
-      `export default WORKSTREAM_REGISTRY;`,
-    ].join("\n");
-  }
-
-  return null;
+      owner:       manifest.owner,
+      repo:        manifest.repo,
+      branch:      manifest.branch,
+      rawBaseUrl:  manifest.rawBaseUrl,
+      blobBaseUrl: manifest.blobBaseUrl,
+      fileGroups:  manifest.fileGroups
+        .filter((g) => g.group !== "manifest")
+        .map((g) => ({
+          group: g.group,
+          files: g.files.map((f) => ({ path: f.path, category: f.category })),
+        })),
+      files: installable.map((f) => ({
+        path:     f.path,
+        category: f.category,
+        rawUrl:   f.rawUrl,
+        blobUrl:  f.blobUrl,
+      })),
+    },
+    null,
+    2
+  );
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -309,10 +229,10 @@ const PRIORITY_COLORS = {
 };
 
 const SOURCE_META = {
-  canonical: { label: "canonical", color: "bg-emerald-100 text-emerald-800", title: "Content fetched from GovernanceHub source file at push time" },
-  template:  { label: "template",  color: "bg-blue-100 text-blue-800",       title: "Explicit generated template content, clearly labeled" },
-  excluded:  { label: "excluded",  color: "bg-red-100 text-red-700",         title: "Omitted — no safe content source" },
-  undefined: { label: "unknown",   color: "bg-gray-100 text-gray-500",       title: "Source not defined" },
+  manifest:       { label: "manifest",    color: "bg-violet-100 text-violet-800",  title: "Repo-aware manifest generated for this repo" },
+  "starter-kit":  { label: "starter-kit", color: "bg-emerald-100 text-emerald-800", title: "Content fetched from GovernanceHub starter-kit" },
+  excluded:       { label: "excluded",    color: "bg-red-100 text-red-700",         title: "Omitted — excluded from this push phase" },
+  undefined:      { label: "unknown",     color: "bg-gray-100 text-gray-500",        title: "Source not defined" },
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -413,7 +333,8 @@ function DraftManifestSection({ manifest }) {
           <Badge className="bg-amber-100 text-amber-800 text-xs">Draft – not pushed</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Auto-generated scaffold manifest for this repo. Not verified against remote. No API calls made.
+          Phase 1 push scope: repo-aware <strong>GOVERNANCE_MANIFEST.json</strong> + starter-kit-approved artifacts only.
+          Broad app scaffold files, GovernanceHub-specific files, audits, and execution logs are <strong>not</strong> included.
         </p>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
@@ -467,6 +388,21 @@ function DraftManifestSection({ manifest }) {
 }
 
 function PushPreviewSection({ manifest }) {
+  const manifestFiles    = manifest.files.filter((f) => f.group === "manifest");
+  const starterKitFiles  = manifest.files.filter((f) => f.group !== "manifest");
+
+  const FileSourceRow = ({ f }) => {
+    const src  = CONTENT_SOURCES[f.path];
+    const meta = SOURCE_META[src?.type] ?? SOURCE_META.undefined;
+    return (
+      <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
+        <span className="font-mono text-slate-700 truncate" title={f.path}>{f.path}</span>
+        <Badge className={`${meta.color} text-[10px] whitespace-nowrap`} title={meta.title}>{meta.label}</Badge>
+        <Badge className="bg-slate-100 text-slate-600 text-[10px] whitespace-nowrap">{f.action}</Badge>
+      </div>
+    );
+  };
+
   return (
     <Card className="border-blue-200 bg-blue-50/30">
       <CardHeader className="pb-3">
@@ -476,34 +412,39 @@ function PushPreviewSection({ manifest }) {
           <Badge className="bg-blue-100 text-blue-800 text-xs">Preview only — no writes</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Shows each file&apos;s planned content source. Canonical files are fetched from GovernanceHub at push time.
-          Template files use generated content. Excluded files are omitted from the push.
+          Phase 1 push scope only: repo-aware manifest + starter-kit artifacts.
+          No broad scaffold, governance-specific, or audit/log files are included.
         </p>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="rounded border border-blue-100 bg-white overflow-hidden">
-          {/* Header row */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-blue-50 border-b border-blue-100 text-[10px] font-semibold text-blue-700 uppercase tracking-wide">
-            <span>Path</span>
-            <span>Source</span>
-            <span>Action</span>
+      <CardContent className="pt-0 space-y-3">
+        {/* Manifest group */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-700 mb-1">
+            Repo-aware manifest
+          </p>
+          <div className="rounded border border-violet-100 bg-white overflow-hidden">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-violet-50 border-b border-violet-100 text-[10px] font-semibold text-violet-700 uppercase tracking-wide">
+              <span>Path</span><span>Source</span><span>Action</span>
+            </div>
+            {manifestFiles.map((f) => <FileSourceRow key={f.path} f={f} />)}
           </div>
-          {manifest.files.map((f) => {
-            const src = CONTENT_SOURCES[f.path];
-            const meta = SOURCE_META[src?.type] ?? SOURCE_META.undefined;
-            return (
-              <div key={f.path} className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 border-b border-slate-50 last:border-0 items-center text-xs">
-                <span className="font-mono text-slate-700 truncate" title={f.path}>{f.path}</span>
-                <Badge className={`${meta.color} text-[10px] whitespace-nowrap`} title={meta.title}>{meta.label}</Badge>
-                <Badge className={`text-[10px] whitespace-nowrap ${src?.type === "excluded" ? "bg-red-50 text-red-400 line-through" : "bg-slate-100 text-slate-600"}`}>
-                  {src?.type === "excluded" ? "skip" : f.action}
-                </Badge>
-              </div>
-            );
-          })}
         </div>
-        <p className="text-[10px] text-slate-400 mt-2">
-          {manifest.files.length} file{manifest.files.length !== 1 ? "s" : ""} · Branch: <strong>{manifest.branch}</strong>{manifest.branchIsDefault ? " (default)" : " (fallback — confirm before push)"} · Repo: <strong>{manifest.owner}/{manifest.repo}</strong>
+
+        {/* Starter-kit group */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 mb-1">
+            Starter-kit artifacts ({starterKitFiles.length} files)
+          </p>
+          <div className="rounded border border-emerald-100 bg-white overflow-hidden">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-1.5 bg-emerald-50 border-b border-emerald-100 text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">
+              <span>Path</span><span>Source</span><span>Action</span>
+            </div>
+            {starterKitFiles.map((f) => <FileSourceRow key={f.path} f={f} />)}
+          </div>
+        </div>
+
+        <p className="text-[10px] text-slate-400">
+          {manifest.files.length} file{manifest.files.length !== 1 ? "s" : ""} total · Branch: <strong>{manifest.branch}</strong>{manifest.branchIsDefault ? " (default)" : " (fallback — confirm before push)"} · Repo: <strong>{manifest.owner}/{manifest.repo}</strong>
         </p>
       </CardContent>
     </Card>
@@ -530,31 +471,31 @@ function DirectPushSection({ manifest }) {
     for (const file of manifest.files) {
       const src = CONTENT_SOURCES[file.path];
 
-      if (!src || src.type === "excluded") {
-        excluded.push({ path: file.path, reason: src?.reason ?? "No content source defined for this path" });
+      if (!src) {
+        excluded.push({ path: file.path, reason: "No content source defined — not in starter-kit scope" });
         continue;
       }
 
-      if (src.type === "canonical") {
+      if (src.type === "manifest") {
+        const content = generateManifestContent(manifest);
+        pushable.push({ path: file.path, content, source: "manifest" });
+        continue;
+      }
+
+      if (src.type === "starter-kit") {
         try {
           const res = await fetch(src.rawUrl);
-          if (!res.ok) throw new Error(`HTTP ${res.status} from GovernanceHub raw URL`);
+          if (!res.ok) throw new Error(`HTTP ${res.status} from GovernanceHub starter-kit URL`);
           const content = await res.text();
-          pushable.push({ path: file.path, content, source: "canonical", rawUrl: src.rawUrl });
+          pushable.push({ path: file.path, content, source: "starter-kit", rawUrl: src.rawUrl });
         } catch (err) {
-          excluded.push({ path: file.path, reason: `Canonical fetch failed: ${err.message}` });
+          excluded.push({ path: file.path, reason: `Starter-kit fetch failed: ${err.message}` });
         }
         continue;
       }
 
-      if (src.type === "template") {
-        const content = generateTemplateContent(file.path, owner, repo);
-        if (!content) {
-          excluded.push({ path: file.path, reason: "Template generator returned no content for this path" });
-          continue;
-        }
-        pushable.push({ path: file.path, content, source: "template" });
-      }
+      // Any other (unexpected) source type is excluded
+      excluded.push({ path: file.path, reason: `Source type "${src.type}" is not permitted in phase 1 push` });
     }
 
     setAssembled({ pushable, excluded });
@@ -571,7 +512,7 @@ function DirectPushSection({ manifest }) {
         owner,
         repo,
         branch,
-        message: `GovernanceHub scaffold: initial draft push [${new Date().toISOString()}]`,
+        message: `GovernanceHub starter-kit install [${new Date().toISOString()}]`,
         files: assembled.pushable.map((f) => ({
           path: f.path,
           content: f.content,
@@ -598,12 +539,13 @@ function DirectPushSection({ manifest }) {
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <Send className="w-4 h-4 text-slate-600" />
-          <CardTitle className="text-base text-slate-800">Push Draft to GitHub</CardTitle>
+          <CardTitle className="text-base text-slate-800">Install Starter Kit to GitHub</CardTitle>
           <Badge className="bg-slate-200 text-slate-700 text-xs">Explicit operator action only</Badge>
         </div>
         <p className="text-xs text-slate-500 mt-1">
-          Assemble real file content, then push directly to{" "}
+          Fetch starter-kit files from GovernanceHub, generate the repo-aware manifest, then push to{" "}
           <strong>{owner}/{repo}</strong> on branch <strong>{branch}</strong>.
+          Phase 1 scope only — no broad scaffold or governance-specific files.
           {!branchIsDefault && (
             <span className="text-amber-600"> ⚠ Branch is not the default — confirm before pushing.</span>
           )}
@@ -658,8 +600,8 @@ function DirectPushSection({ manifest }) {
                       <Badge className={`${SOURCE_META[f.source]?.color ?? SOURCE_META.undefined.color} text-[10px]`} title={SOURCE_META[f.source]?.title}>
                         {SOURCE_META[f.source]?.label ?? "unknown"}
                       </Badge>
-                      {f.source === "canonical" && f.rawUrl && (
-                        <a href={f.rawUrl} target="_blank" rel="noopener noreferrer" title="View GovernanceHub source" className="text-slate-400 hover:text-slate-600">
+                      {f.source === "starter-kit" && f.rawUrl && (
+                        <a href={f.rawUrl} target="_blank" rel="noopener noreferrer" title="View GovernanceHub starter-kit source" className="text-slate-400 hover:text-slate-600">
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
@@ -692,7 +634,7 @@ function DirectPushSection({ manifest }) {
             className="w-full bg-slate-800 hover:bg-slate-700 text-white"
           >
             <Send className="w-3.5 h-3.5 mr-1.5" />
-            Push Draft to GitHub ({assembled.pushable.length} file{assembled.pushable.length !== 1 ? "s" : ""})
+            Install Starter Kit to GitHub ({assembled.pushable.length} file{assembled.pushable.length !== 1 ? "s" : ""})
           </Button>
         )}
 
@@ -751,8 +693,8 @@ function DirectPushSection({ manifest }) {
         {/* Safety notice — shown until push completes */}
         {phase !== "done" && (
           <p className="text-[10px] text-slate-400 text-center">
-            ⚠ Canonical files are fetched live from GovernanceHub. Template content is explicitly generated.
-            No auto-push. No background writes. Push only executes on explicit operator confirmation above.
+            ⚠ Phase 1 scope only: repo-aware manifest + starter-kit artifacts. No broad scaffold, governance-specific, or audit/log files.
+            Starter-kit files are fetched live from GovernanceHub. No auto-push. Push executes only on explicit operator action above.
           </p>
         )}
       </CardContent>
