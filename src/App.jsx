@@ -88,16 +88,7 @@ const AuthenticatedApp = () => {
   }
 
   // Render the main app
-  return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/Home" replace />} />
-      <Route path="/Home" element={<AppLayout><Home /></AppLayout>} />
-      <Route path="/Projects" element={<AppLayout><Projects /></AppLayout>} />
-      <Route path="/Audits" element={<AppLayout><Audits /></AppLayout>} />
-      <Route path="/Admin" element={<AppLayout><Admin /></AppLayout>} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
-  );
+  return <AnimatedRoutes />;
 };
 
 
