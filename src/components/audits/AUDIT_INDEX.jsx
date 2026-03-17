@@ -26,6 +26,7 @@
 //   gov-004   verified   / preliminary: false  — lifecycle gaps identified; ExecutionLogPanel implemented as one safe next step
 //   gov-005   verified   / preliminary: false  — audit executed; no partial dispatch arch found; PromptProfileRegistry.jsx is one safe next step
 //   gov-006   verified   / preliminary: false  — PhaseExecutionLog safety audit; all 17 entries are non-authoritative for app runtime (dev-phase origin); recommended: archive + reset
+//   gov-007   verified   / preliminary: false  — raw-access/manifest/repo-index subsystem audit; GovernanceHub-only scaffold mode confirmed; recommended model: Option C hybrid (canonical refs preserved + approval-gated draft generation)
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 //   ui-001    verified   / preliminary: false  — Admin workflow/UI clarity audit; Govern tab overload; no onboarding gate; NEXT_SAFE_STEP invisible; 5 non-operational gov-006 panels inflate Govern tab
 
@@ -334,6 +335,72 @@ export const AUDIT_INDEX = {
         "In a separate supervised PR: add devPhaseArchive: [...currentEntries] to PHASE_EXECUTION_LOG, " +
         "set entries: [], and add logEligibilityNote to writeStrategy. Reference gov-006 as justification.",
       dataFile: "src/components/audits/governance/phase-execution-log-safety-audit-2026-03-17.jsx",
+    },
+
+    {
+      id: "gov-007",
+      title: "Raw-Access / Manifest / Repo-Index Subsystem Architecture Audit",
+      category: "Governance",
+      type: "Architecture and Mode Classification Audit",
+      status: "verified",
+      date: "2026-03-17",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary:
+        "Audited RepoRawAccessPanel.jsx, ActiveRepoContext.jsx, REPO_FILE_MANIFEST.jsx, and all six " +
+        "repo-index/*.jsx files. Classification: GovernanceHub-only scaffold mode with a thin " +
+        "repo-awareness shim. Data layer is 100% hardcoded to Luckywolf82/governancehub. ActiveRepoContext " +
+        "is a proper multi-repo identity layer but is used only for banner display — not for data generation. " +
+        "Two parallel manifest representations (JSON file + inline panel constant) can diverge silently. " +
+        "exists: true flags are static and unverified at runtime. Amber/gray banners contain Norwegian text " +
+        "inconsistent with English codebase. Recommended model: Option C hybrid — GovernanceHub canonical " +
+        "reference artifacts remain; repo-specific draft artifacts generated on demand; explicit approval " +
+        "required before any push.",
+      problem:
+        "The panel title 'Repository Raw Access' implies multi-repo capability that does not yet exist. " +
+        "The gray info banner implies the panel will dynamically update when a repo is selected — it will not. " +
+        "Two parallel manifest representations (REPO_FILE_MANIFEST.jsx and the inline MANIFEST constant in " +
+        "RepoRawAccessPanel.jsx) are not linked and can diverge independently. exists: true flags are static " +
+        "declarations, not live-verified values. Amber and gray banner text is in Norwegian while the rest of " +
+        "the codebase is English.",
+      impact:
+        "Operators may incorrectly assume the panel serves the currently selected repo. The static exists: true " +
+        "flags may mislead operators relying on them for deployment decisions. Dual manifest representations " +
+        "create maintenance confusion. Without a defined draft-generation and approval-gate model, any future " +
+        "attempt to add repo-specific generation risks bypassing the approval-before-push governance requirement.",
+      affectedFiles: [
+        "src/components/admin/RepoRawAccessPanel.jsx",
+        "src/components/ActiveRepoContext.jsx",
+        "src/components/governance/REPO_FILE_MANIFEST.jsx",
+        "src/components/governance/repo-index/pages-index.jsx",
+        "src/components/governance/repo-index/admin-index.jsx",
+        "src/components/governance/repo-index/components-index.jsx",
+        "src/components/governance/repo-index/governance-index.jsx",
+        "src/components/governance/repo-index/root-index.jsx",
+        "src/components/governance/repo-index/audits-index.jsx",
+      ],
+      requiredChange:
+        "Step 1 (this PR): Register gov-007 in AUDIT_INDEX and create audit data file. " +
+        "Step 2 (separate PR): Update RepoRawAccessPanel.jsx card header subtitle to always display " +
+        "'GovernanceHub canonical reference' as a persistent scope label; replace Norwegian banner text " +
+        "with English equivalents. " +
+        "Do NOT implement draft generation or push mechanism until a separate governance audit defines " +
+        "the draft storage model and approval gate.",
+      constraints:
+        "Do not mutate PhaseExecutionLog.jsx as part of this audit. " +
+        "Do not implement draft generation, approval gate, or push mechanism in this step. " +
+        "Audit registration only. One structural change at a time.",
+      acceptanceCriteria:
+        "gov-007 registered in AUDIT_INDEX with dataFile link. " +
+        "Audit data file exists at src/components/audits/governance/raw-access-manifest-subsystem-audit-2026-03-17.jsx. " +
+        "Panel scope label updated in a subsequent PR to prevent operator misunderstanding.",
+      oneSafeNextStep:
+        "Update RepoRawAccessPanel.jsx card header subtitle to always display 'GovernanceHub canonical reference' " +
+        "as a persistent scope label, and replace Norwegian-language amber and gray banner text with English. " +
+        "Localized cosmetic-only change to one file.",
+      dataFile: "src/components/audits/governance/raw-access-manifest-subsystem-audit-2026-03-17.jsx",
     },
 
     {
