@@ -432,4 +432,72 @@ export const PHASE_EXECUTION_LOG = {
       }
     ]
   },
+
+  // logLifecycleModel — SPEC-ONLY. Does NOT execute any reset.
+  // Defines the governance-approved model for separating development-phase log entries
+  // from runtime entries, per gov-006 audit findings.
+  // No mutation of PHASE_EXECUTION_LOG.entries occurs in this step.
+  logLifecycleModel: {
+
+    // 1. devPhaseArchive
+    // Describes the structure for storing pre-reset development-phase entries.
+    // These are the entries that existed before the one-time controlled reset
+    // described in resetOperation below.
+    devPhaseArchive: {
+      description: 'Read-only historical archive of entries produced during the development phase (pre-reset).',
+      sourceEntries: 'PHASE_EXECUTION_LOG.entries at the time of the governed reset operation',
+      nonRuntime: true,
+      readOnly: true,
+      usedByExecutionLogPanel: false,
+      note: 'devPhaseArchive entries retain repository-development trace value but are NOT ' +
+            'authoritative for app runtime state. They were appended outside the app governance ' +
+            'flow and must not be treated as runtime entries.',
+    },
+
+    // 2. runtimeEntries
+    // Reference to the only authoritative runtime list of execution log entries.
+    // After the one-time reset, only governance-flow-produced entries belong here.
+    runtimeEntries: {
+      ref: 'PHASE_EXECUTION_LOG.entries',
+      isAuthoritativeRuntimeList: true,
+      note: 'PHASE_EXECUTION_LOG.entries is the ONLY authoritative runtime list. ' +
+            'After the one-time controlled reset, only entries produced via the app ' +
+            'governance flow are eligible to reside here.',
+    },
+
+    // 3. resetOperation — SPEC-ONLY
+    // Describes the one-time controlled reset to be performed under governance authorization.
+    // This is NOT execution. This is NOT mutation. This object is a SPEC only.
+    resetOperation: {
+      specOnly: true,
+      oneTimeOperation: true,
+      justificationRef: 'gov-006',
+      lockedFileExceptionNote: 'PhaseExecutionLog.jsx is a locked file. Any step that executes ' +
+                               'this reset requires an explicit locked-file exception authorized ' +
+                               'under the gov-006 audit findings.',
+      steps: [
+        'Capture all current PHASE_EXECUTION_LOG.entries into logLifecycleModel.devPhaseArchive ' +
+        '(populating the archive with the pre-reset development-phase entries)',
+        'Set PHASE_EXECUTION_LOG.entries → [] so runtime entries begin empty and accept only ' +
+        'governance-flow-produced appends going forward',
+      ],
+      notExecuted: true,
+      note: 'This spec does not authorize or perform any mutation. ' +
+            'It defines the model for a future single governed reset step.',
+    },
+
+    // 4. eligibilityRule — SPEC-ONLY
+    // Defines which entries are eligible to exist in runtimeEntries (PHASE_EXECUTION_LOG.entries)
+    // after the controlled reset.
+    eligibilityRule: {
+      specOnly: true,
+      rule: 'Only entries produced via the app governance flow are eligible to exist in ' +
+            'PHASE_EXECUTION_LOG.entries (runtimeEntries).',
+      ineligible: 'External writes, development-phase appends, and entries added outside the ' +
+                  'app governance flow are NOT eligible for runtimeEntries.',
+      note: 'Entries that do not satisfy this rule must reside in devPhaseArchive only ' +
+            'and must not be re-introduced into runtimeEntries.',
+    },
+
+  },
 };
