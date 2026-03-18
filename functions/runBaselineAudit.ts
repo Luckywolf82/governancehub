@@ -2,12 +2,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 Deno.serve(async (req) => {
   try {
-if ([req.me](https://req.me)thod !== 'POST') {
+    if (req.method !== 'POST') {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
-    const user = await [base44.auth.me](https://base44.auth.me)();
+    const user = await base44.auth.me();
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,4 +24,4 @@ if ([req.me](https://req.me)thod !== 'POST') {
   } catch (err) {
     return Response.json({ error: (err as Error).message }, { status: 500 });
   }
-})
+});
