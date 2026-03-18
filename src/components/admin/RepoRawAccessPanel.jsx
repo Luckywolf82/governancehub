@@ -210,10 +210,11 @@ function generateManifestContent(manifest) {
   );
 }
 
-// ── README create-or-update helpers ──────────────────────────────────────────
-// These are used during payload assembly to generate or merge README.md content
-// for the target repo.  A bounded governance section is inserted/updated so that
-// any pre-existing repo identity content is preserved.
+// ── README governance section builder ─────────────────────────────────────────
+// Generates the bounded governance section that is passed to the server during
+// README assembly.  The server handles merging it into the existing README (or
+// generating a template if no README exists yet), using authenticated API access
+// so the flow works for both public and private repositories.
 
 const GOVERNANCE_SECTION_START = "<!-- GOVERNANCE:START -->";
 const GOVERNANCE_SECTION_END   = "<!-- GOVERNANCE:END -->";
@@ -242,41 +243,6 @@ function buildGovernanceSection(owner, repo) {
     "- Audit artifacts live in `src/components/audits/`",
     GOVERNANCE_SECTION_END,
   ].join("\n");
-}
-
-function generateReadmeTemplate(owner, repo, branch) {
-  return [
-    `# ${repo}`,
-    "",
-    `> Repository: \`${owner}/${repo}\` · Branch: \`${branch}\``,
-    "",
-    "## Overview",
-    "",
-    "<!-- Add your project description here -->",
-    "",
-    buildGovernanceSection(owner, repo),
-    "",
-  ].join("\n");
-}
-
-// Inserts the governance section if absent, or replaces an existing one in-place,
-// leaving all surrounding content untouched.
-function mergeGovernanceSection(existingContent, owner, repo) {
-  const govSection = buildGovernanceSection(owner, repo);
-  const startIdx = existingContent.indexOf(GOVERNANCE_SECTION_START);
-  const endIdx   = existingContent.indexOf(GOVERNANCE_SECTION_END);
-
-  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-    // Replace the existing governance section in-place, preserving everything else.
-    return (
-      existingContent.slice(0, startIdx) +
-      govSection +
-      existingContent.slice(endIdx + GOVERNANCE_SECTION_END.length)
-    );
-  }
-
-  // No existing section — append at the end without touching existing content.
-  return `${existingContent.trimEnd()}\n\n${govSection}\n`;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -569,23 +535,12 @@ function DirectPushSection({ manifest }) {
       }
 
       if (src.type === "readme") {
-        try {
-          const existingUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/README.md`;
-          const res = await fetch(existingUrl);
-          let content;
-          if (!res.ok) {
-            // Target repo has no README — generate a repo-aware template.
-            content = generateReadmeTemplate(owner, repo, branch);
-          } else {
-            // Target repo already has a README — preserve all existing content
-            // and only insert or update the bounded governance section.
-            const existing = await res.text();
-            content = mergeGovernanceSection(existing, owner, repo);
-          }
-          pushable.push({ path: file.path, content, source: "starter-kit" });
-        } catch (err) {
-          excluded.push({ path: file.path, reason: `README handling failed: ${err.message}` });
-        }
+        // Pass the governance section to the server as source "readme".
+        // The server fetches the existing README content with auth (handles private repos),
+        // merges the governance section into it, then pushes the result.
+        // This avoids the unauthenticated raw-URL fetch which fails for private repos.
+        const governanceSection = buildGovernanceSection(owner, repo);
+        pushable.push({ path: file.path, content: governanceSection, source: "readme" });
         continue;
       }
 
@@ -870,17 +825,17 @@ export default function RepoRawAccessPanel() {
       activeRepo.repo?.toLowerCase() === MANIFEST_REPO.repo.toLowerCase() ? (
         <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-200 rounded px-3 py-2 text-xs text-emerald-800">
           <span className="w-2 h-2 rounded-full bg-emerald-400 mt-0.5 shrink-0" />
-          <span><strong>Repo-kjent:</strong> Aktivt repo samsvarer med manifest-kilde ({activeRepo.fullName}). Filene nedenfor er verifisert mot denne kilden.</span>
+          <span><strong>Repo match:</strong> Active repo matches manifest source ({activeRepo.fullName}). Files below are verified against this source.</span>
         </div>
       ) : activeRepo ? (
         <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span><strong>Stale manifest-referanse:</strong> Aktivt repo er <strong>{activeRepo.fullName}</strong>, men dette panelet viser GovernanceHub-kanonisk manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). Filene nedenfor gjelder ikke aktivt valgt repo.</span>
+          <span><strong>Stale manifest reference:</strong> Active repo is <strong>{activeRepo.fullName}</strong>, but this panel shows the GovernanceHub canonical manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). The file list below does not apply to the selected repo.</span>
         </div>
       ) : (
         <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded px-3 py-2 text-xs text-slate-600">
           <FileText className="w-3 h-3 mt-0.5 shrink-0" />
-          <span><strong>Ingen aktivt repo.</strong> Viser kanonisk GovernanceHub-manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). Velg aktivt repo i toppmenyen for repo-spesifikk visning.</span>
+          <span><strong>No active repo.</strong> Showing canonical GovernanceHub manifest ({MANIFEST_REPO.owner}/{MANIFEST_REPO.repo}). Select an active repo in the top menu for repo-specific view.</span>
         </div>
       )}
 
@@ -894,7 +849,7 @@ export default function RepoRawAccessPanel() {
                 <Badge className="bg-purple-100 text-purple-700 text-xs">GovernanceHub canonical reference</Badge>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Inspecting: {MANIFEST_REPO.owner}/{MANIFEST_REPO.repo} · {allFiles.length} filer · Generert {MANIFEST._meta?.generatedAt}
+                Inspecting: {MANIFEST_REPO.owner}/{MANIFEST_REPO.repo} · {allFiles.length} files · Generated {MANIFEST._meta?.generatedAt}
               </p>
             </div>
           </div>

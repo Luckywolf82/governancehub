@@ -11,7 +11,15 @@ export default [
       "src/pages/**/*.{js,mjs,cjs,jsx}",
       "src/Layout.jsx",
     ],
-    ignores: ["src/lib/**/*", "src/components/ui/**/*"],
+    ignores: [
+      "src/lib/**/*",
+      "src/components/ui/**/*",
+      // These files contain JSON or Markdown content and are not valid JSX
+      "src/components/governance/PRIORITY_REPO_FILES.jsx",
+      "src/components/governance/REPO_FILE_MANIFEST.jsx",
+      "src/components/governance/GITHUB_GOVERNANCE_IMPLEMENTATION.jsx",
+      "src/components/governance/repo-index/**/*",
+    ],
     ...pluginJs.configs.recommended,
     ...pluginReact.configs.flat.recommended,
     languageOptions: {

@@ -20,12 +20,14 @@ export default function GitHubRepoDiscoveryPanel() {
   const [repos, setRepos] = useState([]);
   const [status, setStatus] = useState("idle"); // idle | loading | success | error | not_connected
   const [error, setError] = useState(null);
+  const [warnings, setWarnings] = useState([]);
   const [registeringId, setRegisteringId] = useState(null);
   const [registerResult, setRegisterResult] = useState({});
 
   const discover = async () => {
     setStatus("loading");
     setError(null);
+    setWarnings([]);
     setRepos([]);
     setRegisterResult({});
     try {
@@ -40,6 +42,7 @@ export default function GitHubRepoDiscoveryPanel() {
         return;
       }
       setRepos(result.repositories ?? []);
+      setWarnings(result.warnings ?? []);
       setStatus("success");
     } catch (err) {
       setStatus("error");
@@ -125,6 +128,20 @@ export default function GitHubRepoDiscoveryPanel() {
         <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded px-3 py-2 text-xs text-red-800">
           <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
           {error}
+        </div>
+      )}
+
+      {status === "success" && warnings.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800 space-y-1">
+          <div className="flex items-center gap-1.5 font-semibold">
+            <AlertTriangle className="w-3 h-3 shrink-0" />
+            {warnings.length} installation{warnings.length !== 1 ? "s" : ""} could not be accessed — repositories from those installations are not listed:
+          </div>
+          <ul className="list-disc list-inside space-y-0.5 pl-1">
+            {warnings.map((w, i) => (
+              <li key={i} className="font-mono text-[10px] text-amber-700">{w}</li>
+            ))}
+          </ul>
         </div>
       )}
 
