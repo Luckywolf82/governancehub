@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 Deno.serve(async (req) => {
   try {
-    if ([req.me](https://req.me)thod !== 'POST') {
+if ([req.me](https://req.me)thod !== 'POST') {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
