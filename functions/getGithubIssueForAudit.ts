@@ -77,6 +77,7 @@ Deno.serve(async (req) => {
     // Not found
     return Response.json({ found: false });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    const msg = (error instanceof Error ? error.message : String(error)) || 'Internal server error';
+    return Response.json({ error: msg }, { status: 500 });
   }
 });
