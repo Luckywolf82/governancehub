@@ -27,6 +27,7 @@
 //   gov-005   verified   / preliminary: false  — audit executed; no partial dispatch arch found; PromptProfileRegistry.jsx is one safe next step
 //   gov-006   verified   / preliminary: false  — PhaseExecutionLog safety audit; all 17 entries are non-authoritative for app runtime (dev-phase origin); recommended: archive + reset
 //   gov-007   verified   / preliminary: false  — raw-access/manifest/repo-index subsystem audit; GovernanceHub-only scaffold mode confirmed; recommended model: Option C hybrid (canonical refs preserved + approval-gated draft generation)
+//   gov-008   verified   / preliminary: false  — hardcoded Luckywolf82/governancehub reference classification; 35 files inspected; 2 unsafe (RepoFileExplorer live API call; ExecutionLogPanel REPO_BASE fallback); 33 safe
 //   perf-001  planned    / preliminary: true   — scope only; not executed
 //   ui-001    verified   / preliminary: false  — Admin workflow/UI clarity audit; Govern tab overload; no onboarding gate; NEXT_SAFE_STEP invisible; 5 non-operational gov-006 panels inflate Govern tab
 
@@ -401,6 +402,58 @@ export const AUDIT_INDEX = {
         "as a persistent scope label, and replace Norwegian-language amber and gray banner text with English. " +
         "Localized cosmetic-only change to one file.",
       dataFile: "src/components/audits/governance/raw-access-manifest-subsystem-audit-2026-03-17.jsx",
+    },
+
+    {
+      id: "gov-008",
+      title: "Hardcoded Luckywolf82/governancehub Reference Classification Audit",
+      category: "Governance",
+      type: "Security and Runtime Safety Classification Audit",
+      status: "verified",
+      date: "2026-03-18",
+      projectId: "governancehub",
+      projectSlug: "governancehub",
+      preliminary: false,
+      evidenceSource: "repo-derived",
+      summary:
+        "Inspected 35 files for every occurrence of 'Luckywolf82/governancehub', 'governancehub', " +
+        "'raw.githubusercontent.com', MANIFEST_REPO, RAW_BASE, GH_BASE, and hardcoded owner/repo constants. " +
+        "33 occurrences classified SAFE (self-referential static manifests, project metadata, or correct " +
+        "template-source fetches from GovernanceHub for installation into target repos). " +
+        "2 occurrences classified UNSAFE: (1) RepoFileExplorer.jsx makes a live API call to the hardcoded " +
+        "GovernanceHub Git Trees endpoint, bypassing ActiveRepoContext entirely — currently dead code " +
+        "but a critical latent hazard if activated; (2) ExecutionLogPanel.jsx defines REPO_OWNER/REPO_NAME/ " +
+        "REPO_BASE hardcoded to GovernanceHub and uses them as the fallback for verification link construction " +
+        "— currently zero impact (all log entries are GovernanceHub-internal) but silently misroutes " +
+        "verification links for any future target-repo log entry that lacks githubVerificationUrl. " +
+        "Backend functions (getGithubRepoContents, pushFilesToGithub, listGithubRepos, " +
+        "runBaselineAudit, verifyExecutionLogEntry) contain zero hardcoded GovernanceHub references.",
+      problem:
+        "Two runtime-active files contain hardcoded GovernanceHub references: " +
+        "RepoFileExplorer.jsx (live fetch to api.github.com/repos/Luckywolf82/governancehub — dead code); " +
+        "ExecutionLogPanel.jsx (REPO_BASE fallback for verification links — affects future target-repo entries).",
+      impact:
+        "RepoFileExplorer.jsx: if rendered, always shows GovernanceHub file tree regardless of active repo. " +
+        "ExecutionLogPanel.jsx: verification PR/commit links silently point to GovernanceHub for entries " +
+        "lacking githubVerificationUrl, causing verification failures for target-repo work.",
+      affectedFiles: [
+        "src/components/github/RepoFileExplorer.jsx",
+        "src/components/admin/ExecutionLogPanel.jsx",
+      ],
+      requiredChange:
+        "Step 2 (separate PR): Refactor RepoFileExplorer.jsx to consume owner/repo from ActiveRepoContext. " +
+        "Step 3 (separate PR): Replace REPO_OWNER/REPO_NAME/REPO_BASE in ExecutionLogPanel.jsx with " +
+        "ActiveRepoContext-derived values or mandate githubVerificationUrl for cross-repo entries.",
+      constraints:
+        "Audit only. No implementation in this step. Do not mutate PhaseExecutionLog.jsx.",
+      acceptanceCriteria:
+        "gov-008 registered in AUDIT_INDEX with dataFile link. " +
+        "Audit data file exists at src/components/audits/governance/hardcoded-repo-reference-classification-audit-2026-03-18.jsx.",
+      oneSafeNextStep:
+        "Refactor RepoFileExplorer.jsx to use ActiveRepoContext for owner/repo resolution. " +
+        "Single-file change (34 lines), fully reversible, eliminates the highest-risk UNSAFE usage.",
+      dataFile:
+        "src/components/audits/governance/hardcoded-repo-reference-classification-audit-2026-03-18.jsx",
     },
 
     {
