@@ -1,24 +1,28 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { getInstallationAccessToken, isGithubAppConfigured } from './_shared/githubAppAuth.ts';
 
 /**
  * registerGithubRepo
- * 
+ *
  * Register an existing GitHub repository into GovernanceHub's Repository registry.
- * Verifies the repo exists on GitHub and stores metadata.
- * 
+ * Verifies the repo exists on GitHub and stores metadata, including GitHub App
+ * installation data when available.
+ *
  * Payload:
  * {
  *   owner: string,
  *   repo: string,
+ *   installationId?: number | string,   // from listGithubRepos discovery
  *   notes?: string,
  *   capabilities?: {
  *     "contents:read"?: boolean,
  *     "issue:create"?: boolean,
  *     "repo:create"?: boolean,
- *     "dispatch:audit"?: boolean
+ *     "dispatch:audit"?: boolean,
+ *     "contents:write"?: boolean
  *   }
  * }
- * 
+ *
  * Returns:
  * {
  *   success: true,
@@ -28,7 +32,9 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
  *     repo,
  *     fullName,
  *     isEnabled,
- *     capabilities
+ *     capabilities,
+ *     githubCanWrite,
+ *     githubInstallationId
  *   }
  * }
  */
@@ -66,7 +72,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { owner, repo, notes, capabilities } = payload;
+    const { owner, repo, installationId, notes, capabilities } = payload;
 
     // Validate
     if (!owner || typeof owner !== 'string' || owner.trim() === '') {
@@ -76,16 +82,34 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'repo must be a non-empty string' }, { status: 400 });
     }
 
-    // GitHub connector
-    let accessToken;
-    try {
-      const conn = await base44.asServiceRole.connectors.getConnection('github');
-      accessToken = conn.accessToken;
-    } catch {
-      return Response.json({
-        error: 'github_not_connected',
-        message: 'GitHub connector is not authorized.',
-      }, { status: 503 });
+    // Resolve access token:
+    //   1. If installationId provided → use GitHub App installation token
+    //   2. Else if GitHub App env vars configured → fetch token for any matching installation
+    //   3. Else → fall back to legacy connector
+    let accessToken: string;
+    const resolvedInstallationId: number | null = installationId ? Number(installationId) : null;
+
+    if (resolvedInstallationId && isGithubAppConfigured()) {
+      // GitHub App: use provided installationId
+      try {
+        accessToken = await getInstallationAccessToken(resolvedInstallationId);
+      } catch (appErr) {
+        return Response.json({
+          error: 'github_not_connected',
+          message: `Failed to get GitHub App installation token: ${(appErr as Error).message}`,
+        }, { status: 503 });
+      }
+    } else {
+      // Legacy connector fallback
+      try {
+        const conn = await base44.asServiceRole.connectors.getConnection('github');
+        accessToken = conn.accessToken;
+      } catch {
+        return Response.json({
+          error: 'github_not_connected',
+          message: 'No installationId provided and GitHub connector is not authorized.',
+        }, { status: 503 });
+      }
     }
 
     // Verify repo exists on GitHub
@@ -99,7 +123,7 @@ Deno.serve(async (req) => {
     });
 
     if (!ghRes.ok) {
-      const ghErr = await ghRes.json();
+      const ghErr = await ghRes.json().catch(() => ({}));
       return Response.json({
         error: 'github_repo_not_found',
         message: ghErr.message ?? 'Repository not found on GitHub',
@@ -110,7 +134,7 @@ Deno.serve(async (req) => {
     const fullName = `${owner}/${repo}`;
 
     // Derive contents:write from real GitHub push permission.
-    // GitHub says technically possible; admin can still override via capabilities payload.
+    // Admin can still override via the capabilities payload.
     const githubCanWrite = ghRepo.permissions?.push === true;
 
     // Merge capabilities: defaults → github-derived → admin-supplied overrides
@@ -139,6 +163,10 @@ Deno.serve(async (req) => {
         isArchived: ghRepo.archived,
         isEnabled: true,
         capabilitiesJson: mergedCapabilities,
+        githubInstallationId: resolvedInstallationId !== null
+          ? resolvedInstallationId
+          : (existingRepo.githubInstallationId ?? null),
+        githubCanWrite,
         notes: notes || existingRepo.notes,
         lastVerifiedAt: new Date().toISOString(),
       });
@@ -154,6 +182,8 @@ Deno.serve(async (req) => {
         isArchived: ghRepo.archived,
         isEnabled: true,
         capabilitiesJson: mergedCapabilities,
+        githubInstallationId: resolvedInstallationId ?? null,
+        githubCanWrite,
         notes: notes || null,
         lastVerifiedAt: new Date().toISOString(),
       });
@@ -166,8 +196,14 @@ Deno.serve(async (req) => {
       actorUserId: user.id,
       actionType: 'repository.register',
       status: 'success',
-      requestJson: { owner, repo, notes: notes || null },
-      responseJson: { id: result.id, fullName, isEnabled: result.isEnabled, githubCanWrite },
+      requestJson: { owner, repo, installationId: resolvedInstallationId, notes: notes || null },
+      responseJson: {
+        id: result.id,
+        fullName,
+        isEnabled: result.isEnabled,
+        githubCanWrite,
+        githubInstallationId: resolvedInstallationId,
+      },
       githubUrl: ghRepo.html_url,
       errorMessage: null,
     });
@@ -182,6 +218,7 @@ Deno.serve(async (req) => {
         isEnabled: result.isEnabled,
         capabilities: result.capabilitiesJson,
         githubCanWrite,
+        githubInstallationId: resolvedInstallationId,
       },
     });
 
