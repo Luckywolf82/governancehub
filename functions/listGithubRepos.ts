@@ -21,7 +21,9 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
  *       archived,
  *       registered,
  *       enabled,
- *       repositoryId
+ *       repositoryId,
+ *       canWrite,          // true if GitHub access token has push permission
+ *       githubPermissions  // { admin, maintain, push, triage, pull } from GitHub API
  *     }
  *   ]
  * }
@@ -89,6 +91,7 @@ Deno.serve(async (req) => {
       const registered = !!registeredByFullName[fullName];
       const regRecord = registeredByFullName[fullName];
 
+      const perms = ghRepo.permissions ?? {};
       return {
         owner: ghRepo.owner.login,
         repo: ghRepo.name,
@@ -99,6 +102,14 @@ Deno.serve(async (req) => {
         registered,
         enabled: registered ? regRecord.isEnabled : false,
         repositoryId: registered ? regRecord.id : null,
+        canWrite: perms.push === true,
+        githubPermissions: {
+          admin: perms.admin === true,
+          maintain: perms.maintain === true,
+          push: perms.push === true,
+          triage: perms.triage === true,
+          pull: perms.pull === true,
+        },
       };
     });
 

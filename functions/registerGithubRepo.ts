@@ -38,6 +38,7 @@ const DEFAULT_CAPABILITIES = {
   'issue:create': true,
   'repo:create': false,
   'dispatch:audit': true,
+  'contents:write': false,
 };
 
 Deno.serve(async (req) => {
@@ -108,8 +109,16 @@ Deno.serve(async (req) => {
     const ghRepo = await ghRes.json();
     const fullName = `${owner}/${repo}`;
 
-    // Merge capabilities
-    const mergedCapabilities = { ...DEFAULT_CAPABILITIES, ...(capabilities || {}) };
+    // Derive contents:write from real GitHub push permission.
+    // GitHub says technically possible; admin can still override via capabilities payload.
+    const githubCanWrite = ghRepo.permissions?.push === true;
+
+    // Merge capabilities: defaults → github-derived → admin-supplied overrides
+    const mergedCapabilities = {
+      ...DEFAULT_CAPABILITIES,
+      'contents:write': githubCanWrite,
+      ...(capabilities || {}),
+    };
 
     // Check if already registered
     const existing = await base44.asServiceRole.entities.Repository.filter({
@@ -158,7 +167,7 @@ Deno.serve(async (req) => {
       actionType: 'repository.register',
       status: 'success',
       requestJson: { owner, repo, notes: notes || null },
-      responseJson: { id: result.id, fullName, isEnabled: result.isEnabled },
+      responseJson: { id: result.id, fullName, isEnabled: result.isEnabled, githubCanWrite },
       githubUrl: ghRepo.html_url,
       errorMessage: null,
     });
@@ -172,6 +181,7 @@ Deno.serve(async (req) => {
         fullName: result.fullName,
         isEnabled: result.isEnabled,
         capabilities: result.capabilitiesJson,
+        githubCanWrite,
       },
     });
 
