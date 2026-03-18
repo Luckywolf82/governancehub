@@ -24,14 +24,15 @@ import Verification from "@/components/governance/Verification";
 import ExecutionLog from "@/components/governance/ExecutionLog";
 import { NEXT_SAFE_STEP } from "@/components/governance/NextSafeStep";
 
-const TABS = ["Setup", "Build Prep", "Govern", "Strategy"];
+const TABS = ["Onboarding", "Govern", "Strategy"];
 
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("Setup");
+  const [tab, setTab] = useState("Onboarding");
   const [injectedAudit, setInjectedAudit] = useState(null);
   const [pipelineOpen, setPipelineOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 768);
   const { activeRepo } = useActiveRepo();
 
@@ -210,119 +211,90 @@ export default function Admin() {
           </div>
         )}
 
-        {tab === "Setup" && (
+        {tab === "Onboarding" && (
           <div className="space-y-6">
             <div className="space-y-1">
-              <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wide">Setup</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Registrer repo og opprett eller koble prosjekt</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wide">Onboarding</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Koble GitHub, registrer repo og installer governance starter kit</p>
             </div>
 
-            {/* Setup Readiness — compact operator-orientation card */}
+            {/* Onboarding flow — compact operator-orientation card */}
             <div className="border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 px-4 py-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Setup · forutsetninger</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500">Oversikt over forutsetninger før du fortsetter til Build Prep og Govern.</p>
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Onboarding · steg</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Følg stegene nedenfor for å komme i gang med GovernanceHub.</p>
               <div className="space-y-1.5 pt-0.5">
-                {/* Row 1: active repo — truly deterministic */}
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-amber-400"}`} />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Aktivt repo</span>
-                  <span className={`min-w-0 break-all ${activeRepo ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"}`}>
-                    {activeRepo ? `Valgt · ${activeRepo.fullName}` : "Ikke valgt · velg repo i toppmenyen"}
+                {/* Step 1: connect GitHub */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0 w-4">1.</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Koble GitHub</span>
+                  <span className="ml-1 text-slate-400 dark:text-slate-500">· Discover-panelet nedenfor viser tilkoblingsstatus</span>
+                </div>
+                {/* Step 2: discover and register repo */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0 w-4">2.</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Oppdag og registrer repo</span>
+                  <span className="ml-1 text-slate-400 dark:text-slate-500">· Bruk GitHub Repository Discovery og Repository Manager</span>
+                </div>
+                {/* Step 3: install starter kit */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className={`text-slate-400 dark:text-slate-500 font-medium shrink-0 w-4`}>3.</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Installer governance starter kit</span>
+                  <span className={`ml-1 ${activeRepo ? "text-slate-400 dark:text-slate-500" : "text-amber-600 dark:text-amber-400"}`}>
+                    {activeRepo ? "· Tilgjengelig nedenfor" : "· Velg aktivt repo i toppmenyen først"}
                   </span>
                 </div>
-                {/* Row 2: repository registration panel — informational */}
+                {/* Step 4: ready */}
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Repository-registrering</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Administrert nedenfor i Setup</span>
-                </div>
-                {/* Row 3: project bootstrap — informational */}
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Prosjekt-bootstrap</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Tilgjengelig nedenfor i Setup</span>
-                </div>
-                {/* Row 4: governance installation — now directly available */}
-                <div className="flex items-center gap-2 text-xs">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-slate-300 dark:bg-slate-600"}`} />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Governance-installasjon</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Direkte installasjon tilgjengelig nedenfor — ingen bootstrap kreves</span>
+                  <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0 w-4">4.</span>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Klar til bruk</span>
+                  <span className="ml-1 text-slate-400 dark:text-slate-500">· Gå til Govern-fanen for å starte audit og styring</span>
                 </div>
               </div>
             </div>
 
+            {/* Step 1–2: GitHub connection and repo registration */}
             <GitHubRepoDiscoveryPanel />
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
               <RepositoryManagerPanel />
             </div>
+
+            {/* Step 3: Install governance starter kit */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Direkte Starter Kit-installasjon</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Steg 3 · Installer governance starter kit</p>
               <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
                 Installer governance starter kit direkte fra aktivt repo — ingen prosjekt-bootstrap, audit eller planoppretting kreves.
                 Bootstrap-konfigurasjon genereres automatisk med standardverdier.
               </p>
               <GovernanceStarterKitPanel />
             </div>
-            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Avansert: Prosjekt-bootstrap</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Opprett eller koble eksisterende prosjekt for avansert governance-flyt (valgfritt).</p>
-              <ProjectBootstrapPanel />
-            </div>
-            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-              <RepoRawAccessPanel />
-            </div>
-            <RepoVerificationPanel />
-          </div>
-        )}
 
-        {tab === "Build Prep" && (
-          <div className="space-y-6">
-            <div className="space-y-1">
-              <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wide">Build Prep</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Generer prompt og governance-startpakke før bygging</p>
-            </div>
-
-            {/* Build Prep Readiness — compact operator-orientation card */}
-            <div className="border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 px-4 py-3 space-y-2">
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Build Prep · forberedelser</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500">Oversikt over forberedelser før du genererer prompt eller installerer governance starter kit.</p>
-              <div className="space-y-1.5 pt-0.5">
-                {/* Row 1: active repo — truly deterministic */}
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-amber-400"}`} />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Aktivt repo</span>
-                  <span className={`min-w-0 break-all ${activeRepo ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"}`}>
-                    {activeRepo ? `Valgt · ${activeRepo.fullName}` : "Ikke valgt · velg repo i toppmenyen"}
-                  </span>
-                </div>
-                {/* Row 2: start prompt generation — informational */}
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Start Prompt-generering</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Tilgjengelig nedenfor</span>
-                </div>
-                {/* Row 3: governance starter kit — informational */}
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Governance starter kit</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Administrert nedenfor</span>
-                </div>
-                {/* Row 4: govern workflow — informational */}
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Govern-arbeidsflyt</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Fortsetter i Govern etter Build Prep</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">Generatorer</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Bruk disse for å forberede AI-arbeid og governance-struktur før implementering.</p>
-              <StartPromptGeneratorPanel />
-            </div>
+            {/* Advanced tools — collapsed by default */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-              <GovernanceStarterKitPanel />
+              <button
+                type="button"
+                aria-expanded={advancedOpen}
+                onClick={() => setAdvancedOpen((v) => !v)}
+                className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors w-full text-left"
+              >
+                <span className={`inline-block transition-transform duration-150 ${advancedOpen ? "rotate-90" : ""}`}>▶</span>
+                Avanserte verktøy
+                <span className="ml-1 text-slate-400 dark:text-slate-500 font-normal">· prosjekt-bootstrap, rå filtilgang, verifikasjon</span>
+              </button>
+              {advancedOpen && (
+                <div className="space-y-4 mt-4">
+                  <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Prosjekt-bootstrap</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Opprett eller koble eksisterende prosjekt for avansert governance-flyt (valgfritt).</p>
+                    <ProjectBootstrapPanel />
+                  </div>
+                  <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                    <RepoRawAccessPanel />
+                  </div>
+                  <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                    <RepoVerificationPanel />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -331,10 +303,10 @@ export default function Admin() {
           <div className="space-y-6">
             <div className="space-y-1">
               <p className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wide">Strategy</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Roadmap, prioritering og referansepanel</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Roadmap, prioritering, referansepanel og prompt-generatorer</p>
             </div>
 
-            <p className="text-xs text-slate-400 dark:text-slate-500 italic">Bruk Product Intelligence for prioritering. Approval-panelene er støtte for governance og publisering.</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 italic">Bruk Product Intelligence for prioritering. Prompt-generatorer er tilgjengelige her. Approval-panelene er støtte for governance og publisering.</p>
 
             {/* Strategy overview — compact operator-orientation card */}
             <div className="border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 px-4 py-3 space-y-2">
@@ -347,6 +319,11 @@ export default function Admin() {
                   <span className={`min-w-0 break-all ${activeRepo ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"}`}>
                     {activeRepo ? `Valgt · ${activeRepo.fullName}` : "Ikke valgt · velg repo i toppmenyen"}
                   </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
+                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Prompt-generatorer</span>
+                  <span className="ml-1 text-slate-400 dark:text-slate-500">· Start Prompt Generator nedenfor</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
@@ -378,6 +355,12 @@ export default function Admin() {
               }}
               activeRepo={activeRepo}
             />
+
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1 uppercase tracking-wide">Generatorer</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Bruk disse for å forberede AI-arbeid og governance-struktur før implementering.</p>
+              <StartPromptGeneratorPanel />
+            </div>
 
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
               <button
