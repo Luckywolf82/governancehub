@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { getInstallationAccessToken } from './_shared/githubAppAuth.ts';
 
 /**
  * pushFilesToGithub
@@ -51,18 +52,6 @@ Deno.serve(async (req) => {
     }
     if (user.role !== 'admin') {
       return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
-    }
-
-    // GitHub connector
-    let accessToken: string;
-    try {
-      const conn = await base44.asServiceRole.connectors.getConnection('github');
-      accessToken = conn.accessToken;
-    } catch {
-      return Response.json({
-        error: 'github_not_connected',
-        message: 'GitHub connector is not authorized.',
-      }, { status: 503 });
     }
 
     // Parse payload
@@ -170,6 +159,50 @@ Deno.serve(async (req) => {
         errorMessage: 'contents:write capability not enabled',
       });
       return Response.json({ error: 'contents:write capability not enabled for this repository' }, { status: 403 });
+    }
+
+    // Check GitHub-tier write permission (only when explicitly stored at registration time)
+    if (repository.githubCanWrite === false) {
+      await base44.asServiceRole.entities.RepoActionLog.create({
+        repositoryFullName: repoKey,
+        repositoryId: repository.id,
+        actorUserId: user.id,
+        actionType: 'github.contents.push',
+        status: 'failure',
+        requestJson: { owner, repo, branch, fileCount: files.length },
+        responseJson: { reason: 'github_write_denied' },
+        githubUrl: null,
+        errorMessage: 'GitHub App does not have push permission for this repository',
+      });
+      return Response.json({
+        error: 'github_write_denied',
+        message: 'The GitHub App does not have push permission for this repository',
+      }, { status: 403 });
+    }
+
+    // Resolve access token:
+    //   1. If repository has a stored installationId → use GitHub App installation token
+    //   2. Else → fall back to legacy connector (for pre-App registrations)
+    let accessToken: string;
+    if (repository.githubInstallationId) {
+      try {
+        accessToken = await getInstallationAccessToken(repository.githubInstallationId);
+      } catch (appErr) {
+        return Response.json({
+          error: 'github_not_connected',
+          message: `Failed to get GitHub App installation token: ${(appErr as Error).message}`,
+        }, { status: 503 });
+      }
+    } else {
+      try {
+        const conn = await base44.asServiceRole.connectors.getConnection('github');
+        accessToken = conn.accessToken;
+      } catch {
+        return Response.json({
+          error: 'github_not_connected',
+          message: 'Repository has no installation ID and the GitHub connector is not authorized.',
+        }, { status: 503 });
+      }
     }
 
     const pushed: Array<{ path: string; sha: string; html_url: string }> = [];

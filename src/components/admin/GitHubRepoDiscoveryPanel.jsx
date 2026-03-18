@@ -53,6 +53,7 @@ export default function GitHubRepoDiscoveryPanel() {
       const result = await base44.functions.invoke("registerGithubRepo", {
         owner: repo.owner,
         repo: repo.repo,
+        ...(repo.installationId != null ? { installationId: repo.installationId } : {}),
       });
       if (result.success) {
         setRegisterResult((prev) => ({
@@ -104,7 +105,7 @@ export default function GitHubRepoDiscoveryPanel() {
       <div className="border border-blue-100 bg-blue-50 rounded px-3 py-2 text-xs text-blue-800 space-y-0.5">
         <p className="font-semibold">Two-layer access model</p>
         <p>
-          <span className="font-medium text-blue-700">GitHub tier</span> — repository visibility and push permission come from the connected GitHub account.
+          <span className="font-medium text-blue-700">GitHub tier</span> — repository visibility and push permission come from the GitHub App installation.
         </p>
         <p>
           <span className="font-medium text-blue-700">GovernanceHub tier</span> — registered + enabled + capabilities are GovernanceHub governance decisions, independent of GitHub.
@@ -115,7 +116,7 @@ export default function GitHubRepoDiscoveryPanel() {
         <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-800">
           <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           <span>
-            GitHub connector is not authorized. Connect a GitHub account in the platform connector settings before using repository discovery.
+            GitHub is not connected. Configure <span className="font-semibold">GITHUB_APP_ID</span> and <span className="font-semibold">GITHUB_APP_PRIVATE_KEY</span> environment variables to enable GitHub App–based repository discovery. A connector-based fallback is also supported if the GitHub connector is authorized.
           </span>
         </div>
       )}
