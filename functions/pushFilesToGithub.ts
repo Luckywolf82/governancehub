@@ -51,7 +51,7 @@ function mergeGovernanceSectionIntoReadme(existingContent: string, governanceSec
  *     {
  *       path:    string,        // repo-relative file path
  *       content: string,        // UTF-8 text content (will be base64-encoded)
- *       source:  "starter-kit" | "manifest"
+ *       source:  "starter-kit" | "manifest" | "readme"
  *     },
  *     ...
  *   ]
