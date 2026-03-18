@@ -70,11 +70,18 @@ interface RepoEntry {
   githubPermissions: { admin: boolean; maintain: boolean; push: boolean; triage: boolean; pull: boolean };
 }
 
+interface AppDiscoveryResult {
+  repos: RepoEntry[];
+  /** Non-fatal warnings: e.g. installation token failures that were skipped. */
+  warnings: string[];
+}
+
 /**
  * Fetch all repos accessible via GitHub App installations.
  * Returns each repo tagged with its installationId and canWrite flag.
+ * Non-fatal installation failures are collected in `warnings`.
  */
-async function listReposViaApp(): Promise<RepoEntry[]> {
+async function listReposViaApp(): Promise<AppDiscoveryResult> {
   const appId = Deno.env.get('GITHUB_APP_ID')!;
   const privateKey = Deno.env.get('GITHUB_APP_PRIVATE_KEY')!;
   const jwt = await createAppJWT(appId, privateKey);
@@ -99,10 +106,13 @@ async function listReposViaApp(): Promise<RepoEntry[]> {
   }
 
   const installations: GhInstallation[] = await installRes.json();
-  const results: RepoEntry[] = [];
+  const repos: RepoEntry[] = [];
+  const warnings: string[] = [];
 
   // 2. For each installation, get an installation token and list repos
   for (const installation of installations) {
+    const account = installation.account?.login ?? `installation:${installation.id}`;
+
     // Get installation access token
     const tokenRes = await fetch(
       `https://api.github.com/app/installations/${installation.id}/access_tokens`,
@@ -117,7 +127,10 @@ async function listReposViaApp(): Promise<RepoEntry[]> {
     );
 
     if (!tokenRes.ok) {
-      // Skip this installation on token failure (log but continue)
+      const tokenErr = await tokenRes.json().catch(() => ({}));
+      warnings.push(
+        `Installation ${account} (id:${installation.id}): token request failed — ${tokenErr.message ?? `HTTP ${tokenRes.status}`}`,
+      );
       continue;
     }
 
@@ -136,6 +149,10 @@ async function listReposViaApp(): Promise<RepoEntry[]> {
     );
 
     if (!reposRes.ok) {
+      const reposErr = await reposRes.json().catch(() => ({}));
+      warnings.push(
+        `Installation ${account} (id:${installation.id}): repo list failed — ${reposErr.message ?? `HTTP ${reposRes.status}`}`,
+      );
       continue;
     }
 
@@ -143,7 +160,7 @@ async function listReposViaApp(): Promise<RepoEntry[]> {
 
     for (const ghRepo of ghRepos) {
       const perms = ghRepo.permissions ?? {};
-      results.push({
+      repos.push({
         owner: ghRepo.owner.login,
         repo: ghRepo.name,
         fullName: `${ghRepo.owner.login}/${ghRepo.name}`,
@@ -163,7 +180,7 @@ async function listReposViaApp(): Promise<RepoEntry[]> {
     }
   }
 
-  return results;
+  return { repos, warnings };
 }
 
 // ---------------------------------------------------------------------------
@@ -231,11 +248,14 @@ Deno.serve(async (req) => {
 
     // --- Repo discovery: GitHub App (preferred) or connector (fallback) ---
     let rawRepos: RepoEntry[];
+    let discoveryWarnings: string[] = [];
 
     if (isGithubAppConfigured()) {
       // GitHub App path
       try {
-        rawRepos = await listReposViaApp();
+        const appResult = await listReposViaApp();
+        rawRepos = appResult.repos;
+        discoveryWarnings = appResult.warnings;
       } catch (appErr) {
         return Response.json({
           error: 'github_not_connected',
@@ -305,12 +325,16 @@ Deno.serve(async (req) => {
       actionType: 'github.repos.list',
       status: 'success',
       requestJson: { source: isGithubAppConfigured() ? 'github_app' : 'connector' },
-      responseJson: { count: normalized.length },
+      responseJson: { count: normalized.length, warnings: discoveryWarnings.length },
       githubUrl: null,
-      errorMessage: null,
+      errorMessage: discoveryWarnings.length > 0 ? `${discoveryWarnings.length} installation(s) skipped` : null,
     });
 
-    return Response.json({ success: true, repositories: normalized });
+    return Response.json({
+      success: true,
+      repositories: normalized,
+      ...(discoveryWarnings.length > 0 ? { warnings: discoveryWarnings } : {}),
+    });
 
   } catch (error) {
     const msg = (error instanceof Error ? error.message : String(error)) || 'Internal server error';

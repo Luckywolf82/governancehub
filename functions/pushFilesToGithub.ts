@@ -1,6 +1,35 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 import { getInstallationAccessToken } from './_shared/githubAppAuth.ts';
 
+// ---------------------------------------------------------------------------
+// README merge helpers
+// ---------------------------------------------------------------------------
+
+const GOVERNANCE_SECTION_START = '<!-- GOVERNANCE:START -->';
+const GOVERNANCE_SECTION_END = '<!-- GOVERNANCE:END -->';
+
+/**
+ * Insert or replace the bounded governance section inside an existing README.
+ * The `governanceSection` string must already include the START/END comment markers.
+ * All content outside those markers is preserved exactly.
+ */
+function mergeGovernanceSectionIntoReadme(existingContent: string, governanceSection: string): string {
+  const startIdx = existingContent.indexOf(GOVERNANCE_SECTION_START);
+  const endIdx = existingContent.indexOf(GOVERNANCE_SECTION_END);
+
+  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+    // Replace the existing governance section in-place, preserving everything else.
+    return (
+      existingContent.slice(0, startIdx) +
+      governanceSection +
+      existingContent.slice(endIdx + GOVERNANCE_SECTION_END.length)
+    );
+  }
+
+  // No existing section — append at the end without touching existing content.
+  return `${existingContent.trimEnd()}\n\n${governanceSection}\n`;
+}
+
 /**
  * pushFilesToGithub
  *
@@ -97,9 +126,9 @@ Deno.serve(async (req) => {
           error: `File "${f.path}" has empty content — only explicit content may be pushed`,
         }, { status: 400 });
       }
-      if (!['starter-kit', 'manifest'].includes(f.source)) {
+      if (!['starter-kit', 'manifest', 'readme'].includes(f.source)) {
         return Response.json({
-          error: `File "${f.path}" has an unrecognised source "${f.source}" — must be "starter-kit" or "manifest"`,
+          error: `File "${f.path}" has an unrecognised source "${f.source}" — must be "starter-kit", "manifest", or "readme"`,
         }, { status: 400 });
       }
     }
@@ -203,8 +232,10 @@ Deno.serve(async (req) => {
     for (const file of files) {
       const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`;
 
-      // Check if file already exists on the target branch (need its SHA for update)
+      // Check if file already exists on the target branch (need its SHA for update).
+      // For 'readme' source type we also capture the existing content for merging.
       let existingSha: string | undefined;
+      let existingContentB64: string | undefined;
       try {
         const existRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}`, {
           method: 'GET',
@@ -213,17 +244,37 @@ Deno.serve(async (req) => {
         if (existRes.ok) {
           const existData = await existRes.json();
           existingSha = existData.sha;
+          if (file.source === 'readme') {
+            existingContentB64 = existData.content; // base64-encoded, may contain newlines
+          }
         }
         // 404 = file does not exist yet on this branch, that's fine
       } catch {
         // Network error reading existing file — proceed without SHA (will fail on update)
       }
 
+      // Determine final text content to push.
+      // For 'readme' source: file.content is the governance section (with START/END markers).
+      // Merge it into the existing README (server-side, authenticated), or generate a template.
+      let finalContent: string;
+      if (file.source === 'readme') {
+        if (existingContentB64) {
+          // Decode existing README and merge governance section into it.
+          const existingText = atob(existingContentB64.replace(/\n/g, ''));
+          finalContent = mergeGovernanceSectionIntoReadme(existingText, file.content);
+        } else {
+          // No existing README — generate a minimal template.
+          finalContent = `# ${repo}\n\n> Repository: \`${owner}/${repo}\`\n\n## Overview\n\n<!-- Add your project description here -->\n\n${file.content}\n`;
+        }
+      } else {
+        finalContent = file.content;
+      }
+
       // Encode content as base64 using a chunk-safe approach.
       // 0x8000 (32 768) bytes per chunk avoids call-stack overflow in
       // String.fromCharCode spread for large governance files.
       const encoder = new TextEncoder();
-      const bytes = encoder.encode(file.content);
+      const bytes = encoder.encode(finalContent);
       let binary = '';
       const chunkSize = 0x8000;
       for (let i = 0; i < bytes.length; i += chunkSize) {
