@@ -384,9 +384,9 @@ export default function GovernanceStarterKitPanel() {
             <Package className="w-4 h-4 text-emerald-600" />
             Governance Starter Kit
           </h2>
-          <p className="text-xs text-slate-500">Manifest-drevet — filer hentes fra STARTER_KIT_MANIFEST.json</p>
+          <p className="text-xs text-slate-500">Manifest-drevet — velg repo og kopier install-prompt. Ingen prosjekt-bootstrap kreves.</p>
         </div>
-        <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Generering kun</Badge>
+        <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Direkte installasjon</Badge>
       </div>
 
       {/* Manifest status */}
@@ -623,34 +623,29 @@ export default function GovernanceStarterKitPanel() {
             </Card>
           )}
 
-          {/* ── Install prompt — gated by readiness ── */}
+          {/* ── Install prompt — always available; readiness is advisory only ── */}
           {(() => {
             const isSafe = installReadiness === "safe_to_install";
-            const isIdle = installReadiness === "idle" || installReadiness === "checking";
-            const isBlocked = !isSafe && !isIdle;
+            const isChecked = installReadiness !== "idle" && installReadiness !== "checking" && installReadiness !== "repo_not_connected";
 
-            // Per-state warning copy
-            const warnings = {
-              existing_governance_detected: "Eksisterende governance oppdaget — ikke installer blindt. Gjør en audit/merge-vurdering først.",
-              partial_governance_detected:  "Delvis governance oppdaget — audit/merge kreves før installasjon.",
-              verification_failed:          "Verifisering feilet — bekreft repo-tilgang før installasjon.",
-              repo_not_connected:           "Velg et aktivt repo og kjør readiness-sjekk før du installerer.",
+            // Per-state advisory copy (shown as info, not blocking)
+            const advisories = {
+              existing_governance_detected: "Eksisterende governance oppdaget — vurder audit/merge før du overskriver.",
+              partial_governance_detected:  "Delvis governance oppdaget — se over hvilke filer som allerede finnes.",
+              verification_failed:          "Verifisering feilet — bekreft repo-tilgang om mulig.",
             };
-            const warningText = warnings[installReadiness];
+            const advisoryText = advisories[installReadiness];
 
             return (
-              <Card className={`${isBlocked ? "border-amber-300 bg-amber-50" : isSafe ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50"}`}>
+              <Card className={`${isSafe ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white"}`}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <CardTitle className={`text-sm flex items-center gap-1.5 ${isBlocked ? "text-amber-800" : isSafe ? "text-emerald-800" : "text-slate-600"}`}>
-                      {isBlocked
-                        ? <XCircle className="w-4 h-4 text-amber-600" />
-                        : <Download className="w-4 h-4" />
-                      }
+                    <CardTitle className={`text-sm flex items-center gap-1.5 ${isSafe ? "text-emerald-800" : "text-slate-700"}`}>
+                      <Download className="w-4 h-4" />
                       Kopier install-prompt
                     </CardTitle>
                     <CopyBtn
-                      value={isSafe ? installPrompt : null}
+                      value={installPrompt}
                       label="Kopier install-prompt"
                     />
                   </div>
@@ -659,15 +654,15 @@ export default function GovernanceStarterKitPanel() {
                       Starter kit er klar for installasjon i <span className="font-mono font-medium">{activeRepo.owner}/{activeRepo.repo}</span>.
                     </p>
                   )}
-                  {isIdle && (
+                  {!isChecked && (
                     <p className="text-xs text-slate-500 mt-1">
-                      Kjør readiness-sjekken ovenfor for å aktivere denne handlingen.
+                      Install-prompten er klar. Kjør readiness-sjekken ovenfor for å se status — dette er veiledende, ikke et krav.
                     </p>
                   )}
-                  {isBlocked && warningText && (
-                    <p className="text-xs text-amber-800 mt-1 flex items-start gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-600" />
-                      {warningText}
+                  {isChecked && advisoryText && (
+                    <p className="text-xs text-amber-700 mt-1 flex items-start gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-500" />
+                      <span><span className="font-medium">Merknad:</span> {advisoryText}</span>
                     </p>
                   )}
                 </CardHeader>
