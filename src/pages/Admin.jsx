@@ -13,6 +13,7 @@ import ProductIntelligencePanel from "@/components/admin/ProductIntelligencePane
 import StartPromptGeneratorPanel from "@/components/admin/StartPromptGeneratorPanel";
 import GovernanceStarterKitPanel from "@/components/admin/GovernanceStarterKitPanel";
 import ProjectBootstrapPanel from "@/components/admin/ProjectBootstrapPanel";
+import GitHubRepoDiscoveryPanel from "@/components/admin/GitHubRepoDiscoveryPanel";
 import { useActiveRepo } from "@/components/ActiveRepoContext";
 import BuildIntegrityBanner from "@/components/admin/BuildIntegrityBanner";
 import PromptApprovalGate from "@/components/admin/PromptApprovalGate";
@@ -250,7 +251,10 @@ export default function Admin() {
               </div>
             </div>
 
-            <RepositoryManagerPanel />
+            <GitHubRepoDiscoveryPanel />
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+              <RepositoryManagerPanel />
+            </div>
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
               <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Neste steg etter repo-oppsett: bootstrap eller koble prosjekt</p>
               <ProjectBootstrapPanel />
