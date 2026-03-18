@@ -236,11 +236,15 @@ export default function Admin() {
                   <span className="ml-1 text-slate-400 dark:text-slate-500">· Bruk GitHub Repository Discovery og Repository Manager</span>
                 </div>
                 {/* Step 3: install starter kit */}
-                <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-start gap-2 text-xs">
                   <span className={`text-slate-400 dark:text-slate-500 font-medium shrink-0 w-4`}>3.</span>
-                  <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Installer governance starter kit</span>
-                  <span className={`ml-1 ${activeRepo ? "text-slate-400 dark:text-slate-500" : "text-amber-600 dark:text-amber-400"}`}>
-                    {activeRepo ? "· Tilgjengelig nedenfor" : "· Velg aktivt repo i toppmenyen først"}
+                  <span>
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">Installer governance starter kit</span>
+                    <span className={`ml-1 ${activeRepo ? "text-slate-400 dark:text-slate-500" : "text-amber-600 dark:text-amber-400"}`}>
+                      {activeRepo
+                        ? "· Draft manifest → Payload-forhåndsvisning → Installer til GitHub"
+                        : "· Velg aktivt repo i toppmenyen først"}
+                    </span>
                   </span>
                 </div>
                 {/* Step 4: ready */}
@@ -258,14 +262,14 @@ export default function Admin() {
               <RepositoryManagerPanel />
             </div>
 
-            {/* Step 3: Install governance starter kit */}
+            {/* Step 3: Install governance starter kit — Draft manifest → Payload preview → Install to GitHub */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
               <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Steg 3 · Installer governance starter kit</p>
               <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-                Installer governance starter kit direkte fra aktivt repo — ingen prosjekt-bootstrap, audit eller planoppretting kreves.
-                Bootstrap-konfigurasjon genereres automatisk med standardverdier.
+                Velg aktivt repo, generer draft-manifest, se payload-forhåndsvisning og installer direkte til GitHub.
+                Flyt: <span className="font-medium text-slate-600 dark:text-slate-300">Draft manifest → Payload-forhåndsvisning → Installer til GitHub</span>
               </p>
-              <GovernanceStarterKitPanel />
+              <RepoRawAccessPanel />
             </div>
 
             {/* Advanced tools — collapsed by default */}
@@ -278,17 +282,19 @@ export default function Admin() {
               >
                 <span className={`inline-block transition-transform duration-150 ${advancedOpen ? "rotate-90" : ""}`}>▶</span>
                 Avanserte verktøy
-                <span className="ml-1 text-slate-400 dark:text-slate-500 font-normal">· prosjekt-bootstrap, rå filtilgang, verifikasjon</span>
+                <span className="ml-1 text-slate-400 dark:text-slate-500 font-normal">· install-prompt, prosjekt-bootstrap, verifikasjon</span>
               </button>
               {advancedOpen && (
                 <div className="space-y-4 mt-4">
                   <div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Kopier install-prompt (alternativ flyt)</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Generer og kopier en installasjonsprompt for manuell bruk — alternativ til direkteinstallasjon ovenfor.</p>
+                    <GovernanceStarterKitPanel />
+                  </div>
+                  <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                     <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Prosjekt-bootstrap</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Opprett eller koble eksisterende prosjekt for avansert governance-flyt (valgfritt).</p>
                     <ProjectBootstrapPanel />
-                  </div>
-                  <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                    <RepoRawAccessPanel />
                   </div>
                   <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                     <RepoVerificationPanel />

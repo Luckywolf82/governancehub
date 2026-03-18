@@ -313,6 +313,7 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, repositories: normalized });
 
   } catch (error) {
-    return Response.json({ error: (error as Error).message }, { status: 500 });
+    const msg = (error instanceof Error ? error.message : String(error)) || 'Internal server error';
+    return Response.json({ error: msg }, { status: 500 });
   }
 });
