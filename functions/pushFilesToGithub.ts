@@ -161,24 +161,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'contents:write capability not enabled for this repository' }, { status: 403 });
     }
 
-    // Check GitHub-tier write permission (only when explicitly stored at registration time)
-    if (repository.githubCanWrite === false) {
-      await base44.asServiceRole.entities.RepoActionLog.create({
-        repositoryFullName: repoKey,
-        repositoryId: repository.id,
-        actorUserId: user.id,
-        actionType: 'github.contents.push',
-        status: 'failure',
-        requestJson: { owner, repo, branch, fileCount: files.length },
-        responseJson: { reason: 'github_write_denied' },
-        githubUrl: null,
-        errorMessage: 'GitHub App does not have push permission for this repository',
-      });
-      return Response.json({
-        error: 'github_write_denied',
-        message: 'The GitHub App does not have push permission for this repository',
-      }, { status: 403 });
-    }
+    // Note: githubCanWrite is a registration-time snapshot and may be stale.
+    // It is treated as a hint only — the actual GitHub API write result is the
+    // final authority.  A stale false value must not block a valid push attempt.
 
     // Resolve access token:
     //   1. If repository has a stored installationId → use GitHub App installation token
