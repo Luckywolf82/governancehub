@@ -242,11 +242,11 @@ export default function Admin() {
                   <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Prosjekt-bootstrap</span>
                   <span className="ml-1 text-slate-400 dark:text-slate-500">Tilgjengelig nedenfor i Setup</span>
                 </div>
-                {/* Row 4: governance installation — informational */}
+                {/* Row 4: governance installation — now directly available */}
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600" />
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${activeRepo ? "bg-emerald-400" : "bg-slate-300 dark:bg-slate-600"}`} />
                   <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">Governance-installasjon</span>
-                  <span className="ml-1 text-slate-400 dark:text-slate-500">Fortsetter i Build Prep</span>
+                  <span className="ml-1 text-slate-400 dark:text-slate-500">Direkte installasjon tilgjengelig nedenfor — ingen bootstrap kreves</span>
                 </div>
               </div>
             </div>
@@ -256,7 +256,16 @@ export default function Admin() {
               <RepositoryManagerPanel />
             </div>
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Neste steg etter repo-oppsett: bootstrap eller koble prosjekt</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Direkte Starter Kit-installasjon</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
+                Installer governance starter kit direkte fra aktivt repo — ingen prosjekt-bootstrap, audit eller planoppretting kreves.
+                Bootstrap-konfigurasjon genereres automatisk med standardverdier.
+              </p>
+              <GovernanceStarterKitPanel />
+            </div>
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1 font-semibold uppercase tracking-wide">Avansert: Prosjekt-bootstrap</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">Opprett eller koble eksisterende prosjekt for avansert governance-flyt (valgfritt).</p>
               <ProjectBootstrapPanel />
             </div>
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
