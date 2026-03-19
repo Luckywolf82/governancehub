@@ -47,31 +47,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
 
-    // Resolve access token:
-    //   1. If repository has a stored installationId → use GitHub App installation token
-    //   2. Else → fall back to legacy connector (for pre-App registrations)
-    let accessToken: string;
-    if (repository.githubInstallationId) {
-      try {
-        accessToken = await getInstallationAccessToken(repository.githubInstallationId);
-      } catch (appErr) {
-        return Response.json({
-          error: 'github_not_connected',
-          message: `Failed to get GitHub App installation token: ${(appErr as Error).message}`,
-        }, { status: 503 });
-      }
-    } else {
-      try {
-        const conn = await base44.asServiceRole.connectors.getConnection('github');
-        accessToken = conn.accessToken;
-      } catch {
-        return Response.json({
-          error: 'github_not_connected',
-          message: 'Repository has no installation ID and the GitHub connector is not authorized.',
-        }, { status: 503 });
-      }
-    }
-
     // Parse payload
     let payload;
     try {
@@ -118,6 +93,31 @@ Deno.serve(async (req) => {
     }
 
     const repository = registeredRepos[0];
+
+    // Resolve access token:
+    //   1. If repository has a stored installationId -> use GitHub App installation token
+    //   2. Else -> fall back to legacy connector (for pre-App registrations)
+    let accessToken: string;
+    if (repository.githubInstallationId) {
+      try {
+        accessToken = await getInstallationAccessToken(repository.githubInstallationId);
+      } catch (appErr) {
+        return Response.json({
+          error: 'github_not_connected',
+          message: `Failed to get GitHub App installation token: ${(appErr as Error).message}`,
+        }, { status: 503 });
+      }
+    } else {
+      try {
+        const conn = await base44.asServiceRole.connectors.getConnection('github');
+        accessToken = conn.accessToken;
+      } catch {
+        return Response.json({
+          error: 'github_not_connected',
+          message: 'Repository has no installation ID and the GitHub connector is not authorized.',
+        }, { status: 503 });
+      }
+    }
 
     // Check if repo is enabled
     if (!repository.isEnabled) {
