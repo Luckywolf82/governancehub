@@ -95,8 +95,8 @@ Deno.serve(async (req) => {
     const repository = registeredRepos[0];
 
     // Resolve access token:
-    //   1. If repository has a stored installationId → use GitHub App installation token
-    //   2. Else → fall back to legacy connector (for pre-App registrations)
+    //   1. If repository has a stored installationId -> use GitHub App installation token
+    //   2. Else -> fall back to legacy connector (for pre-App registrations)
     let accessToken: string;
     if (repository.githubInstallationId) {
       try {
