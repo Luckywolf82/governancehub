@@ -22,6 +22,7 @@ Deno.serve(async (req) => {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return Response.json({ error: (err as Error).message }, { status: 500 });
+    const msg = (err instanceof Error ? err.message : String(err)) || 'Internal server error';
+    return Response.json({ error: msg }, { status: 500 });
   }
 });
