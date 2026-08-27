@@ -1,0 +1,82 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Project display name"
+    },
+    "projectSlug": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "URL-safe slug derived from project name"
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Short description of the project"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "active",
+        "in-progress",
+        "blocked",
+        "archived"
+      ],
+      "default": "planned",
+      "description": "Current project status"
+    },
+    "phase": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Current project phase label (e.g. Bootstrap, Phase 1)"
+    },
+    "owner": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Owner team or individual"
+    },
+    "repoFullName": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Linked repository full name (owner/repo)"
+    },
+    "buildIntent": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "new-app",
+        "existing",
+        "new-capability",
+        "scaffold",
+        "governance",
+        null
+      ],
+      "description": "Build intent used during bootstrap"
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Admin notes or project goal description"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

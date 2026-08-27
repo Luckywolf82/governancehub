@@ -1,0 +1,77 @@
+{
+  "name": "RepoActionLog",
+  "type": "object",
+  "properties": {
+    "repositoryFullName": {
+      "type": "string",
+      "description": "Full repository name (owner/repo)"
+    },
+    "repositoryId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "ID of Repository entity record, if registered"
+    },
+    "actorUserId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "User ID of the admin who initiated the action"
+    },
+    "actionType": {
+      "type": "string",
+      "enum": [
+        "github.repos.list",
+        "repository.register",
+        "github.issue.create",
+        "github.repo.create",
+        "github.contents.read"
+      ],
+      "description": "Type of action performed"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failure",
+        "error"
+      ],
+      "description": "Action outcome status"
+    },
+    "requestJson": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Request payload (sensitive fields redacted)"
+    },
+    "responseJson": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Response data or error details"
+    },
+    "githubUrl": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "URL to related GitHub resource if applicable"
+    },
+    "errorMessage": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Error message if action failed"
+    }
+  },
+  "required": [
+    "repositoryFullName",
+    "actionType",
+    "status"
+  ]
+}

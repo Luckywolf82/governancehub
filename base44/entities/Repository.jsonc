@@ -1,0 +1,93 @@
+{
+  "name": "Repository",
+  "type": "object",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "default": "github",
+      "description": "Git provider (e.g., 'github')"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Repository owner (user or org)"
+    },
+    "repo": {
+      "type": "string",
+      "description": "Repository name"
+    },
+    "fullName": {
+      "type": "string",
+      "description": "Full repository name (owner/repo)"
+    },
+    "visibility": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "public",
+        "private",
+        null
+      ],
+      "description": "Repository visibility status"
+    },
+    "defaultBranch": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Default branch (e.g., 'main')"
+    },
+    "isEnabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this repo is enabled for governance actions"
+    },
+    "isArchived": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether repository is archived on GitHub"
+    },
+    "capabilitiesJson": {
+      "type": "object",
+      "description": "JSON object defining available capabilities",
+      "properties": {
+        "contents:read": {
+          "type": "boolean"
+        },
+        "issue:create": {
+          "type": "boolean"
+        },
+        "repo:create": {
+          "type": "boolean"
+        },
+        "dispatch:audit": {
+          "type": "boolean"
+        }
+      }
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Admin notes about this repository"
+    },
+    "lastVerifiedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Last time repository metadata was verified against GitHub"
+    }
+  },
+  "required": [
+    "provider",
+    "owner",
+    "repo",
+    "fullName",
+    "isEnabled",
+    "capabilitiesJson"
+  ]
+}
